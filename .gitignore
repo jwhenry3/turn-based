@@ -7,6 +7,9 @@
 
 # dependencies
 /node_modules
+/.next
+/.vscode
+packages/frontend/.next
 
 # IDEs and editors
 /.idea
