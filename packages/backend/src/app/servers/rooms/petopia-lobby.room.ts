@@ -1,4 +1,4 @@
-import { Client, LobbyRoom } from 'colyseus'
+import { Client, LobbyRoom, Room } from 'colyseus'
 import {
   ArraySchema,
   filterChildren,
@@ -38,17 +38,15 @@ class LobbyState extends Schema {
   accounts = new MapSchema<Account>()
 }
 
-export class PetopiaLobbyRoom extends LobbyRoom {
+export class PetopiaLobbyRoom extends Room {
   // Life Cycle
   async onCreate(options: any): Promise<void> {
-    await super.onCreate(options)
     this.onMessage('account:login', (client, message) => {
       const acc = new Account()
       acc.accountId = 1
       // client id === room.sessionId
       acc.currentClientId = client.id
       this.state.accounts.set(client.id, acc)
-      // client.send('account:login:success')
     })
 
     this.onMessage('account:register', (client, message) => {
@@ -67,7 +65,7 @@ export class PetopiaLobbyRoom extends LobbyRoom {
         character.id = 1
         character.name = 'test'
         character.level = 1
-        character.map = 'maps_starter'
+        character.map = 'starter'
         account.characterList = new ArraySchema<Character>(character)
       }
     })
@@ -85,11 +83,7 @@ export class PetopiaLobbyRoom extends LobbyRoom {
     this.setState(new LobbyState())
   }
 
-  onJoin(client: Client, options: LobbyOptions): void {
-    super.onJoin(client, options)
-  }
+  onJoin(client: Client, options: LobbyOptions): void {}
 
-  onLeave(client: Client): void {
-    super.onLeave(client)
-  }
+  onLeave(client: Client): void {}
 }

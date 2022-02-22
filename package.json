@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "backend:dev:lobby": "MICROSERVICE_MODULE=lobby nx serve backend",
-    "backend:dev:map_starter": "MICROSERVICE_MODULE=map_starter nx serve backend",
+    "backend:dev:home": "MICROSERVICE_MODULE=home-region nx serve backend",
     "frontend:dev": "next dev packages/frontend"
   },
   "private": true,

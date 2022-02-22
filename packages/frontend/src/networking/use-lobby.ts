@@ -37,6 +37,9 @@ export function useLobby() {
         if (typeof timeout !== 'undefined') {
           clearTimeout(timeout)
         }
+        if (typeof lobby.current !== 'undefined') {
+          lobby.current.connection.close()
+        }
       }
     }
   }, [attempts])

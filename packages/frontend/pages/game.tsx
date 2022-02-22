@@ -1,5 +1,5 @@
-import Lobby from '../src/ui/lobby/Lobby'
+import { Petopia } from '../src/ui/Petopia'
 
 export default function Game() {
-  return <Lobby />
+  return <Petopia />
 }
