@@ -1,35 +1,32 @@
 import { Client, Room } from 'colyseus.js'
 import { useEffect, useRef, useState } from 'react'
-import { useLobbyState } from './state/use-lobby-state'
 
-export function useLobby() {
-  const lobby = useRef<Room | undefined>()
+export function useMap(name: string, port: number) {
+  const map = useRef<Room | undefined>()
   const [attempts, setAttempts] = useState<number>(0)
-  const lobbyState = useLobbyState()
 
   useEffect(() => {
-    if (!lobby.current) {
+    if (!map.current) {
       let timeout
       ;(async () => {
         try {
-          const client = new Client('ws://localhost:9200')
-          console.log('Connecting to Lobby... attempt:', attempts + 1)
+          const client = new Client('ws://localhost:' + port)
+          console.log('Connecting to Map... attempt:', attempts + 1)
           let room = await client.joinOrCreate('lobby')
-          lobby.current = room
+          map.current = room
           console.log('Connected!')
           room.onStateChange(async (state: any) => {
-            const account = state.accounts.get(room.sessionId)
-            lobbyState.update(account)
+            console.log('state', state)
           })
           room.onLeave(async (code) => {
             console.log('Disconnected', code)
             if (code === 1000) {
-              lobby.current = undefined
+              map.current = undefined
               timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
             }
           })
         } catch (e) {
-          lobby.current = undefined
+          map.current = undefined
           timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
         }
       })()
@@ -40,5 +37,5 @@ export function useLobby() {
       }
     }
   }, [attempts])
-  return lobby
+  return map
 }

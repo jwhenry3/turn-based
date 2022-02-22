@@ -4,19 +4,17 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common'
 import { Server } from 'colyseus'
-import { PetopiaLobbyRoom } from './rooms/petopia-lobby.room'
-import { PetopiaMapRoom } from './rooms/petopia-map.room'
+import { PetopiaMapRoom } from '../../app/servers/rooms/petopia-map.room'
 
 @Controller()
-export class ServerController
+export class MapStarterController
   implements OnApplicationShutdown, OnApplicationBootstrap
 {
   constructor(protected server: Server) {}
 
   onApplicationBootstrap() {
-    this.server.define('lobby', PetopiaLobbyRoom)
-    this.server.define('maps_starter', PetopiaMapRoom)
-    this.server.listen(9200)
+    this.server.define('map_starter', PetopiaMapRoom)
+    this.server.listen(9201)
     // throw new Error('Method not implemented.')
   }
 

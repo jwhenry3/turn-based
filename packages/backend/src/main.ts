@@ -3,22 +3,26 @@
  * This is only a minimal backend to get started.
  */
 
-import * as NestCommon from '@nestjs/common'
-import * as NestCore from '@nestjs/core'
-import NestFactory = NestCore.NestFactory
-import Logger = NestCommon.Logger
+import { Logger } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core'
+import { Transport, MicroserviceOptions } from '@nestjs/microservices'
 
-import { AppModule } from './app/app.module'
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
-  const globalPrefix = 'api'
-  app.setGlobalPrefix(globalPrefix)
-  const port = process.env.PORT || 3333
-  await app.listen(port)
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+async function bootstrap(module: string, port: number) {
+  const _module = (await import('./services/' + module + '.module')).default as Function
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    _module,
+    {
+      transport: Transport.TCP,
+      options: {
+        port,
+      },
+    }
   )
+  app.listen()
+  Logger.log(`🚀 "${module}" Microservice running`)
 }
 
-bootstrap()
+const module = process.env.MICROSERVICE_MODULE || 'lobby'
+const port = Number(process.env.MICROSERVICE_PORT || '3000')
+
+bootstrap(module, port)

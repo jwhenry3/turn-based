@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common'
-import { LobbyRoom, Server } from 'colyseus'
-import { DataModule } from '../data/data.module'
-import { ServerController } from './server.controller'
+import { Server } from 'colyseus'
+import { DataModule } from '../app/data/data.module'
 
 @Module({
   imports: [DataModule],
-  controllers: [ServerController],
+  controllers: [],
   providers: [
     {
       provide: Server,

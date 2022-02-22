@@ -3,7 +3,7 @@ import Module = Nest.Module
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { ServerModule } from './servers/server.module'
+import { ServerModule } from '../services/server.module'
 import { DataModule } from './data/data.module'
 
 @Module({

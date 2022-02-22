@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "backend:dev": "nx serve backend",
+    "backend:dev:lobby": "MICROSERVICE_MODULE=lobby nx serve backend",
+    "backend:dev:map_starter": "MICROSERVICE_MODULE=map_starter nx serve backend",
     "frontend:dev": "next dev packages/frontend"
   },
   "private": true,
@@ -20,6 +21,7 @@
     "@geckos.io/server": "^2.1.8",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/microservices": "^8.3.1",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/sequelize": "^8.0.0",
     "@nestjs/typeorm": "^8.0.3",

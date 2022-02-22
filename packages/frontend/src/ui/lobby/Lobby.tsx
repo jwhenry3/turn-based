@@ -25,7 +25,7 @@ export default function Lobby() {
       {(state.account && <Button onClick={onLogout}>Logout</Button>) || (
         <Button onClick={onLogin}>Log In</Button>
       )}
-      {!state.account?.character && (
+      {state.account && !state.account?.character && (
         <>
           {state.account.characterList.length === 0 && (
             <>
