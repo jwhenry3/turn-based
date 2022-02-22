@@ -1,57 +1,16 @@
 import { useEffect } from 'react'
 import styled from 'styled-components'
-import { Client } from 'colyseus.js'
+import { Client, Room } from 'colyseus.js'
+import { useClient } from '../src/networking/use-client'
+import { useLobby } from '../src/networking/use-lobby'
 
 const StyledPage = styled.div`
   .page {
   }
 `
-async function reconnectToServer(roomName: string, sessionId: string) {
-  try {
-    const client = new Client('ws://localhost:9200')
-    try {
-      let room = await client.reconnect(roomName, sessionId)
-      console.log('Reconnected!')
-      room.onStateChange((state) => {
-        console.log(state)
-      })
-      room.onLeave(async (code) => {
-        console.log('Disconnected', code)
-      })
-    } catch (e) {
-      console.log('Could not connect', e)
-      connectToServer()
-    }
-  } catch (e) {
-    setTimeout(() => reconnectToServer(roomName, sessionId), 5000)
-    return
-  }
-}
-async function connectToServer() {
-  try {
-    const client = new Client('ws://localhost:9200')
-    let room = await client.joinOrCreate('mainScene')
-    console.log('Connected!')
-    room.onStateChange((state) => {
-      console.log(state)
-    })
-    room.onLeave(async (code) => {
-      console.log('Disconnected', code)
-      if (code === 1000) {
-        setTimeout(() => reconnectToServer('mainScene', room.sessionId), 5000)
-      }
-    })
-  } catch (e) {
-    console.log('Could not connect', e)
-    setTimeout(connectToServer, 5000)
-  }
-}
-
 export function Index() {
   if (typeof window !== 'undefined') {
-    useEffect(() => {
-      connectToServer()
-    })
+    const client = useLobby()
   }
   /*
    * Replace the elements below with your own.
