@@ -1,7 +1,4 @@
-import { useEffect } from 'react'
 import styled from 'styled-components'
-import { Client, Room } from 'colyseus.js'
-import { useClient } from '../src/networking/use-client'
 import { useLobby } from '../src/networking/use-lobby'
 
 const StyledPage = styled.div`
@@ -9,9 +6,6 @@ const StyledPage = styled.div`
   }
 `
 export function Index() {
-  if (typeof window !== 'undefined') {
-    const client = useLobby()
-  }
   /*
    * Replace the elements below with your own.
    *

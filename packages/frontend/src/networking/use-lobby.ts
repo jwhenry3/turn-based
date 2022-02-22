@@ -15,22 +15,12 @@ export function useLobby() {
       ;(async () => {
         try {
           console.log('Connecting to Lobby... attempt:', attempts + 1)
-          const join = (name: string) => client.current.joinOrCreate(name)
-          let room = await join('lobby')
+          let room = await client.current.joinOrCreate('lobby')
           lobby.current = room
           console.log('Connected!')
-          room.onMessage('rooms', (data) => {
-            console.log(data)
-          })
-          room.send('account:login', { username: '', password: '' })
           room.onStateChange(async (state: any) => {
-            console.log('State', state.toJSON())
             const account = state.accounts.get(room.sessionId)
-            const previousAccount = lobbyState.account
             lobbyState.update(account)
-            if (account && !previousAccount) {
-              console.log('Logged in!', account)
-            }
           })
           room.onLeave(async (code) => {
             console.log('Disconnected', code)
@@ -51,4 +41,5 @@ export function useLobby() {
       }
     }
   }, [client.current, attempts])
+  return lobby
 }
