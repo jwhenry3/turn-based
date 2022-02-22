@@ -1,14 +1,16 @@
 import { Room } from 'colyseus.js'
 import { useEffect, useRef, useState } from 'react'
+import { useLobbyState } from './state/use-lobby-state'
 import { useClient } from './use-client'
 
 export function useLobby() {
   const client = useClient()
   const lobby = useRef<Room | undefined>()
   const [attempts, setAttempts] = useState<number>(0)
+  const lobbyState = useLobbyState()
 
   useEffect(() => {
-    if (client.current) {
+    if (client.current && !lobby.current) {
       let timeout
       ;(async () => {
         try {
@@ -16,40 +18,29 @@ export function useLobby() {
           const join = (name: string) => client.current.joinOrCreate(name)
           let room = await join('lobby')
           lobby.current = room
-          let currentMap: Room
-          let characters = []
           console.log('Connected!')
           room.onMessage('rooms', (data) => {
             console.log(data)
           })
           room.send('account:login', { username: '', password: '' })
-          room.onMessage('account:login:success', () => {
-            room.send('characters:list')
-          })
-          room.onMessage('characters:list:data', (data) => {
-            characters = data
-            room.send('characters:select', { id: data[0].id })
-          })
           room.onStateChange(async (state: any) => {
+            console.log('State', state.toJSON())
             const account = state.accounts.get(room.sessionId)
-            if (account) {
+            const previousAccount = lobbyState.account
+            lobbyState.update(account)
+            if (account && !previousAccount) {
               console.log('Logged in!', account)
-              if (account.character) {
-                console.log('Character Chosen!', account.character.toJSON())
-                if (!currentMap) {
-                  currentMap = await join(account.character.map)
-                  console.log('Joined Map as ' + account.character.name)
-                }
-              }
             }
           })
           room.onLeave(async (code) => {
             console.log('Disconnected', code)
             if (code === 1000) {
+              lobby.current = undefined
               timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
             }
           })
         } catch (e) {
+          lobby.current = undefined
           timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
         }
       })()

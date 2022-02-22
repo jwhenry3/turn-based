@@ -41,7 +41,8 @@
     "sqlite3": "^5.0.2",
     "styled-components": "5.3.3",
     "tslib": "^2.0.0",
-    "typeorm": "^0.2.43"
+    "typeorm": "^0.2.43",
+    "zustand": "^3.7.0"
   },
   "devDependencies": {
     "@nestjs/schematics": "^8.0.0",

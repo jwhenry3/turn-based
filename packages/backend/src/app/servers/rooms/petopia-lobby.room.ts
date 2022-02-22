@@ -1,5 +1,11 @@
 import { Client, LobbyRoom } from 'colyseus'
-import { filterChildren, MapSchema, Schema, type } from '@colyseus/schema'
+import {
+  ArraySchema,
+  filterChildren,
+  MapSchema,
+  Schema,
+  type,
+} from '@colyseus/schema'
 import { LobbyOptions } from '@colyseus/core/build/rooms/LobbyRoom'
 
 class Character extends Schema {
@@ -10,7 +16,7 @@ class Character extends Schema {
   @type('number')
   level: number
   @type('string')
-  map:string
+  map: string
 }
 
 class Account extends Schema {
@@ -20,6 +26,8 @@ class Account extends Schema {
   currentClientId: string
   @type(Character)
   character: Character
+  @type({ array: Character })
+  characterList: ArraySchema<Character> = new ArraySchema<Character>()
 }
 
 class LobbyState extends Schema {
@@ -40,27 +48,38 @@ export class PetopiaLobbyRoom extends LobbyRoom {
       // client id === room.sessionId
       acc.currentClientId = client.id
       this.state.accounts.set(client.id, acc)
-      client.send('account:login:success')
+      // client.send('account:login:success')
     })
 
     this.onMessage('account:register', (client, message) => {
-      client.send('account:register:success', { id: 1 })
+      const acc = new Account()
+      acc.accountId = 1
+      // client id === room.sessionId
+      acc.currentClientId = client.id
+      this.state.accounts.set(client.id, acc)
     })
 
     this.onMessage('characters:list', (client, message) => {
-      client.send('characters:list:data', [{ id: 1 }])
+      const account = this.state.accounts.get(client.id) as Account
+      if (account) {
+        account.character = undefined
+        const character = new Character()
+        character.id = 1
+        character.name = 'test'
+        character.level = 1
+        character.map = 'maps_starter'
+        account.characterList = new ArraySchema<Character>(character)
+      }
     })
 
     this.onMessage('characters:select', (client, message) => {
-      const character = new Character()
-      character.id = 1
-      character.name = 'test'
-      character.level = 1
-      character.map = 'maps_starter'
       const account = this.state.accounts.get(client.id) as Account
-      account.character = character
-      // account.triggerAll()
-      client.send('characters:select:success')
+      if (account) {
+        const character = account.characterList.find(
+          (character) => character.id === message.id
+        )
+        account.character = character
+      }
     })
 
     this.setState(new LobbyState())
