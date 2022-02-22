@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "lobby": "node --loader ts-node/esm packages/core/src/lib/lobby",
+    "backend:dev": "nx serve backend",
     "frontend:dev": "next dev packages/frontend"
   },
   "private": true,
