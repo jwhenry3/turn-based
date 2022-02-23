@@ -7,28 +7,7 @@ import {
   type,
 } from '@colyseus/schema'
 import { LobbyOptions } from '@colyseus/core/build/rooms/LobbyRoom'
-
-class Character extends Schema {
-  @type('number')
-  id: number
-  @type('string')
-  name: string
-  @type('number')
-  level: number
-  @type('string')
-  map: string
-}
-
-class Account extends Schema {
-  @type('number')
-  accountId: number
-  @type('string')
-  currentClientId: string
-  @type(Character)
-  character: Character
-  @type({ array: Character })
-  characterList: ArraySchema<Character> = new ArraySchema<Character>()
-}
+import { Account } from '../schemas'
 
 class LobbyState extends Schema {
   @filterChildren((client, key, value: Account, root) => {

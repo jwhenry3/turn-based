@@ -4,7 +4,7 @@ import { mapRegions, regionServers } from './maps'
 import { useRegion } from './use-region'
 
 export function useMap(name: string) {
-  const region = useRegion(mapRegions[name])
+  const { region, rooms } = useRegion(mapRegions[name], name)
   const map = useRef<Room | undefined>()
   const [attempts, setAttempts] = useState<number>(0)
 
@@ -18,6 +18,9 @@ export function useMap(name: string) {
           let room = await client.joinOrCreate(name)
           map.current = room
           console.log('Connected!')
+          room.onMessage('scene:created', () => {
+            console.log('Scene Created')
+          })
           room.onStateChange(async (state: any) => {
             console.log('state', state)
           })
@@ -45,5 +48,5 @@ export function useMap(name: string) {
   }, [region.current, attempts])
 
   // todo: expose high-level api for interacting with the server (move, chat, etc)
-  return map
+  return { region, map, rooms }
 }

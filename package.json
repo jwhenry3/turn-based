@@ -48,6 +48,7 @@
     "styled-components": "5.3.3",
     "tslib": "^2.0.0",
     "typeorm": "^0.2.43",
+    "uuid": "^8.3.2",
     "zustand": "^3.7.0"
   },
   "devDependencies": {

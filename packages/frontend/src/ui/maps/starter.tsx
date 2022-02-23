@@ -1,6 +1,14 @@
+import { useEffect } from 'react'
+import { useRoomsState } from '../../networking/state/use-rooms-state'
 import { useMap } from '../../networking/use-map'
 
 export default function Starter() {
-  const map = useMap('starter')
+  const { region, map, rooms } = useMap('starter')
+  const roomsState = useRoomsState()
+
+  useEffect(() => {
+    console.log(rooms)
+  }, [rooms])
+
   return <div>Starter Map</div>
 }
