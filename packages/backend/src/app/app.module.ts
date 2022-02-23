@@ -7,7 +7,7 @@ import { ServerModule } from '../services/server.module'
 import { DataModule } from './data/data.module'
 
 @Module({
-  imports: [ServerModule, DataModule.forRoot()],
+  imports: [ServerModule, DataModule.forRoot([])],
   controllers: [AppController],
   providers: [AppService],
 })

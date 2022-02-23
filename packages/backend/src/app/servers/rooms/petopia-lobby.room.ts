@@ -25,16 +25,10 @@ class LobbyState extends Schema {
 export class PetopiaLobbyRoom extends Room {
   accountModels: Record<string, AccountModel> = {}
 
-  constructor(
-    @InjectModel(AccountModel) protected account: typeof AccountModel,
-    @InjectModel(CharacterModel) protected character: typeof CharacterModel
-  ) {
-    super()
-  }
   // Life Cycle
-  async onCreate(options: any): Promise<void> {
+  async onCreate({account: accountRepo, character: characterRepo}: {account: typeof AccountModel, character: typeof CharacterModel}): Promise<void> {
     this.onMessage('account:login', async (client, { username, password }) => {
-      const account = await this.account.findOne({ where: { username } })
+      const account = await accountRepo.findOne({ where: { username } })
       if (account?.comparePassword(password)) {
         this.accountModels[client.sessionId] = account
         const accountSchema = createAccount(client.sessionId, account)
@@ -50,7 +44,7 @@ export class PetopiaLobbyRoom extends Room {
       'account:register',
       async (client, { username, password }) => {
         try {
-          const account = await this.account.create({
+          const account = await accountRepo.create({
             accountId: AccountModel.id(),
             username,
           })

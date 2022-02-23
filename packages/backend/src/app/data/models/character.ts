@@ -1,6 +1,7 @@
 import {
   BelongsTo,
   Column,
+  ForeignKey,
   Model,
   PrimaryKey,
   Table,
@@ -10,6 +11,10 @@ import { v4 } from 'uuid'
 
 @Table
 export class CharacterModel extends Model {
+  @ForeignKey(() => AccountModel)
+  @Column
+  accountId: string
+
   @BelongsTo(() => AccountModel, 'accountId')
   account: AccountModel
 

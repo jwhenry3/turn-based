@@ -37,9 +37,9 @@ export class PetopiaMapRoom extends Room {
     // not too strict on the transporting until it becomes an issue (fast travel will probably be easy to come by tbh)
     // maybe authorize if quest markers are not triggered (cant enter an instance or zone if a quest hasnt been completed)
     client.send('scene:created', { value: this.created })
-    const account = createAccount(client.sessionId, 'test')
-    const character = createCharacter('test', account)
-    this.state.players.set(character.characterId, character)
+    // const account = createAccount(client.sessionId, 'test')
+    // const character = createCharacter('test', account)
+    // this.state.players.set(character.characterId, character)
   }
   async onLeave(client: Client, consented?: boolean): Promise<any> {
     if (!consented) {
