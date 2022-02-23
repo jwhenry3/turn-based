@@ -34,55 +34,60 @@ export class Appearance extends Schema {
 
 export class Attribute extends Schema {
   @type('number')
-  base: number
+  base: number = 0
   @type('number')
-  fromEquipment: number
+  fromEquipment: number = 0
   @type('number')
-  fromBuffs: number
+  fromBuffs: number = 0
   @type('number')
   total: number
+
+  constructor(initialValue?: number) {
+    super()
+    this.base = initialValue || 0
+  }
 }
 
 export class Statistics extends Schema {
   @type('number')
-  level: number
+  level: number = 1
 
   // not visible on client
   @filter(() => false)
   @type('number')
-  grantExpOnDeath: number
+  grantExpOnDeath: number = 0
 
   @type('number')
-  currentExp: number
+  currentExp: number = 0
   @type('number')
-  maxExpForCurrentLevel: number
+  maxExpForCurrentLevel: number = 100
   @type('number')
-  availableStatPoints: number
+  availableStatPoints: number = 5
 
   @type(Attribute)
-  maxHp: Attribute
+  maxHp: Attribute = new Attribute(100)
   @type(Attribute)
-  maxMp: Attribute
+  maxMp: Attribute = new Attribute(100)
   @type(Attribute)
-  str: Attribute
+  str: Attribute = new Attribute(5)
   @type(Attribute)
-  dex: Attribute
+  dex: Attribute = new Attribute(5)
   @type(Attribute)
-  vit: Attribute
+  vit: Attribute = new Attribute(5)
   @type(Attribute)
-  agi: Attribute
+  agi: Attribute = new Attribute(5)
   @type(Attribute)
-  int: Attribute
+  int: Attribute = new Attribute(5)
   @type(Attribute)
-  mnd: Attribute
+  mnd: Attribute = new Attribute(5)
   @type(Attribute)
-  chr: Attribute
+  chr: Attribute = new Attribute(5)
 }
 export class Effect extends Schema {
   @type('string')
   effectId: string
   @type(Attribute)
-  potency: Attribute
+  potency: Attribute = new Attribute(1)
   @type('number')
   remainingDuration: number
 }
@@ -93,7 +98,7 @@ export class Status extends Schema {
   @type('number')
   mp: number
   @type({ array: Effect })
-  effects: ArraySchema<Effect>
+  effects: ArraySchema<Effect> = new ArraySchema<Effect>()
 }
 export class ItemCategory extends Schema {
   @type('string')
@@ -205,16 +210,16 @@ export class Character extends Schema {
   name: string
 
   @type(Appearance)
-  appearance: Appearance
+  appearance: Appearance = new Appearance()
 
   @type(Statistics)
-  stats: Statistics
+  stats: Statistics = new Statistics()
 
   @type(Position)
-  position: Position
+  position: Position = new Position()
 
   @type(Inventory)
-  inventory: Inventory
+  inventory: Inventory = new Inventory()
 }
 
 export class ItemDrop extends Schema {
@@ -240,19 +245,25 @@ export class Npc extends Schema {
   drops: ArraySchema<ItemDrop> = new ArraySchema<ItemDrop>()
 
   @type(Statistics)
-  stats: Statistics
+  stats: Statistics = new Statistics()
 
   @type(Position)
-  position: Position
+  position: Position = new Position()
 }
 
 export class Account extends Schema {
   @type('string')
   accountId: string
   @type('string')
+  username: string
+  @type('string')
   currentClientId: string
+
   @type(Character)
   character: Character
+
+  // Only current client can see character list
+  @filter((account, client) => account.currentClientId === client.sessionId)
   @type({ array: Character })
   characterList: ArraySchema<Character> = new ArraySchema<Character>()
 }

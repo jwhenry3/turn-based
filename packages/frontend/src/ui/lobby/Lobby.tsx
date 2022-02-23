@@ -17,7 +17,7 @@ export default function Lobby() {
   }
   const onSelectCharacter = () => {
     lobby.current?.send('characters:select', {
-      id: state.account.characterList[0].id,
+      characterId: state.account.characterList[0].characterId,
     })
   }
   return (

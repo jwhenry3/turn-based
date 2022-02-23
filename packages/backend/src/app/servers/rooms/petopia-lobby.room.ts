@@ -7,7 +7,9 @@ import {
   type,
 } from '@colyseus/schema'
 import { LobbyOptions } from '@colyseus/core/build/rooms/LobbyRoom'
-import { Account } from '../schemas'
+import { Account, Appearance, Character, Statistics } from '../schemas'
+import { createCharacter } from '../generators/character'
+import { createAccount } from '../generators/account'
 
 class LobbyState extends Schema {
   @filterChildren((client, key, value: Account, root) => {
@@ -21,31 +23,26 @@ export class PetopiaLobbyRoom extends Room {
   // Life Cycle
   async onCreate(options: any): Promise<void> {
     this.onMessage('account:login', (client, message) => {
-      const acc = new Account()
-      acc.accountId = 1
-      // client id === room.sessionId
-      acc.currentClientId = client.id
-      this.state.accounts.set(client.id, acc)
+      this.state.accounts.set(
+        client.id,
+        createAccount(client.sessionId, message.username)
+      )
     })
 
     this.onMessage('account:register', (client, message) => {
-      const acc = new Account()
-      acc.accountId = 1
-      // client id === room.sessionId
-      acc.currentClientId = client.id
-      this.state.accounts.set(client.id, acc)
+      this.state.accounts.set(
+        client.id,
+        createAccount(client.sessionId, message.username)
+      )
     })
 
     this.onMessage('characters:list', (client, message) => {
       const account = this.state.accounts.get(client.id) as Account
       if (account) {
         account.character = undefined
-        const character = new Character()
-        character.id = 1
-        character.name = 'test'
-        character.level = 1
-        character.map = 'starter'
-        account.characterList = new ArraySchema<Character>(character)
+        account.characterList = new ArraySchema<Character>(
+          createCharacter('test', account)
+        )
       }
     })
 
@@ -53,7 +50,7 @@ export class PetopiaLobbyRoom extends Room {
       const account = this.state.accounts.get(client.id) as Account
       if (account) {
         const character = account.characterList.find(
-          (character) => character.id === message.id
+          (character) => character.characterId === message.characterId
         )
         account.character = character
       }
