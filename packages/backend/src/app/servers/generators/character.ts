@@ -7,5 +7,6 @@ export function createCharacter(name: string, account: Account) {
   char.accountId = account.accountId
   char.currentClientId = account.currentClientId
   char.characterId = v4()
+  char.position.map = 'starter'
   return char
 }

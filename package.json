@@ -29,10 +29,12 @@
     "@nrwl/next": "13.8.3",
     "@phaserjs/phaser": "^0.2.2",
     "@types/react": "^17.0.39",
+    "canvas": "^2.9.0",
     "colyseus": "^0.14.23",
     "colyseus.js": "^0.14.13",
     "core-js": "^3.6.5",
     "framer-motion": "^6",
+    "jsdom": "^19.0.0",
     "mysql2": "^2.3.3",
     "next": "12.1.0",
     "phaser": "^3.55.2",
@@ -49,6 +51,7 @@
     "tslib": "^2.0.0",
     "typeorm": "^0.2.43",
     "uuid": "^8.3.2",
+    "xmlhttprequest": "^1.8.0",
     "zustand": "^3.7.0"
   },
   "devDependencies": {
@@ -69,6 +72,7 @@
     "@testing-library/react": "12.1.2",
     "@testing-library/react-hooks": "7.0.2",
     "@types/jest": "27.0.2",
+    "@types/jsdom": "^16.2.14",
     "@types/node": "16.11.7",
     "@types/react": "17.0.30",
     "@types/react-dom": "17.0.9",

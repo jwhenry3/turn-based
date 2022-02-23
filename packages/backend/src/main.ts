@@ -2,13 +2,14 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-
 import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { Transport, MicroserviceOptions } from '@nestjs/microservices'
 
+
 async function bootstrap(module: string, port: number) {
-  const _module = (await import('./services/' + module + '.module')).default as Function
+  const _module = (await import('./services/' + module + '.module'))
+    .default as Function
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     _module,
     {

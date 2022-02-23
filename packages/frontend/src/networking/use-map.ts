@@ -3,19 +3,24 @@ import { useEffect, useRef, useState } from 'react'
 import { mapRegions, regionServers } from './maps'
 import { useRegion } from './use-region'
 
+const maps: Record<string, { room: Room }> = {}
 export function useMap(name: string) {
   const { region, rooms } = useRegion(mapRegions[name], name)
   const map = useRef<Room | undefined>()
   const [attempts, setAttempts] = useState<number>(0)
 
   useEffect(() => {
-    if (!map.current && region.current) {
+    if (!maps[name] && region.current) {
       let timeout
+      maps[name] = {
+        room: undefined,
+      }
       ;(async () => {
         try {
           const client = region.current as Client
           console.log('Connecting to Map... attempt:', attempts + 1)
           let room = await client.joinOrCreate(name)
+          maps[name] = { room }
           map.current = room
           console.log('Connected!')
           room.onMessage('scene:created', () => {

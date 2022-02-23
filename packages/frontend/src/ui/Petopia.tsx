@@ -9,7 +9,7 @@ export function Petopia() {
   }
   try {
     const Component = lazy(
-      () => import('./maps/' + lobbyState.account.character.map)
+      () => import('./maps/' + lobbyState.account.character.position.map)
     )
     return (
       <Suspense fallback={<div>Loading map...</div>}>

@@ -10,7 +10,7 @@ import {
 
 export class Position extends Schema {
   @type('string')
-  map: string
+  map: string = 'starter'
   @type('number')
   x = 100
   @type('number')
@@ -132,7 +132,7 @@ export class EquipmentProfile extends Schema {
   displayOrder: number
   @type('string')
   label: string
-  @type({ map: Item })
+  @type({ map: 'string' })
   equipment: MapSchema<string> = new MapSchema<string>({
     head: undefined,
     chest: undefined,
@@ -164,28 +164,12 @@ export class Inventory extends Schema {
   inventoryItems: MapSchema<InventoryItem> = new MapSchema<InventoryItem>()
 
   @type({ map: 'string' })
-  equippedItems: MapSchema<string> = new MapSchema<string>({
-    head: undefined,
-    chest: undefined,
-    arms: undefined,
-    legs: undefined,
-    feet: undefined,
-    leftHand: undefined,
-    rightHand: undefined,
-  })
+  equippedItems: MapSchema<string> = new MapSchema<string>({})
   /**
    * items used as cosmetic display
    */
   @type({ map: 'string' })
-  wardrobe: MapSchema<string> = new MapSchema<string>({
-    head: undefined,
-    chest: undefined,
-    arms: undefined,
-    legs: undefined,
-    feet: undefined,
-    leftHand: undefined,
-    rightHand: undefined,
-  })
+  wardrobe: MapSchema<string> = new MapSchema<string>({})
 
   /**
    * We only want the current client to see this character's equipment profiles

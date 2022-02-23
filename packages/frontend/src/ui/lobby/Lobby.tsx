@@ -7,7 +7,7 @@ export default function Lobby() {
   const lobby = useLobby()
   const state = useLobbyState()
   const onLogin = () => {
-    lobby.current?.send('account:login')
+    lobby.current?.send('account:login', {username: 'test', password: 'test'})
   }
   const onLogout = () => {
     console.log('log out!')

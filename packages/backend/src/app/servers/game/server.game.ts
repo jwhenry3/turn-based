@@ -1,4 +1,4 @@
-import '@geckos.io/phaser-on-nodejs'
+import './polyfill/polyfill'
 import 'phaser'
 
 export class ServerGame extends Phaser.Game {
@@ -27,5 +27,6 @@ export class ServerGame extends Phaser.Game {
         default: 'arcade',
       },
     })
+    console.log('Game Created')
   }
 }

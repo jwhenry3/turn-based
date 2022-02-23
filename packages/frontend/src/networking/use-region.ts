@@ -18,11 +18,12 @@ export function useRegion(name: string, roomName?: string) {
     let timeout
     if (!regions[name]) {
       regions[name] = new Client(regionServers[name])
-      const connect = () => {
+      const connect = async () => {
         if (timeout) {
           clearTimeout(timeout)
         }
-        return regions[name].joinOrCreate('lobby').then((room) => {
+        try {
+          const room = await regions[name].joinOrCreate('lobby')
           roomInstance = room
           room.onMessage('rooms', (data) => {
             setRoomsFor(name, data)
@@ -32,11 +33,11 @@ export function useRegion(name: string, roomName?: string) {
               timeout = setTimeout(connect, 5000)
             }
           })
-        })
+        } catch (e) {
+          timeout = setTimeout(connect, 5000)
+        }
       }
-      connect().catch(() => {
-        timeout = setTimeout(connect, 5000)
-      })
+      connect()
     }
     region.current = regions[name]
     return () => {
