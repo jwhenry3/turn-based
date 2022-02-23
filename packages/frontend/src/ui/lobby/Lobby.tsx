@@ -1,19 +1,14 @@
-import { Button } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { Button } from '@mui/material'
 import { useLobbyState } from '../../networking/state/use-lobby-state'
 import { useLobby } from '../../networking/use-lobby'
+import { Characters } from './Characters'
+import { Login } from './Login'
 
 export default function Lobby() {
-  const lobby = useLobby()
+  const lobby = useLobby(true)
   const state = useLobbyState()
-  const onLogin = () => {
-    lobby.current?.send('account:login', {username: 'test', password: 'test'})
-  }
   const onLogout = () => {
     console.log('log out!')
-  }
-  const onLoadCharacters = () => {
-    lobby.current?.send('characters:list')
   }
   const onSelectCharacter = () => {
     lobby.current?.send('characters:select', {
@@ -22,21 +17,9 @@ export default function Lobby() {
   }
   return (
     <div>
-      {(state.account && <Button onClick={onLogout}>Logout</Button>) || (
-        <Button onClick={onLogin}>Log In</Button>
-      )}
-      {state.account && !state.account?.character && (
-        <>
-          {state.account.characterList.length === 0 && (
-            <>
-              <Button onClick={onLoadCharacters}>Load Characters</Button>
-            </>
-          )}
-          {state.account?.characterList.length > 0 && (
-            <Button onClick={onSelectCharacter}>Select Character</Button>
-          )}
-        </>
-      )}
+      {!state.account && <Login />}
+      {state.account && <Button onClick={onLogout}>Logout</Button>}
+      {state.account && !state.account?.character && <Characters />}
       {state.account?.character && <div>Character Selected</div>}
     </div>
   )

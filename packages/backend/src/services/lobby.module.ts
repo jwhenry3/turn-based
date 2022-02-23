@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { DataModule } from '../app/data/data.module'
 import { AccountModel } from '../app/data/models/account'
+import { AppearanceModel } from '../app/data/models/appearance'
 import { CharacterModel } from '../app/data/models/character'
 import { LobbyController } from './lobby/lobby.controller'
 import { ServerModule } from './server.module'
@@ -14,7 +15,7 @@ import { ServerModule } from './server.module'
       dialect: 'sqlite',
       storage: './petopia.sqlite',
       autoLoadModels: true,
-      models: [AccountModel, CharacterModel],
+      models: [AccountModel, CharacterModel, AppearanceModel],
       synchronize: true,
     }),
   ],

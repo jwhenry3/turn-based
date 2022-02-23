@@ -1,4 +1,4 @@
-import { Account, Character } from '../schemas'
+import { Account, Appearance, Character } from '../schemas'
 import { CharacterModel } from '../../data/models/character'
 
 export function createCharacter(model: CharacterModel, account: Account) {
@@ -7,6 +7,15 @@ export function createCharacter(model: CharacterModel, account: Account) {
   char.characterId = model.characterId
   char.accountId = account.accountId
   char.currentClientId = account.currentClientId
+  const { eyes, eyeColor, hair, hairColor, skinColor, gender } = char.appearance
+  char.appearance = new Appearance({
+    eyes,
+    eyeColor,
+    hair,
+    hairColor,
+    skinColor,
+    gender,
+  })
   char.position.map = 'starter'
   return char
 }

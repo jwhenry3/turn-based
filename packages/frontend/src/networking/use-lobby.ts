@@ -2,13 +2,14 @@ import { Client, Room } from 'colyseus.js'
 import { useEffect, useRef, useState } from 'react'
 import { useLobbyState } from './state/use-lobby-state'
 
-export function useLobby() {
-  const lobby = useRef<Room | undefined>()
+const lobbyObj: { current: Room | undefined } = { current: undefined }
+export function useLobby(isTopLevel: boolean = false) {
+  const lobby = lobbyObj
   const [attempts, setAttempts] = useState<number>(0)
   const lobbyState = useLobbyState()
 
   useEffect(() => {
-    if (!lobby.current) {
+    if (!lobby.current && isTopLevel) {
       let timeout
       ;(async () => {
         try {
@@ -37,8 +38,9 @@ export function useLobby() {
         if (typeof timeout !== 'undefined') {
           clearTimeout(timeout)
         }
-        if (typeof lobby.current !== 'undefined') {
+        if (typeof lobby.current !== 'undefined' && isTopLevel) {
           lobby.current.connection.close()
+          lobby.current = undefined
         }
       }
     }
