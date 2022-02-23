@@ -1,4 +1,3 @@
-import './polyfill/polyfill'
 import 'phaser'
 
 export class ServerGame extends Phaser.Game {
