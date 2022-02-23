@@ -29,6 +29,7 @@
     "@nrwl/next": "13.8.3",
     "@phaserjs/phaser": "^0.2.2",
     "@types/react": "^17.0.39",
+    "bcrypt": "^5.0.1",
     "canvas": "^2.9.0",
     "colyseus": "^0.14.23",
     "colyseus.js": "^0.14.13",

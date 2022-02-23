@@ -1,10 +1,11 @@
 import { Account } from '../schemas'
 import { v4 } from 'uuid'
+import { AccountModel } from '../../data/models/account'
 
-export function createAccount(clientId: string, username: string) {
+export function createAccount(clientId: string, model: AccountModel) {
   const acc = new Account()
-  acc.username = username
+  acc.username = model.username
   acc.currentClientId = clientId
-  acc.accountId = v4()
+  acc.accountId = model.accountId
   return acc
 }

@@ -1,12 +1,12 @@
 import { Account, Character } from '../schemas'
-import { v4 } from 'uuid'
+import { CharacterModel } from '../../data/models/character'
 
-export function createCharacter(name: string, account: Account) {
+export function createCharacter(model: CharacterModel, account: Account) {
   const char = new Character()
-  char.name = name
+  char.name = model.name
+  char.characterId = model.characterId
   char.accountId = account.accountId
   char.currentClientId = account.currentClientId
-  char.characterId = v4()
   char.position.map = 'starter'
   return char
 }

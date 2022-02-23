@@ -1,5 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common'
 import { SequelizeModule } from '@nestjs/sequelize'
+import { AccountModel } from './models/account'
+import { CharacterModel } from './models/character'
 
 @Module({
   imports: [SequelizeModule],
@@ -23,6 +25,7 @@ export class DataModule {
       imports: [
         SequelizeModule.forRoot({
           dialect: 'sqlite',
+          models: [AccountModel, CharacterModel],
           storage: './petopia.sqlite',
         }),
       ],
