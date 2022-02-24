@@ -22,8 +22,6 @@ export class AppearanceModel extends Model {
   @Column
   characterId: string
 
-  @BelongsTo(() => CharacterModel, 'characterId')
-  character: CharacterModel
 
   @AllowNull(false)
   @Column

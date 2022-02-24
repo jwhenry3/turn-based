@@ -1,6 +1,5 @@
 import { Account } from '../schemas'
-import { v4 } from 'uuid'
-import { AccountModel } from '../../data/models/account'
+import { AccountModel } from '../../data/account'
 
 export function createAccount(clientId: string, model: AccountModel) {
   const acc = new Account()

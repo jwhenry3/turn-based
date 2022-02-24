@@ -1,5 +1,5 @@
 import { Account, Appearance, Character } from '../schemas'
-import { CharacterModel } from '../../data/models/character'
+import { CharacterModel } from '../../data/character'
 
 export function createCharacter(model: CharacterModel, account: Account) {
   const char = new Character()

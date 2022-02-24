@@ -10,7 +10,7 @@ export function CharacterListItem({ character }: { character: any }) {
   }
   return (
     <ListItemButton onClick={onSelect}>
-      LV {character.level} {character.name} - {character.position.map}
+      LV {character.stats.level} {character.name} - {character.position.map}
     </ListItemButton>
   )
 }

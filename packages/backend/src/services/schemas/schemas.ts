@@ -2,7 +2,6 @@ import { Client } from '@colyseus/core'
 import {
   ArraySchema,
   filter,
-  filterChildren,
   MapSchema,
   Schema,
   type,

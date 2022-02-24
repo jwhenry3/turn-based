@@ -1,9 +1,6 @@
 import { Client, Room } from '@colyseus/core'
 import { MapSchema, Schema, type } from '@colyseus/schema'
-import { ServerGame } from '../game/server.game'
-import { createAccount } from '../generators/account'
-import { createCharacter } from '../generators/character'
-import { Character, Npc } from '../schemas'
+import { Character, Npc } from '../schemas/schemas'
 
 export class PetopiaMapState extends Schema {
   @type({ map: Character })
@@ -16,19 +13,9 @@ export class PetopiaMapState extends Schema {
 export class PetopiaMapRoom extends Room {
   maxClients: number = 64
 
-  game: ServerGame
   created = false
   onCreate(options: any): void | Promise<any> {
     this.setState(new PetopiaMapState())
-    const scene = {
-      init() {},
-      preload() {},
-      create() {
-        console.log('Created!')
-        this.created = true
-      },
-    }
-    this.game = new ServerGame(scene)
   }
   onJoin(client: Client, options?: any, auth?: any): void | Promise<any> {
     // authenticate token and retrieve requested character to load into the map
@@ -50,7 +37,6 @@ export class PetopiaMapRoom extends Room {
           this.state.players.delete(v.characterId)
         }
       })
-
     }
   }
 }

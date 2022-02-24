@@ -7,13 +7,12 @@ import {
   type,
 } from '@colyseus/schema'
 import { LobbyOptions } from '@colyseus/core/build/rooms/LobbyRoom'
-import { Account, Appearance, Character, Statistics } from '../schemas'
-import { createCharacter } from '../generators/character'
-import { createAccount } from '../generators/account'
-import { AccountModel } from '../../data/models/account'
-import { InjectModel } from '@nestjs/sequelize'
-import { CharacterModel } from '../../data/models/character'
-import { AppearanceModel } from '../../data/models/appearance'
+import { Account, Character } from '../schemas/schemas'
+import { createCharacter } from '../schemas/factories/character'
+import { createAccount } from '../schemas/factories/account'
+import { AccountModel } from '../data/account'
+import { Accounts } from '../data/helpers/accounts'
+import { Characters } from '../data/helpers/characters'
 
 class LobbyState extends Schema {
   @filterChildren((client, key, value: Account, root) => {
@@ -27,17 +26,10 @@ export class PetopiaLobbyRoom extends Room {
   accountModels: Record<string, AccountModel> = {}
 
   // Life Cycle
-  async onCreate({
-    account: accountRepo,
-    character: characterRepo,
-  }: {
-    account: typeof AccountModel
-    character: typeof CharacterModel
-  }): Promise<void> {
+  async onCreate(): Promise<void> {
     this.onMessage('account:login', async (client, { username, password }) => {
-      const account = await accountRepo.findOne({ where: { username } })
-      console.log(account.hashedPassword)
-      if (account?.comparePassword(password)) {
+      const account = await Accounts.verifyAccountByUsername(username, password)
+      if (account) {
         this.accountModels[client.sessionId] = account
         const accountSchema = createAccount(client.sessionId, account)
         this.state.accounts.set(client.sessionId, accountSchema)
@@ -52,19 +44,19 @@ export class PetopiaLobbyRoom extends Room {
       'account:register',
       async (client, { username, password }) => {
         try {
-          const account = await accountRepo.create({
-            accountId: AccountModel.id(),
+          this.accountModels[client.sessionId] = await Accounts.createAccount(
             username,
-          })
-          await account.setPassword(password)
-
-          await account.save()
-          const accountSchema = createAccount(client.sessionId, account)
-          this.accountModels[client.sessionId] = account
+            password
+          )
+          const accountSchema = createAccount(
+            client.sessionId,
+            this.accountModels[client.sessionId]
+          )
           this.state.accounts.set(client.sessionId, accountSchema)
         } catch (e) {
+          console.log(e)
           client.send('account:register:failure', {
-            message: 'Account already exists',
+            message: 'Could not register that account at this time',
           })
         }
       }
@@ -74,11 +66,9 @@ export class PetopiaLobbyRoom extends Room {
       const account = this.state.accounts.get(client.sessionId) as Account
       if (account) {
         const accountModel = this.accountModels[client.sessionId]
-        const characters = await CharacterModel.findAll({
-          where: {
-            accountId: accountModel.accountId,
-          },
-        })
+        const characters = await Characters.getCharactersForAccount(
+          accountModel.accountId
+        )
         account.characterList = new ArraySchema<Character>()
         for (const character of characters) {
           account.characterList.push(createCharacter(character, account))
@@ -92,39 +82,23 @@ export class PetopiaLobbyRoom extends Room {
           'Could not locate the account on the server, please login again',
       })
     })
-    this.onMessage(
-      'characters:create',
-      async (
-        client,
-        { name, hair, hairColor, eyes, eyeColor, skinColor, gender }
-      ) => {
-        const account = this.state.accounts.get(client.sessionId) as Account
-        if (account) {
-          const accountModel = this.accountModels[client.sessionId]
-          const character = await CharacterModel.create({
-            characterId: CharacterModel.id(),
-            accountId: accountModel.accountId,
-            account: accountModel,
-            name: name,
-          })
-          character.appearance = new AppearanceModel({
-            hair,
-            hairColor,
-            eyes,
-            eyeColor,
-            skinColor,
-            gender,
-          })
-          await character.save()
-          account.characterList.push(createCharacter(character, account))
-          return
-        }
-        client.send('characters:create:failure', {
-          message:
-            'Could not locate the account on the server, please login again',
-        })
+    this.onMessage('characters:create', async (client, data) => {
+      const account = this.state.accounts.get(client.sessionId) as Account
+      if (account) {
+        const accountModel = this.accountModels[client.sessionId]
+        const character = await Characters.createCharacter(
+          accountModel.accountId,
+          data
+        )
+
+        account.characterList.push(createCharacter(character, account))
+        return
       }
-    )
+      client.send('characters:create:failure', {
+        message:
+          'Could not locate the account on the server, please login again',
+      })
+    })
 
     this.onMessage('characters:select', (client, message) => {
       const account = this.state.accounts.get(client.sessionId) as Account
@@ -141,5 +115,7 @@ export class PetopiaLobbyRoom extends Room {
 
   onJoin(client: Client, options: LobbyOptions): void {}
 
-  onLeave(client: Client): void {}
+  onLeave(client: Client): void {
+    this.state.accounts.delete(client.sessionId)
+  }
 }

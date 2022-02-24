@@ -5,8 +5,8 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common'
 import { LobbyRoom, Server } from 'colyseus'
-import { PetopiaBattleRoom } from '../../app/servers/rooms/petopia-battle.room'
-import { PetopiaMapRoom } from '../../app/servers/rooms/petopia-map.room'
+import { PetopiaBattleRoom } from '../../rooms/petopia-battle.room'
+import { PetopiaMapRoom } from '../../rooms/petopia-map.room'
 
 @Controller()
 export class HomeRegionController
