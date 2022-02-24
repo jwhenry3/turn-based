@@ -9,10 +9,13 @@ const models = [AccountModel, CharacterModel, AppearanceModel]
   imports: [
     SequelizeModule.forFeature(models),
     SequelizeModule.forRoot({
-      dialect: 'sqlite',
-      storage: './petopia.sqlite',
+      dialect: 'mysql',
+      host: process.env.MYSQL_HOST,
+      port: Number(process.env.MYSQL_PORT),
+      username: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASS,
+      database: process.env.MYSQL_DB,
       autoLoadModels: true,
-      models,
       synchronize: true,
     }),
   ],
