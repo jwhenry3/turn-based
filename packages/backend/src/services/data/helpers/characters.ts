@@ -10,9 +10,18 @@ export class Characters {
       },
     })
   }
+
+  static async getCharacterForAccount(
+    accountId: string,
+    characterId: string
+  ) {
+    return await CharacterModel.findOne({ where: { accountId, characterId } })
+  }
+
   static async getCharacterById(characterId: string) {
     return await CharacterModel.findOne({ where: { characterId } })
   }
+
   static async createCharacter(
     accountId: string,
     { name, appearance }: Partial<CharacterModel>

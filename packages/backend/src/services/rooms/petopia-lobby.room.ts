@@ -29,15 +29,26 @@ export class PetopiaLobbyRoom extends Room {
   async onCreate(): Promise<void> {
     this.onMessage('account:login', async (client, { username, password }) => {
       const account = await Accounts.verifyAccountByUsername(username, password)
-      if (account) {
-        this.accountModels[client.sessionId] = account
-        const accountSchema = createAccount(client.sessionId, account)
-        this.state.accounts.set(client.sessionId, accountSchema)
-      } else {
+      if (!account) {
         client.send('account:login:failure', {
           message: 'Invalid username or password',
         })
+        return
       }
+      const existingToken = await Accounts.getValidToken(account.accountId)
+      if (existingToken) {
+        client.send('account:login:failure', {
+          message:
+            'Already Logged In. Please wait a little while and try again',
+        })
+        return
+      }
+      this.accountModels[client.sessionId] = account
+      const token = await Accounts.createToken(account.accountId)
+      this.state.accounts.set(
+        client.sessionId,
+        createAccount(client.sessionId, account, token)
+      )
     })
 
     this.onMessage(
@@ -48,9 +59,13 @@ export class PetopiaLobbyRoom extends Room {
             username,
             password
           )
+          const token = await Accounts.createToken(
+            this.accountModels[client.sessionId].accountId
+          )
           const accountSchema = createAccount(
             client.sessionId,
-            this.accountModels[client.sessionId]
+            this.accountModels[client.sessionId],
+            token
           )
           this.state.accounts.set(client.sessionId, accountSchema)
         } catch (e) {
@@ -71,7 +86,9 @@ export class PetopiaLobbyRoom extends Room {
         )
         account.characterList = new ArraySchema<Character>()
         for (const character of characters) {
-          account.characterList.push(createCharacter(character, account))
+          account.characterList.push(
+            createCharacter(character, client.sessionId)
+          )
         }
         account.character = undefined
         return
@@ -91,7 +108,7 @@ export class PetopiaLobbyRoom extends Room {
           data
         )
 
-        account.characterList.push(createCharacter(character, account))
+        account.characterList.push(createCharacter(character, client.sessionId))
         return
       }
       client.send('characters:create:failure', {

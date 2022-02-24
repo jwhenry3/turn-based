@@ -1,4 +1,10 @@
 require('dotenv').config()
+const mysqlEnv = {
+  MYSQL_DB: process.env.MYSQL_DB,
+  MYSQL_HOST: process.env.MYSQL_HOST,
+  MYSQL_USER: process.env.MYSQL_USER,
+  MYSQL_PASS: process.env.MYSQL_PASS,
+  MYSQL_PORT: process.env.MYSQL_PORT,}
 module.exports = {
   apps: [
     {
@@ -6,7 +12,7 @@ module.exports = {
       script: 'npm',
       args: 'run frontend:dev',
       env: {
-        ...process.env,
+        ...mysqlEnv,
         MICROSERVICE_MODULE: '',
       },
     },
@@ -15,7 +21,7 @@ module.exports = {
       script: 'npm',
       args: 'run backend:dev',
       env: {
-        ...process.env,
+        ...mysqlEnv,
         MICROSERVICE_MODULE: 'lobby',
       },
     },
@@ -24,7 +30,7 @@ module.exports = {
       script: 'npm',
       args: 'run backend:dev',
       env: {
-        ...process.env,
+        ...mysqlEnv,
         MICROSERVICE_MODULE: 'home-region',
       },
     },

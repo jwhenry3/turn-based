@@ -21,3 +21,18 @@ export class AccountModel extends Model {
   @Column
   email: string
 }
+@Table
+export class AccountTokenModel extends Model {
+  @AllowNull(false)
+  @Column
+  accountId: string
+
+  @AllowNull(false)
+  @PrimaryKey
+  @Column
+  token: string
+
+  @AllowNull(false)
+  @Column
+  expires: Date
+}

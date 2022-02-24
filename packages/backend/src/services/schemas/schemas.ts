@@ -1,12 +1,15 @@
 import { Client } from '@colyseus/core'
-import {
-  ArraySchema,
-  filter,
-  MapSchema,
-  Schema,
-  type,
-} from '@colyseus/schema'
+import { ArraySchema, filter, MapSchema, Schema, type } from '@colyseus/schema'
+import { AccountTokenModel } from '../data/account'
 
+export class Movement extends Schema {
+  @type('string')
+  facing: 'up' | 'down' | 'left' | 'right' = 'down'
+  @type('number')
+  horizontal: 1 | -1 | 0 = 0
+  @type('number')
+  vertical: 1 | -1 | 0 = 0
+}
 export class Position extends Schema {
   @type('string')
   map: string = 'starter'
@@ -14,6 +17,9 @@ export class Position extends Schema {
   x = 100
   @type('number')
   y = 100
+
+  @type(Movement)
+  movement: Movement = new Movement()
 }
 
 export class Appearance extends Schema {
@@ -35,16 +41,13 @@ export class Attribute extends Schema {
   @type('number')
   base: number = 0
   @type('number')
+  fromPoints: number = 0
+  @type('number')
   fromEquipment: number = 0
   @type('number')
   fromBuffs: number = 0
   @type('number')
   total: number
-
-  constructor(initialValue?: number) {
-    super()
-    this.base = initialValue || 0
-  }
 }
 
 export class Statistics extends Schema {
@@ -64,29 +67,29 @@ export class Statistics extends Schema {
   availableStatPoints: number = 5
 
   @type(Attribute)
-  maxHp: Attribute = new Attribute(100)
+  maxHp: Attribute = new Attribute({base:100})
   @type(Attribute)
-  maxMp: Attribute = new Attribute(100)
+  maxMp: Attribute = new Attribute({base:100})
   @type(Attribute)
-  str: Attribute = new Attribute(5)
+  str: Attribute = new Attribute({base:5})
   @type(Attribute)
-  dex: Attribute = new Attribute(5)
+  dex: Attribute = new Attribute({base:5})
   @type(Attribute)
-  vit: Attribute = new Attribute(5)
+  vit: Attribute = new Attribute({base:5})
   @type(Attribute)
-  agi: Attribute = new Attribute(5)
+  agi: Attribute = new Attribute({base:5})
   @type(Attribute)
-  int: Attribute = new Attribute(5)
+  int: Attribute = new Attribute({base:5})
   @type(Attribute)
-  mnd: Attribute = new Attribute(5)
+  mnd: Attribute = new Attribute({base:5})
   @type(Attribute)
-  chr: Attribute = new Attribute(5)
+  chr: Attribute = new Attribute({base:5})
 }
 export class Effect extends Schema {
   @type('string')
   effectId: string
   @type(Attribute)
-  potency: Attribute = new Attribute(1)
+  potency: Attribute = new Attribute({base:1})
   @type('number')
   remainingDuration: number
 }
@@ -233,7 +236,12 @@ export class Npc extends Schema {
   @type(Position)
   position: Position = new Position()
 }
-
+export class AccountToken extends Schema {
+  @type('string')
+  token = ''
+  @type('number')
+  expires = new Date().valueOf()
+}
 export class Account extends Schema {
   @type('string')
   accountId: string
@@ -244,6 +252,10 @@ export class Account extends Schema {
 
   @type(Character)
   character: Character
+
+  @filter((account, client) => account.currentClientId === client.sessionId)
+  @type(AccountToken)
+  token: AccountToken = new AccountToken()
 
   // Only current client can see character list
   @filter((account, client) => account.currentClientId === client.sessionId)
