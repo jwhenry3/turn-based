@@ -4,7 +4,7 @@ import { HomeRegionController } from './controllers/regions/home.region.controll
 import { ServerModule } from './server.module'
 
 @Module({
-  imports: [ServerModule, DataModule.forFeature(), DataModule],
+  imports: [ServerModule, DataModule.forRoot()],
   controllers: [HomeRegionController],
 })
 export default class HomeRegionModule {}

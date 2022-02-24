@@ -84,6 +84,7 @@ export class PetopiaLobbyRoom extends Room {
         const characters = await Characters.getCharactersForAccount(
           accountModel.accountId
         )
+        console.log(characters)
         account.characterList = new ArraySchema<Character>()
         for (const character of characters) {
           account.characterList.push(
@@ -103,12 +104,21 @@ export class PetopiaLobbyRoom extends Room {
       const account = this.state.accounts.get(client.sessionId) as Account
       if (account) {
         const accountModel = this.accountModels[client.sessionId]
-        const character = await Characters.createCharacter(
-          accountModel.accountId,
-          data
-        )
+        try {
+          const character = await Characters.createCharacter(
+            accountModel.accountId,
+            data
+          )
 
-        account.characterList.push(createCharacter(character, client.sessionId))
+          account.characterList.push(
+            createCharacter(character, client.sessionId)
+          )
+        } catch (e) {
+          console.log(e)
+          client.send('characters:create:failure', {
+            message: 'Name taken',
+          })
+        }
         return
       }
       client.send('characters:create:failure', {
@@ -133,6 +143,8 @@ export class PetopiaLobbyRoom extends Room {
   onJoin(client: Client, options: LobbyOptions): void {}
 
   onLeave(client: Client): void {
-    this.state.accounts.delete(client.sessionId)
+    if (this.state.accounts[client.sessionId]) {
+      this.state.accounts.delete(client.sessionId)
+    }
   }
 }

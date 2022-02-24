@@ -4,7 +4,7 @@ import { LobbyController } from './controllers/lobby/lobby.controller'
 import { ServerModule } from './server.module'
 
 @Module({
-  imports: [ServerModule, DataModule.forFeature(), DataModule],
+  imports: [ServerModule, DataModule.forRoot()],
   controllers: [LobbyController],
 })
 export default class LobbyModule {}

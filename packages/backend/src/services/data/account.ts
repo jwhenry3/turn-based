@@ -4,6 +4,7 @@ import {
   Model,
   PrimaryKey,
   Table,
+  Unique,
 } from 'sequelize-typescript'
 
 @Table
@@ -13,6 +14,7 @@ export class AccountModel extends Model {
   @Column
   accountId: string
   @AllowNull(false)
+  @Unique
   @Column
   username: string
   @AllowNull(false)

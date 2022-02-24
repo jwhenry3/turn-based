@@ -1,4 +1,4 @@
-import { Column, ForeignKey, Model, Table, Unique } from 'sequelize-typescript'
+import { Column, ForeignKey, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 import { CharacterModel } from './character'
 
 @Table
@@ -7,6 +7,10 @@ export class StatsModel extends Model {
   @Unique
   @Column
   characterId: string
+
+  @PrimaryKey
+  @Column
+  statsId: string
 
   @Column
   level: number = 1
