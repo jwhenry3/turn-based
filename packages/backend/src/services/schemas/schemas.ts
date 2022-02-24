@@ -67,29 +67,29 @@ export class Statistics extends Schema {
   availableStatPoints: number = 5
 
   @type(Attribute)
-  maxHp: Attribute = new Attribute({base:100})
+  maxHp: Attribute = new Attribute({ base: 100 })
   @type(Attribute)
-  maxMp: Attribute = new Attribute({base:100})
+  maxMp: Attribute = new Attribute({ base: 100 })
   @type(Attribute)
-  str: Attribute = new Attribute({base:5})
+  str: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  dex: Attribute = new Attribute({base:5})
+  dex: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  vit: Attribute = new Attribute({base:5})
+  vit: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  agi: Attribute = new Attribute({base:5})
+  agi: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  int: Attribute = new Attribute({base:5})
+  int: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  mnd: Attribute = new Attribute({base:5})
+  mnd: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  chr: Attribute = new Attribute({base:5})
+  chr: Attribute = new Attribute({ base: 5 })
 }
 export class Effect extends Schema {
   @type('string')
   effectId: string
   @type(Attribute)
-  potency: Attribute = new Attribute({base:1})
+  potency: Attribute = new Attribute({ base: 1 })
   @type('number')
   remainingDuration: number
 }
@@ -197,6 +197,9 @@ export class Character extends Schema {
 
   @type('string')
   status: 'connected' | 'reconnecting' | 'disconnected' = 'connected'
+
+  @type('boolean')
+  inBattle: boolean = false
 
   @type(Appearance)
   appearance: Appearance = new Appearance()

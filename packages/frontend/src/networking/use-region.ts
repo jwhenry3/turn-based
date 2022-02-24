@@ -6,10 +6,7 @@ import { useRoomsState } from './state/use-rooms-state'
 const regions: Record<string, Client> = {}
 export function useRegion(name: string, roomName?: string) {
   const region = useRef<Client | undefined>()
-  const { rooms, setRoomsFor } = useRoomsState(({ setRoomsFor, regions }) => ({
-    rooms: roomName
-      ? regions[name]?.filter((room) => room.name === roomName) || []
-      : regions[name] || [],
+  const { setRoomsFor } = useRoomsState(({ setRoomsFor, regions }) => ({
     setRoomsFor,
   }))
 
@@ -47,5 +44,5 @@ export function useRegion(name: string, roomName?: string) {
       }
     }
   }, [region])
-  return { region, rooms }
+  return { region }
 }

@@ -2,61 +2,75 @@ import { Client, Room } from 'colyseus.js'
 import { useEffect, useRef, useState } from 'react'
 import { mapRegions } from './maps'
 import { useAuthState } from './state/use-auth-state'
+import { useEntityState } from './state/use-entity-state'
+import { usePlayerListState } from './state/use-player-list-state'
 import { useRegion } from './use-region'
 
 const maps: Record<string, { room: Room }> = {}
-export function useMap(name: string) {
+export function useMap(name: string, root: boolean = false) {
   const { token, characterId } = useAuthState()
-  const { region, rooms } = useRegion(mapRegions[name], name)
-  const map = useRef<Room | undefined>()
-  const [attempts, setAttempts] = useState<number>(0)
+  const { region } = useRegion(mapRegions[name], name)
+  const map = useRef<Room | undefined>(maps[name]?.room)
+  const playerList = usePlayerListState(({ update }) => ({ update }))
+  const updateEntities = useEntityState(({ update }) => update)
+  const connect = async (data: { timeout: any }) => {
+    try {
+      const client = region.current as Client
+      let room = await client.joinOrCreate(name, {
+        token,
+        characterId,
+      })
+      maps[name] = { room }
+      map.current = room
+      console.log('Connected!')
+      room.onMessage('scene:created', () => {
+        console.log('Scene Created')
+      })
+      room.onStateChange(async (state: any) => {
+        const stateObject = state.toJSON()
+        playerList.update(Object.keys(stateObject.players))
+        updateEntities(stateObject.players)
+      })
 
+      const stateObject = (room.state as any).toJSON()
+      playerList.update(Object.keys(stateObject.players))
+      updateEntities(stateObject.players)
+
+      room.onLeave(async (code) => {
+        console.log('Disconnected', code)
+        if (code === 1000) {
+          map.current = undefined
+          data.timeout = setTimeout(connect, 5000)
+        }
+      })
+      return room
+    } catch (e) {
+      map.current = undefined
+      data.timeout = setTimeout(connect, 5000)
+    }
+  }
   useEffect(() => {
-    if (!maps[name] && region.current) {
-      let timeout
+    if (root) {
       maps[name] = {
         room: undefined,
       }
-      ;(async () => {
-        try {
-          const client = region.current as Client
-          console.log('Connecting to Map... attempt:', attempts + 1)
-          let room = await client.joinOrCreate(name, {
-            token,
-            characterId,
-          })
-          maps[name] = { room }
-          map.current = room
-          console.log('Connected!')
-          room.onMessage('scene:created', () => {
-            console.log('Scene Created')
-          })
-          room.onStateChange(async (state: any) => {
-            console.log('state', state)
-          })
-          room.onLeave(async (code) => {
-            console.log('Disconnected', code)
-            if (code === 1000) {
-              map.current = undefined
-              timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
-            }
-          })
-        } catch (e) {
-          map.current = undefined
-          timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
-        }
-      })()
+      const data = { timeout: undefined }
+      connect(data)
       return () => {
-        if (typeof timeout !== 'undefined') {
-          clearTimeout(timeout)
+        if (typeof data.timeout !== 'undefined') {
+          clearTimeout(data.timeout)
         }
         if (typeof map.current !== 'undefined') {
           map.current.connection.close()
+          map.current = undefined
+          maps[name] = {
+            room: undefined,
+          }
         }
       }
     }
-  }, [region.current, attempts])
+  }, [])
 
   // todo: expose high-level api for interacting with the server (move, chat, etc)
-  return { region, map, rooms }
+  return { region, map }
 }
