@@ -5,8 +5,6 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript'
-import bcrypt from 'bcrypt'
-import { v4 } from 'uuid'
 
 @Table
 export class AccountModel extends Model {
@@ -22,9 +20,4 @@ export class AccountModel extends Model {
   hashedPassword: string
   @Column
   email: string
-
-  static id() {
-    return v4()
-  }
-
 }

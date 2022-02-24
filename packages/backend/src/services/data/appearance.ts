@@ -22,27 +22,29 @@ export class AppearanceModel extends Model {
   @Column
   characterId: string
 
+  @AllowNull(false)
+  @Column
+  eyes: string = 'a'
 
   @AllowNull(false)
   @Column
-  eyes: string
+  eyeColor: string = 'brown'
 
   @AllowNull(false)
   @Column
-  eyeColor: string
+  hair: string = 'a'
 
   @AllowNull(false)
   @Column
-  hair: string
+  hairColor: string = 'brown'
+
   @AllowNull(false)
   @Column
-  hairColor: string
+  skinColor: string = 'tan'
+
   @AllowNull(false)
   @Column
-  skinColor: string
-  @AllowNull(false)
-  @Column
-  gender: string
+  gender: string = 'male'
 
   static id() {
     return v4()

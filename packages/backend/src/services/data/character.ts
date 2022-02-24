@@ -7,8 +7,9 @@ import {
   Table,
   Unique,
 } from 'sequelize-typescript'
-import { v4 } from 'uuid'
 import { AppearanceModel } from './appearance'
+import { PositionModel } from './position'
+import { StatsModel } from './stats'
 
 @Table
 export class CharacterModel extends Model {
@@ -27,9 +28,11 @@ export class CharacterModel extends Model {
   name: string
 
   @HasOne(() => AppearanceModel)
-  appearance: AppearanceModel
+  appearance: AppearanceModel = new AppearanceModel()
 
-  static id() {
-    return v4()
-  }
+  @HasOne(() => PositionModel)
+  position: PositionModel = new PositionModel()
+
+  @HasOne(() => StatsModel)
+  stats: StatsModel = new StatsModel()
 }

@@ -1,6 +1,16 @@
-import { Column, Model, PrimaryKey, Unique } from 'sequelize-typescript'
+import {
+  Column,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
+} from 'sequelize-typescript'
+import { CharacterModel } from './character'
 
+@Table
 export class PositionModel extends Model {
+  @ForeignKey(() => CharacterModel)
   @Unique
   @Column
   characterId: string
@@ -10,14 +20,14 @@ export class PositionModel extends Model {
   positionId: string
 
   @Column
-  x: number
+  x: number = 0
 
   @Column
-  y: number
+  y: number = 0
 
   @Column
-  facing: 'left' | 'right' | 'down' | 'up'
+  facing: 'left' | 'right' | 'down' | 'up' = 'down'
 
   @Column
-  map: string
+  map: string = 'starter'
 }

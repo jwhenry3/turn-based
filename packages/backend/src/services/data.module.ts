@@ -3,8 +3,10 @@ import { SequelizeModule } from '@nestjs/sequelize'
 import { AccountModel } from './data/account'
 import { AppearanceModel } from './data/appearance'
 import { CharacterModel } from './data/character'
+import { PositionModel } from './data/position'
+import { StatsModel } from './data/stats'
 
-const models = [AccountModel, CharacterModel, AppearanceModel]
+const models = [AccountModel, CharacterModel, AppearanceModel, PositionModel, StatsModel]
 @Module({
   imports: [
     SequelizeModule.forFeature(models),
