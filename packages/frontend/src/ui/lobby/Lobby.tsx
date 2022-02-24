@@ -10,11 +10,6 @@ export default function Lobby() {
   const onLogout = () => {
     console.log('log out!')
   }
-  const onSelectCharacter = () => {
-    lobby.current?.send('characters:select', {
-      characterId: state.account.characterList[0].characterId,
-    })
-  }
   return (
     <div>
       {!state.account && <Login />}

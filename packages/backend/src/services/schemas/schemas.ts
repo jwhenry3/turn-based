@@ -195,6 +195,9 @@ export class Character extends Schema {
   @type('string')
   name: string
 
+  @type('string')
+  status: 'connected' | 'reconnecting' | 'disconnected' = 'connected'
+
   @type(Appearance)
   appearance: Appearance = new Appearance()
 

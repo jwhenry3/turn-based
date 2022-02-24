@@ -142,9 +142,16 @@ export class PetopiaLobbyRoom extends Room {
 
   onJoin(client: Client, options: LobbyOptions): void {}
 
-  onLeave(client: Client): void {
-    if (this.state.accounts[client.sessionId]) {
-      this.state.accounts.delete(client.sessionId)
+  async onLeave(client: Client, consented: boolean) {
+    try {
+      if (consented) {
+        throw new Error('Consented leave')
+      }
+      await this.allowReconnection(client, 30)
+    } catch (e) {
+      if (this.state.accounts[client.sessionId]) {
+        this.state.accounts.delete(client.sessionId)
+      }
     }
   }
 }

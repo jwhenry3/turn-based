@@ -52,14 +52,40 @@ export class PetopiaMapRoom extends Room {
       client.close(4404)
       return
     }
-    const character = createCharacter(characterModel, client.sessionId)
-    this.state.players.set(client.sessionId, character)
+    if (!this.state.players[characterModel.name]) {
+      const character = createCharacter(characterModel, client.sessionId)
+      this.state.players.set(character.name, character)
+    } else {
+      this.state.players[characterModel.name].set(
+        'currentClientId',
+        client.sessionId
+      )
+    }
   }
   async onLeave(client: Client, consented?: boolean): Promise<any> {
-    if (!consented) {
+    const character = this.state.players.find(
+      (v: Character, k) => v.currentClientId === client.sessionId
+    )
+    try {
+      if (consented) {
+        throw new Error('consented leave')
+      }
+      if (character) {
+        character.set('status', 'reconnecting')
+      }
       await this.allowReconnection(client, 30)
-    } else {
-      this.state.players.delete(client.sessionId)
+      if (character) {
+        character.set('status', 'connected')
+      }
+    } catch (e) {
+      if (character) {
+        character.set('status', 'disconnected')
+      }
+      this.state.players.forEach((v: Character, k) => {
+        if (v.currentClientId === client.sessionId) {
+          this.state.players.delete(v.characterId)
+        }
+      })
     }
   }
 }
