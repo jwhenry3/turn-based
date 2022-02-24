@@ -5,7 +5,7 @@ import { Characters } from './Characters'
 import { Login } from './Login'
 
 export default function Lobby() {
-  const lobby = useLobby(true)
+  const lobby = useLobby()
   const state = useLobbyState()
   const onLogout = () => {
     console.log('log out!')

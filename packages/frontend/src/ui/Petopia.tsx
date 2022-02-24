@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react'
 import { useLobbyState } from '../networking/state/use-lobby-state'
+import { useLobby } from '../networking/use-lobby'
 import Lobby from './lobby/Lobby'
 
 export function Petopia() {
+  useLobby(true)
   const lobbyState = useLobbyState()
   if (!lobbyState.account?.character) {
     return <Lobby />

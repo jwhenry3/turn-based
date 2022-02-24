@@ -1,10 +1,12 @@
 import { Client, Room } from 'colyseus.js'
 import { useEffect, useRef, useState } from 'react'
 import { mapRegions, regionServers } from './maps'
+import { useLobbyState } from './state/use-lobby-state'
 import { useRegion } from './use-region'
 
 const maps: Record<string, { room: Room }> = {}
 export function useMap(name: string) {
+  const lobbyState = useLobbyState()
   const { region, rooms } = useRegion(mapRegions[name], name)
   const map = useRef<Room | undefined>()
   const [attempts, setAttempts] = useState<number>(0)
@@ -19,7 +21,10 @@ export function useMap(name: string) {
         try {
           const client = region.current as Client
           console.log('Connecting to Map... attempt:', attempts + 1)
-          let room = await client.joinOrCreate(name)
+          let room = await client.joinOrCreate(name, {
+            token: lobbyState.account.token.token,
+            characterId: lobbyState.account.character.characterId,
+          })
           maps[name] = { room }
           map.current = room
           console.log('Connected!')
