@@ -1,8 +1,15 @@
 import { Client, Room } from 'colyseus.js'
 import { useEffect, useRef, useState } from 'react'
 import { useLobbyState } from './state/use-lobby-state'
+import { Observable, Subject } from 'rxjs'
 
-const lobbyObj: { current: Room | undefined } = { current: undefined }
+const lobbyObj: {
+  current: Room | undefined
+  messages: Subject<{ type: string; message: any }>
+} = {
+  current: undefined,
+  messages: new Subject<{ type: string; message: any }>(),
+}
 export function useLobby(isTopLevel: boolean = false) {
   const lobby = lobbyObj
   const [attempts, setAttempts] = useState<number>(0)
@@ -32,6 +39,9 @@ export function useLobby(isTopLevel: boolean = false) {
               lobby.current = undefined
               timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
             }
+          })
+          room.onMessage('*', (type: string, message) => {
+            lobby.messages.next({ type, message })
           })
         } catch (e) {
           lobby.current = undefined

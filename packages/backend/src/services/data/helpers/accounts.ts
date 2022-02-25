@@ -8,12 +8,24 @@ export class Accounts {
   static async getAccountById(accountId: string) {
     return await AccountModel.findOne({ where: { accountId } })
   }
+  static async getAccountByUsername(username: string) {
+    return await AccountModel.findOne({ where: { username } })
+  }
 
   static async createAccount(
     username: string,
     password: string,
     email?: string
   ) {
+    if (await Accounts.getAccountByUsername(username)) {
+      throw new Error('Username is taken')
+    }
+    if (!username) {
+      throw new Error('Username is required')
+    }
+    if (!password) {
+      throw new Error('Password is required')
+    }
     return await AccountModel.create({
       accountId: Identities.id(),
       username,

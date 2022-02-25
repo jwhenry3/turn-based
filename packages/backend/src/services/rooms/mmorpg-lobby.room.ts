@@ -69,9 +69,8 @@ export class MmorpgLobbyRoom extends Room {
           )
           this.state.accounts.set(client.sessionId, accountSchema)
         } catch (e) {
-          console.log(e)
           client.send('account:register:failure', {
-            message: 'Could not register that account at this time',
+            message: e.message,
           })
         }
       }

@@ -1,10 +1,13 @@
 import create, { State } from 'zustand'
-export interface LobbyState extends State {
-  entities: Record<string, any>
-  update(entities: Record<string, any>): void
+export interface EntityState extends State {
+  entities: { players: Record<string, any>; npcs: Record<string, any> }
+  update(entities: {
+    players: Record<string, any>
+    npcs: Record<string, any>
+  }): void
 }
-export const useEntityState = create<LobbyState>((set) => ({
-  entities: {},
+export const useEntityState = create<EntityState>((set) => ({
+  entities: { players: {}, npcs: {} },
   update: (entities) =>
     set((state) => {
       state.entities = entities

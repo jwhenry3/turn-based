@@ -4,7 +4,7 @@ import { useEntityState } from '../../networking/state/use-entity-state'
 import { useMovement } from './use-movement'
 import { useUpdateLoop } from './use-update-loop'
 
-export const PlayerEntity = styled.div`
+export const NpcEntity = styled.div`
   width: 32px;
   height: 64px;
   transform: translate3d(-16px, -56px, 0);
@@ -17,7 +17,7 @@ export const PlayerEntity = styled.div`
     align-items: center;
   }
 `
-export const PlayerName = styled.div`
+export const NpcName = styled.div`
   position: absolute;
   bottom: 72px;
   font-size: 12px;
@@ -26,7 +26,7 @@ export const PlayerName = styled.div`
   color: #fff;
   text-shadow: 0 -1px #000, -1px 0 #000, 0 1px #000, 1px 0 #000, -1px -1px #000,
     1px -1px #000, -1px 1px #000, 1px 1px #000;
-  background: #8af;
+  background: #ffcf88;
   text-align: center;
   white-space: nowrap;
   border-radius: 12px;
@@ -38,21 +38,22 @@ export const PlayerName = styled.div`
     margin-top: -8px;
   }
 `
-export const PlayerBody = styled.div`
+export const NpcBody = styled.div`
   position: relative;
-  background: green;
+  background: orange;
   flex: 1;
   width: 100%;
   border-radius: 24px;
 `
-export function Player({ name }) {
-  const position = useEntityState((state) => {
+export function Npc({ id }) {
+  const { name, x, y } = useEntityState((state) => {
     return {
-      x: state.entities.players[name]?.position.x || -1,
-      y: state.entities.players[name]?.position.y || -1,
+      name: state.entities.npcs[id]?.name,
+      x: state.entities.npcs[id]?.position.x || -1,
+      y: state.entities.npcs[id]?.position.y || -1,
     }
   })
-  const { positionsRef, move } = useMovement({ x: -1, y: -1 }, position)
+  const { positionsRef, move } = useMovement({ x: -1, y: -1 }, { x, y })
   const element = useRef<HTMLElement | null>(null)
 
   useUpdateLoop(() => {
@@ -64,19 +65,19 @@ export function Player({ name }) {
       element.current.style.zIndex = positionsRef.current.current.y + ''
     }
   })
-
-  return (
-    <PlayerEntity
-      ref={(node) => {
-        element.current = node
-      }}
-    >
-      <div style={{ position: 'relative' }}>
-        <PlayerName>
-          <div>{name}</div>
-        </PlayerName>
-        <PlayerBody />
-      </div>
-    </PlayerEntity>
-  )
+  return <></>
+  // return (
+  //   <NpcEntity
+  //     ref={(node) => {
+  //       element.current = node
+  //     }}
+  //   >
+  //     <div style={{ position: 'relative' }}>
+  //       <NpcName>
+  //         <div>{name}</div>
+  //       </NpcName>
+  //       <NpcBody />
+  //     </div>
+  //   </NpcEntity>
+  // )
 }

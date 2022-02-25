@@ -1,36 +1,26 @@
 import styled from '@emotion/styled'
 import { Button, FormHelperText, TextField } from '@mui/material'
 import { useState } from 'react'
-import { useLobby } from '../../networking/use-lobby'
 export const RegisterForm = styled.form`
   display: flex;
   flex-direction: column;
 `
-export function Register({ onBack }) {
-  const lobby = useLobby()
+export function Register({ onBack, onRegister }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [formError, setFormError] = useState('')
-  const onRegister = (e) => {
-    e.preventDefault()
-    if (password !== confirmPassword) {
-      setFormError('Password and Confirm Password must match')
-      return false
-    }
-    lobby.current?.send('account:register', {
-      username,
-      password,
-    })
-    return false
-  }
   return (
-    <RegisterForm onSubmit={onRegister}>
-      {formError && <FormHelperText error>{formError}</FormHelperText>}
+    <RegisterForm
+      onSubmit={(e) => {
+        e.preventDefault()
+        onRegister({ username, password, confirmPassword })
+      }}
+    >
       <TextField
         name="username"
         type="text"
         value={username}
+        variant="filled"
         required
         label="Username"
         onChange={(e) => setUsername(e.target.value)}
@@ -40,6 +30,7 @@ export function Register({ onBack }) {
         name="password"
         type="password"
         value={password}
+        variant="filled"
         label="Password"
         required
         onChange={(e) => setPassword(e.target.value)}
@@ -49,6 +40,7 @@ export function Register({ onBack }) {
         name="password"
         type="password"
         label="Confirm Password"
+        variant="filled"
         value={confirmPassword}
         required
         onChange={(e) => setConfirmPassword(e.target.value)}

@@ -1,10 +1,11 @@
+import 'phaser'
 import { lazy, Suspense } from 'react'
 import { useSceneState } from '../networking/state/use-scene-state'
 import { useLobby } from '../networking/use-lobby'
 import Lobby from './lobby/Lobby'
 
 const maps: Record<string, Function> = {}
-export function Mmorpg() {
+export default function Mmorpg() {
   useLobby(true)
   const { scene } = useSceneState()
   if (!scene) {
