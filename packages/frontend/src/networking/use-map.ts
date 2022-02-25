@@ -7,12 +7,19 @@ import { usePlayerListState } from './state/use-player-list-state'
 import { useRegion } from './use-region'
 
 const maps: Record<string, { room: Room }> = {}
+
 export function useMap(name: string, root: boolean = false) {
   const { token, characterId } = useAuthState()
   const { region } = useRegion(mapRegions[name], name)
   const map = useRef<Room | undefined>(maps[name]?.room)
-  const playerList = usePlayerListState(({ update }) => ({ update }))
-  const updateEntities = useEntityState(({ update }) => update)
+  const playerList = usePlayerListState(
+    ({ update }) => ({ update }),
+    () => false
+  )
+  const updateEntities = useEntityState(
+    ({ update }) => update,
+    () => false
+  )
   const connect = async (data: { timeout: any }) => {
     try {
       const client = region.current as Client
@@ -38,15 +45,16 @@ export function useMap(name: string, root: boolean = false) {
 
       room.onLeave(async (code) => {
         console.log('Disconnected', code)
-        if (code === 1000) {
+        const reconnectCodes = [1000, 1006, 1002, 1003]
+        if (reconnectCodes.includes(code) && map.current === room) {
           map.current = undefined
-          data.timeout = setTimeout(connect, 5000)
+          data.timeout = setTimeout(() => connect(data), 5000)
         }
       })
       return room
     } catch (e) {
       map.current = undefined
-      data.timeout = setTimeout(connect, 5000)
+      data.timeout = setTimeout(() => connect(data), 5000)
     }
   }
   useEffect(() => {

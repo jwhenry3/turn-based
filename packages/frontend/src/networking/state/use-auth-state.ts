@@ -9,6 +9,7 @@ export const useAuthState = create<LobbyState>((set) => ({
   characterId: undefined,
   update: (token, characterId) =>
     set((state) => {
-      ;(state.token = token), (state.characterId = characterId)
+      state.token = token
+      state.characterId = characterId
     }),
 }))

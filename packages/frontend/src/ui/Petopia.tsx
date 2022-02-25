@@ -1,18 +1,18 @@
 import { lazy, Suspense } from 'react'
-import { useLobbyState } from '../networking/state/use-lobby-state'
+import { useSceneState } from '../networking/state/use-scene-state'
 import { useLobby } from '../networking/use-lobby'
 import Lobby from './lobby/Lobby'
 
+const maps: Record<string, Function> = {}
 export function Petopia() {
   useLobby(true)
-  const lobbyState = useLobbyState()
-  if (!lobbyState.account?.character) {
+  const { scene } = useSceneState()
+  if (!scene) {
     return <Lobby />
   }
   try {
-    const Component = lazy(
-      () => import('./maps/' + lobbyState.account.character.position.map)
-    )
+    maps[scene] = maps[scene] || lazy(() => import('./maps/' + scene))
+    const Component = maps[scene]
     return (
       <Suspense fallback={<div>Loading map...</div>}>
         <Component />

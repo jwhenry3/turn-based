@@ -6,7 +6,10 @@ const lobbyObj: { current: Room | undefined } = { current: undefined }
 export function useLobby(isTopLevel: boolean = false) {
   const lobby = lobbyObj
   const [attempts, setAttempts] = useState<number>(0)
-  const lobbyState = useLobbyState()
+  const update = useLobbyState(
+    ({ update }) => update,
+    () => false
+  )
 
   useEffect(() => {
     if (!lobby.current && isTopLevel) {
@@ -20,11 +23,12 @@ export function useLobby(isTopLevel: boolean = false) {
           console.log('Connected!')
           room.onStateChange(async (state: any) => {
             const account = state.accounts.get(room.sessionId)
-            lobbyState.update(account)
+            update(account)
           })
           room.onLeave(async (code) => {
             console.log('Disconnected', code)
-            if (code === 1000) {
+            const reconnectCodes = [1000, 1006, 1002, 1003]
+            if (reconnectCodes.includes(code)) {
               lobby.current = undefined
               timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
             }

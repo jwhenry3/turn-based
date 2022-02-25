@@ -38,20 +38,18 @@ export class PetopiaMapRoom extends Room {
     this.onMessage('character:battle', (client, { x, y }) => {})
   }
   async onAuth(client, options, request) {
+    console.log('auth', client.sessionId)
     if (!options.characterId) {
       client.send('character id not provided')
-      client.close(4406)
       return
     }
     if (!options.token) {
       client.send('unauthorized')
-      client.close(4401)
       return
     }
     const token = await Accounts.verifyToken(options.token)
     if (!token) {
       client.send('token invalid or expired')
-      client.close(4401)
       return
     }
     const characterModel = await Characters.getCharacterForAccount(
@@ -60,22 +58,21 @@ export class PetopiaMapRoom extends Room {
     )
     if (!characterModel) {
       client.send('character not found with id')
-      client.close(4404)
       return
     }
     const oldCharacter = this.state.players.get(characterModel.name)
-    if (oldCharacter) {
-      const oldClient = this.connectedClients[oldCharacter.currentClientId]
-      if (oldClient) {
-        oldClient.send('character:conflict')
-        oldClient.leave(4409)
-      }
-    }
     this.connectedClients[client.sessionId] = client
-    const character = createCharacter(characterModel, client.sessionId)
-    this.state.players.set(character.name, character)
-    this.state.playersByClient.set(client.sessionId, character)
-    this.state.triggerAll()
+    if (oldCharacter) {
+      if (this.state.playersByClient) {
+        this.state.playersByClient.delete(oldCharacter.currentClientId)
+      }
+      oldCharacter.currentClientId = client.sessionId
+      this.state.playersByClient.set(client.sessionId, oldCharacter)
+    } else {
+      const character = createCharacter(characterModel, client.sessionId)
+      this.state.players.set(character.name, character)
+      this.state.playersByClient.set(client.sessionId, character)
+    }
     return characterModel
   }
   async onJoin(
@@ -94,13 +91,14 @@ export class PetopiaMapRoom extends Room {
       if (consented) {
         throw new Error('consented leave')
       }
-      if (character) {
-        character.status = 'reconnecting'
-      }
-      await this.allowReconnection(client, 30)
-      if (character) {
-        character.status = 'connected'
-      }
+      throw new Error('disconnect no reconnect')
+      // if (character) {
+      //   character.status = 'reconnecting'
+      // }
+      // await this.allowReconnection(client, 30)
+      // if (character) {
+      //   character.status = 'connected'
+      // }
     } catch (e) {
       if (character) {
         character.status = 'disconnected'

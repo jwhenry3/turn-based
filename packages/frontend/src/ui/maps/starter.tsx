@@ -7,6 +7,7 @@ export default function Starter() {
   const { map } = useMap('starter', true)
   const players = usePlayerListState(({ players }) => players)
   useEffect(() => {
+    console.log('Reloaded')
     const keysDown = []
     const movementKeys = ['w', 'a', 's', 'd']
     const onKeyDown = (e) => {
@@ -42,7 +43,6 @@ export default function Starter() {
       clearInterval(interval)
     }
   }, [])
-  console.log('Rerender')
   return (
     <div>
       <div>Starter Map</div>

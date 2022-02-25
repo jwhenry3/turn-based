@@ -136,6 +136,16 @@ export class PetopiaLobbyRoom extends Room {
         account.character = character
       }
     })
+    this.onMessage('character:logout', (client, message) => {
+      if (this.state.accounts[client.sessionId]) {
+        this.state.accounts[client.sessionId].character = undefined
+      }
+    })
+    this.onMessage('account:logout', (client, message) => {
+      if (this.state.accounts[client.sessionId]) {
+        this.state.accounts.delete(client.sessionId)
+      }
+    })
 
     this.setState(new LobbyState())
   }

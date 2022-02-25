@@ -4,11 +4,9 @@ import { regionServers } from './maps'
 import { useRoomsState } from './state/use-rooms-state'
 
 const regions: Record<string, Client> = {}
-export function useRegion(name: string, roomName?: string) {
+export function useRegion(name: string) {
   const region = useRef<Client | undefined>()
-  const { setRoomsFor } = useRoomsState(({ setRoomsFor, regions }) => ({
-    setRoomsFor,
-  }))
+  const setRoomsFor = useRoomsState(({ setRoomsFor }) => setRoomsFor)
 
   useEffect(() => {
     let roomInstance
