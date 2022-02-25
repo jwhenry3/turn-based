@@ -40,7 +40,7 @@ export default function Lobby() {
       <LobbyContainer>
         <Card>
           <CardContent>
-            <LobbyTitle>Petopia</LobbyTitle>
+            <LobbyTitle>MMORPG</LobbyTitle>
             <br />
             {!state.account && <Login />}
             {state.account && !state.account?.character && <Characters />}

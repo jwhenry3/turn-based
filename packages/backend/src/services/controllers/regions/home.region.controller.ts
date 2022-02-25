@@ -5,8 +5,8 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common'
 import { LobbyRoom, Server } from 'colyseus'
-import { PetopiaBattleRoom } from '../../rooms/petopia-battle.room'
-import { PetopiaMapRoom } from '../../rooms/petopia-map.room'
+import { MmorpgBattleRoom } from '../../rooms/mmorpg-battle.room'
+import { MmorpgMapRoom } from '../../rooms/mmorpg-map.room'
 
 @Controller()
 export class HomeRegionController
@@ -16,10 +16,10 @@ export class HomeRegionController
 
   onApplicationBootstrap() {
     this.server.define('lobby', LobbyRoom)
-    this.server.define('starter', PetopiaMapRoom).enableRealtimeListing()
-    this.server.define('town', PetopiaMapRoom).enableRealtimeListing()
-    this.server.define('wilds', PetopiaMapRoom).enableRealtimeListing()
-    this.server.define('battle', PetopiaBattleRoom)
+    this.server.define('starter', MmorpgMapRoom).enableRealtimeListing()
+    this.server.define('town', MmorpgMapRoom).enableRealtimeListing()
+    this.server.define('wilds', MmorpgMapRoom).enableRealtimeListing()
+    this.server.define('battle', MmorpgBattleRoom)
     this.server.listen(9201)
     // throw new Error('Method not implemented.')
   }

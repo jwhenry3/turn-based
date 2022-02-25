@@ -5,7 +5,7 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common'
 import { Server } from 'colyseus'
-import { PetopiaLobbyRoom } from '../../rooms/petopia-lobby.room'
+import { MmorpgLobbyRoom } from '../../rooms/mmorpg-lobby.room'
 
 @Controller()
 @Injectable()
@@ -15,7 +15,7 @@ export class LobbyController
   constructor(protected server: Server) {}
 
   onApplicationBootstrap() {
-    this.server.define('lobby', PetopiaLobbyRoom)
+    this.server.define('lobby', MmorpgLobbyRoom)
     this.server.listen(9200)
     // throw new Error('Method not implemented.')
   }

@@ -3,7 +3,7 @@ import { sign, verify } from 'jsonwebtoken'
 import { AccountModel, AccountTokenModel } from '../account'
 import { Identities } from './identities'
 
-const privateKey = 'petopia'
+const privateKey = 'mmorpg'
 export class Accounts {
   static async getAccountById(accountId: string) {
     return await AccountModel.findOne({ where: { accountId } })

@@ -1,5 +1,5 @@
-import { Petopia } from '../src/ui/Petopia'
+import { Mmorpg } from '../src/ui/Mmorpg'
 
 export default function Game() {
-  return <Petopia />
+  return <Mmorpg />
 }

@@ -6,7 +6,7 @@ import { Characters } from '../data/helpers/characters'
 import { createCharacter } from '../schemas/factories/character'
 import { Character, Npc } from '../schemas/schemas'
 
-export class PetopiaMapState extends Schema {
+export class MmorpgMapState extends Schema {
   @type({ map: Character })
   players = new MapSchema<Character>()
   @type({ map: Character })
@@ -16,13 +16,13 @@ export class PetopiaMapState extends Schema {
   npcs = new MapSchema<Npc>()
 }
 
-export class PetopiaMapRoom extends Room {
+export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
   maxClients: number = 64
 
   created = false
   onCreate(options: any): void | Promise<any> {
-    this.setState(new PetopiaMapState())
+    this.setState(new MmorpgMapState())
     this.onMessage('character:move', (client, { horizontal, vertical }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {

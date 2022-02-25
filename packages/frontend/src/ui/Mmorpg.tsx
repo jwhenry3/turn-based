@@ -4,7 +4,7 @@ import { useLobby } from '../networking/use-lobby'
 import Lobby from './lobby/Lobby'
 
 const maps: Record<string, Function> = {}
-export function Petopia() {
+export function Mmorpg() {
   useLobby(true)
   const { scene } = useSceneState()
   if (!scene) {

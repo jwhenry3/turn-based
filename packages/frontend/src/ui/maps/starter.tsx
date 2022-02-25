@@ -1,17 +1,28 @@
+import styled from '@emotion/styled'
 import { useEffect } from 'react'
 import { usePlayerListState } from '../../networking/state/use-player-list-state'
 import { useMap } from '../../networking/use-map'
 import { Player } from '../entities/Player'
 
+export const Grass = styled.div`
+  background-color: #2a8;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`
 export default function Starter() {
   const { map } = useMap('starter', true)
   const players = usePlayerListState(({ players }) => players)
   useEffect(() => {
-    console.log('Reloaded')
     const keysDown = []
     const movementKeys = ['w', 'a', 's', 'd']
     const onKeyDown = (e) => {
-      if (movementKeys.includes(e.key.toLowerCase()) && !keysDown.includes(e.key.toLowerCase())) {
+      if (
+        movementKeys.includes(e.key.toLowerCase()) &&
+        !keysDown.includes(e.key.toLowerCase())
+      ) {
         keysDown.push(e.key.toLowerCase())
       }
     }
@@ -44,11 +55,11 @@ export default function Starter() {
     }
   }, [])
   return (
-    <div>
+    <Grass>
       <div>Starter Map</div>
       {players.map((key) => (
         <Player key={key} name={key} />
       ))}
-    </div>
+    </Grass>
   )
 }

@@ -22,7 +22,7 @@ class LobbyState extends Schema {
   accounts = new MapSchema<Account>()
 }
 
-export class PetopiaLobbyRoom extends Room {
+export class MmorpgLobbyRoom extends Room {
   accountModels: Record<string, AccountModel> = {}
 
   // Life Cycle
