@@ -17,43 +17,7 @@ export const Grass = styled.div`
 `
 export default function Starter() {
   const { map } = useMap('starter', true)
-  const game = useRef<Phaser.Game | undefined>()
   useMovementInput(map)
-  const onRef = (node) => {
-    if (!game.current) {
-      game.current = new Phaser.Game({
-        parent: node,
-        type: Phaser.AUTO,
-        scale: {
-          mode: Phaser.Scale.RESIZE,
-          parent: node,
-          width: '100%',
-          height: '100%'
-        },
-        antialias: false,
-        scene: {
-          preload: () => {},
-          create() {
-            this.scale.on(
-              'resize',
-              (gameSize, baseSize, displaySize, resolution) => {
-                this.cameras.resize(gameSize.width, gameSize.height)
-              }
-            )
-          },
-          update: () => {},
-        },
-      })
-    }
-  }
 
-  return (
-    <Grass
-      ref={(node) => {
-        if (node) {
-          onRef(node)
-        }
-      }}
-    ></Grass>
-  )
+  return <></>
 }
