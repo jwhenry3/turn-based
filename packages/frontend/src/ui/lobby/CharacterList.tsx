@@ -9,13 +9,16 @@ export const Characters = styled(List)({
 export function CharacterList() {
   const [characters, setCharacters] = useState<Character[]>([])
   useEffect(() => {
-    app.rooms.lobby.state.account.characterList.onChange = (e) => {
+    const unsubscribe = app.rooms.lobby.state.accounts[
+      app.rooms.lobby.sessionId
+    ].listen('characterList', (e) => {
+      console.log(e)
       setCharacters(e)
-    }
+    })
     app.rooms.lobby?.send('characters:list')
 
     return () => {
-      app.rooms.lobby.state.account.characterList.onChange = undefined
+      unsubscribe()
     }
   }, [])
 

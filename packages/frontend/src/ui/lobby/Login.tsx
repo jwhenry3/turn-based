@@ -50,6 +50,7 @@ export function Login() {
   const onLogin = (e) => {
     setFormError('')
     e.preventDefault()
+    console.log(app.rooms.lobby)
     app.rooms.lobby?.send('account:login', { username, password })
     return false
   }

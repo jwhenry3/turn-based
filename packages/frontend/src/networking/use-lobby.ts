@@ -1,9 +1,10 @@
-import { Client } from 'colyseus.js'
+import { Client, Room } from 'colyseus.js'
 import { useEffect, useState } from 'react'
 import { app } from '../ui/app'
 
 export function useLobby() {
   const [attempts, setAttempts] = useState(0)
+  const [lobby, setLobby] = useState<Room | undefined>()
 
   useEffect(() => {
     let timeout
@@ -13,6 +14,7 @@ export function useLobby() {
         console.log('Connecting to Lobby... attempt:', attempts + 1)
         let room = await client.joinOrCreate('lobby')
         app.rooms.lobby = room
+        setLobby(room)
         console.log('Connected!')
         room.onLeave(async (code) => {
           console.log('Disconnected', code)
@@ -34,4 +36,6 @@ export function useLobby() {
       }
     }
   }, [attempts])
+
+  return lobby
 }

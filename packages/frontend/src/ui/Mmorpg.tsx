@@ -17,7 +17,7 @@ const GameContainer = styled.div`
 `
 const maps: Record<string, Function> = {}
 export default function Mmorpg() {
-  useLobby()
+  const lobby = useLobby()
   const { scene, update } = useSceneState()
   const onRef = (node) => {
     if (!app.game) {
@@ -58,7 +58,7 @@ export default function Mmorpg() {
   return (
     <div>
       <GameContainer ref={(node) => onRef(node)} />
-      {scene === 'lobby' && <Lobby />}
+      {scene === 'lobby' && lobby && <Lobby />}
       {scene && scene !== 'lobby' && renderMap()}
     </div>
   )

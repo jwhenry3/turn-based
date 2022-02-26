@@ -30,13 +30,19 @@ export const LobbyTitle = mStyled(Typography)({
 export default function Lobby() {
   const [state, setState] = useState({ account: undefined })
   useEffect(() => {
-    app.rooms.lobby.state.onChange = (e) => setState(e)
+    app.rooms.lobby.state.accounts.onAdd = (e) => {
+      setState({ account: e })
+    }
+    app.rooms.lobby.state.accounts.onRemove = () => {
+      setState({ account: undefined })
+    }
     // setup
     app.game.scene.start('lobby')
     return () => {
       // teardown
       app.game.scene.stop('lobby')
-      app.rooms.lobby.state.onChange = undefined
+      app.rooms.lobby.state.accounts.onAdd = undefined
+      app.rooms.lobby.state.accounts.onRemove = undefined
     }
   })
   return (

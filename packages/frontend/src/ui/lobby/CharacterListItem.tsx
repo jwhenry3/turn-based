@@ -8,7 +8,8 @@ export function CharacterListItem({ character }: { character: any }) {
     app.rooms.lobby?.send('characters:select', {
       characterId: character.characterId,
     })
-    app.auth.token = app.rooms.lobby.state.account.token.token
+    const account = app.rooms.lobby.state.accounts[app.rooms.lobby.sessionId]
+    app.auth.token = account.token.token
     app.auth.characterId = character.characterId
     update(character.position.map)
   }
