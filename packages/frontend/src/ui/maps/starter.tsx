@@ -1,11 +1,7 @@
 import styled from '@emotion/styled'
 import { useEffect, useRef } from 'react'
-import { useNpcListState } from '../../networking/state/use-npc-list-state'
-import { usePlayerListState } from '../../networking/state/use-player-list-state'
 import { useMap } from '../../networking/use-map'
-import { Npc } from '../entities/Npc'
-import { Player } from '../entities/Player'
-import { useMovementInput } from '../entities/use-movement-input'
+import { app } from '../app'
 
 export const Grass = styled.div`
   background-color: #2a8;
@@ -16,8 +12,19 @@ export const Grass = styled.div`
   bottom: 0;
 `
 export default function Starter() {
-  const { map } = useMap('starter', true)
-  useMovementInput(map)
+  useMap('starter', true)
+
+  useEffect(() => {
+    const activeScenes = app.game.scene.getScenes(true)
+    if (!activeScenes.includes(app.scenes.starter)) {
+      // setup
+      app.game.scene.start('starter')
+    }
+    return () => {
+      // teardown
+      app.game.scene.stop('starter')
+    }
+  })
 
   return <></>
 }

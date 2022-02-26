@@ -1,13 +1,9 @@
 import styled from '@emotion/styled'
-import {
-  Button,
-  Typography,
-  styled as mStyled,
-  Card,
-  CardContent,
-} from '@mui/material'
+import { Typography, styled as mStyled, Card, CardContent } from '@mui/material'
+import { useEffect } from 'react'
 import { useLobbyState } from '../../networking/state/use-lobby-state'
-import { useLobby } from '../../networking/use-lobby'
+import { usePhaserGame } from '../../phaser/use-phaser-game'
+import { app } from '../app'
 import { Characters } from './Characters'
 import { Login } from './Login'
 
@@ -35,6 +31,16 @@ export const LobbyTitle = mStyled(Typography)({
 
 export default function Lobby() {
   const state = useLobbyState()
+  const game = usePhaserGame()
+
+  useEffect(() => {
+    // setup
+    app.game.scene.start('lobby')
+    return () => {
+      // teardown
+      app.game.scene.stop('lobby')
+    }
+  })
   return (
     <LobbyPage>
       <LobbyContainer>

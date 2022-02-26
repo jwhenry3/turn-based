@@ -1,13 +1,14 @@
 import { Button } from '@mui/material'
 import { useState } from 'react'
 import { useLobby } from '../../networking/use-lobby'
+import { app } from '../app'
 import { CharacterList } from './CharacterList'
 import { CharacterCreation } from './dialogs/CharacterCreation'
 
 export function Characters() {
   const lobby = useLobby()
   const [createOpen, setCreateOpen] = useState(false)
-  const onCreate = ({name}) => {
+  const onCreate = ({ name }) => {
     const details = {
       name,
       eyes: '1',
@@ -17,13 +18,13 @@ export function Characters() {
       skinColor: '#eeccaa',
       gender: 'male',
     }
-    lobby.current?.send('characters:create', details)
+    app.rooms.lobby?.send('characters:create', details)
     setCreateOpen(false)
   }
   const onLogout = () => {
-    lobby.current?.send('account:logout')
+    app.rooms.lobby?.send('account:logout')
   }
-  if (!lobby.current) return <div>Loading...</div>
+  if (!app.rooms.lobby) return <div>Loading...</div>
   return (
     <div>
       <CharacterList />

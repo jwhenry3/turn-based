@@ -4,6 +4,10 @@ import { lazy, Suspense, useRef, useState } from 'react'
 import { useSceneState } from '../networking/state/use-scene-state'
 import { useLobby } from '../networking/use-lobby'
 import Lobby from './lobby/Lobby'
+import { BackgroundScene } from './scenes/background.scene'
+import { LobbyScene } from './scenes/lobby.scene'
+import { StarterScene } from './scenes/starter.scene'
+import { app } from './app'
 const GameContainer = styled.div`
   position: fixed;
   top: 0;
@@ -14,12 +18,10 @@ const GameContainer = styled.div`
 const maps: Record<string, Function> = {}
 export default function Mmorpg() {
   useLobby(true)
-  const { scene } = useSceneState()
-  const game = useRef<Phaser.Game | undefined>()
-  const [hasInteracted, setHasInteracted] = useState(false)
+  const { scene, update } = useSceneState()
   const onRef = (node) => {
-    if (!game.current) {
-      game.current = new Phaser.Game({
+    if (!app.game) {
+      app.game = new Phaser.Game({
         parent: node,
         type: Phaser.AUTO,
         backgroundColor: '#0af',
@@ -29,17 +31,15 @@ export default function Mmorpg() {
           width: '100%',
           height: '100%',
         },
-        antialias: false,
-        scene: {
-          preload: () => {},
-          create() {
-            this.scale.on('resize', (gameSize) => {
-              this.cameras.resize(gameSize.width, gameSize.height)
-            })
-          },
-          update: () => {},
+        input: {
+          gamepad: true,
         },
+        antialias: false,
+        scene: [BackgroundScene],
       })
+      app.scenes.lobby = app.game.scene.add('lobby', LobbyScene) as any
+      app.scenes.starter = app.game.scene.add('starter', StarterScene) as any
+      update('lobby')
     }
   }
   const renderMap = () => {
@@ -56,10 +56,10 @@ export default function Mmorpg() {
     }
   }
   return (
-    <div onClick={() => setHasInteracted(true)}>
-      {hasInteracted && <GameContainer ref={(node) => onRef(node)} />}
-      {!scene && <Lobby />}
-      {scene && renderMap()}
+    <div>
+      <GameContainer ref={(node) => onRef(node)} />
+      {scene === 'lobby' && <Lobby />}
+      {scene && scene !== 'lobby' && renderMap()}
     </div>
   )
 }

@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "backend:dev": "nx serve backend",
-    "frontend:dev": "next dev packages/frontend"
+    "frontend:dev": "next dev packages/frontend",
+    "frontend:schemas": "npx schema-codegen packages/backend/src/services/schemas/schemas.ts --output packages/frontend/src/networking/schemas --ts"
   },
   "private": true,
   "dependencies": {

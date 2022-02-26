@@ -1,8 +1,8 @@
 import styled from '@emotion/styled'
 import { Button, FormHelperText, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { filter } from 'rxjs/operators'
 import { useLobby } from '../../networking/use-lobby'
+import { app } from '../app'
 import { Register } from './Register'
 
 export const FormErrorContainer = styled.div`
@@ -24,7 +24,7 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [formError, setFormError] = useState('')
   useEffect(() => {
-    const subscription = lobby.messages.subscribe(({ type, message }) => {
+    const subscription = app.messages.lobby.subscribe(({ type, message }) => {
       console.log(type, message)
       if (
         type === 'account:login:failure' ||
@@ -44,7 +44,7 @@ export function Login() {
       setFormError('Password and Confirm Password must match')
       return
     }
-    lobby.current?.send('account:register', {
+    app.rooms.lobby?.send('account:register', {
       username,
       password,
     })
@@ -52,7 +52,7 @@ export function Login() {
   const onLogin = (e) => {
     setFormError('')
     e.preventDefault()
-    lobby.current?.send('account:login', { username, password })
+    app.rooms.lobby?.send('account:login', { username, password })
     return false
   }
   return (

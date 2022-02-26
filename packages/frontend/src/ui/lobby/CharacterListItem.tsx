@@ -2,15 +2,14 @@ import { ListItemButton, ListItemText } from '@mui/material'
 import { useAuthState } from '../../networking/state/use-auth-state'
 import { useLobbyState } from '../../networking/state/use-lobby-state'
 import { useSceneState } from '../../networking/state/use-scene-state'
-import { useLobby } from '../../networking/use-lobby'
+import { app } from '../app'
 
 export function CharacterListItem({ character }: { character: any }) {
-  const lobby = useLobby()
   const lobbyState = useLobbyState()
   const auth = useAuthState()
-  const {scene, update} = useSceneState()
+  const { update } = useSceneState()
   const onSelect = () => {
-    lobby.current?.send('characters:select', {
+    app.rooms.lobby?.send('characters:select', {
       characterId: character.characterId,
     })
     auth.update(lobbyState.account.token.token, character.characterId)
