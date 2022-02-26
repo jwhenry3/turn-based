@@ -1,4 +1,5 @@
 import { MapSchema } from '@colyseus/schema'
+import { Room } from 'colyseus.js'
 import { Character } from '../../networking/schemas/Character'
 import { Npc } from '../../networking/schemas/Npc'
 import { app } from '../../ui/app'
@@ -6,24 +7,24 @@ import { app } from '../../ui/app'
 export class SceneConnector {
   attempts = 0
   timeout: any
-
+  room: Room
   entities: { players: MapSchema<Character>; npcs: MapSchema<Npc> }
   constructor(public name: string) {}
 
   async connect() {
     try {
       const client = app.regions[app.regionMaps[this.name]]
-      let room = await client.joinOrCreate(this.name, {
+      this.room = await client.joinOrCreate(this.name, {
         token: app.auth.token,
         characterId: app.auth.characterId,
       })
-      app.rooms.starter = room
-      this.entities = room.state as {
+      app.rooms.starter = this.room
+      this.entities = this.room.state as {
         players: MapSchema<Character>
         npcs: MapSchema<Npc>
       }
 
-      room.onLeave(async (code) => {
+      this.room.onLeave(async (code) => {
         const reconnectCodes = [1000, 1006, 1002, 1003]
         if (reconnectCodes.includes(code)) {
           this.timeout = setTimeout(() => this.connect(), 5000)

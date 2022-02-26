@@ -1,7 +1,10 @@
 export class MovementInput {
   movement = [0, 0]
 
+  enabled = false
   keys: Record<string, Phaser.Input.Keyboard.Key> = {}
+
+  onChange = (axis: [number, number]) => null
 
   create(input: Phaser.Input.InputPlugin) {
     this.keys = input.keyboard.addKeys({
@@ -12,6 +15,9 @@ export class MovementInput {
     }) as Record<string, Phaser.Input.Keyboard.Key>
   }
   update(input: Phaser.Input.InputPlugin) {
+    if (!this.enabled) {
+      return
+    }
     const movement = [0, 0]
     if (this.keys.left.isDown) {
       movement[0] = -1
@@ -37,7 +43,7 @@ export class MovementInput {
     }
     if (movement[0] !== this.movement[0] || movement[1] !== this.movement[1]) {
       this.movement = movement
+      this.onChange(movement)
     }
   }
 }
-export const singleton: { movement: MovementInput } = { movement: undefined }

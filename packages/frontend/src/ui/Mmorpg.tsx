@@ -24,7 +24,7 @@ export default function Mmorpg() {
     if (!app.game) {
       app.game = new Phaser.Game({
         parent: node,
-        type: Phaser.AUTO,
+        type: Phaser.WEBGL,
         backgroundColor: '#0af',
         scale: {
           mode: Phaser.Scale.RESIZE,
@@ -46,7 +46,7 @@ export default function Mmorpg() {
   return (
     <div>
       <GameContainer ref={(node) => onRef(node)} />
-      {scene === 'lobby' && lobby && <Lobby />}
+      {scene === 'lobby' && lobby && lobby.state && <Lobby />}
       {scene && scene !== 'lobby' && <World />}
     </div>
   )

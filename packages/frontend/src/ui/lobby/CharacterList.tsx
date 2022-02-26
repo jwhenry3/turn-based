@@ -12,7 +12,6 @@ export function CharacterList() {
     const unsubscribe = app.rooms.lobby.state.accounts[
       app.rooms.lobby.sessionId
     ].listen('characterList', (e) => {
-      console.log(e)
       setCharacters(e)
     })
     app.rooms.lobby?.send('characters:list')

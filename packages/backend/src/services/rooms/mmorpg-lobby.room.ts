@@ -83,7 +83,6 @@ export class MmorpgLobbyRoom extends Room {
         const characters = await Characters.getCharactersForAccount(
           accountModel.accountId
         )
-        console.log(characters)
         account.characterList = new ArraySchema<Character>()
         for (const character of characters) {
           account.characterList.push(

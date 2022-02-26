@@ -48,7 +48,7 @@ export class MmorpgMapRoom extends Room {
 
   onCreate(options: any): void | Promise<any> {
     this.setState(new MmorpgMapState())
-    this.spawnNpcs(64)
+    this.spawnNpcs(1000)
     this.interval = setInterval(() => {
       this.update$.next()
       // iterate async to avoid blocking the server

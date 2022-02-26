@@ -1,49 +1,35 @@
-import { Character } from '../../networking/schemas/Character'
-import { app } from '../../ui/app'
+import { Npc } from '../../networking/schemas/Npc'
 import { lerp } from '../behaviors/lerp'
 import { NetworkedScene } from '../scenes/networked.scene'
 import { MovableEntity } from './movable'
 
-export class PlayerEntity extends MovableEntity<Character> {
+export class NpcEntity extends MovableEntity<Npc> {
   rectangle: Phaser.GameObjects.Rectangle
 
-  get isLocalPlayer() {
-    return this.model.currentClientId === this.scene.connector.room.sessionId
-  }
-
-  constructor(public model: Character, public scene: NetworkedScene) {
+  constructor(public model: Npc, public scene: NetworkedScene) {
     super(model, scene)
   }
-
   create() {
-    if (this.isLocalPlayer) {
-      app.movement.create(this.scene.input)
-      app.movement.enabled = true
-      app.movement.onChange = ([horizontal, vertical]) => {
-        this.scene.connector.room.send('character:move', {
-          horizontal,
-          vertical,
-        })
-      }
-    }
     // Using a circle for collision
+    const color = Phaser.Display.Color.HexStringToColor('#ff8822')
+    color.alpha = 0.5
+
     this.rectangle = new Phaser.GameObjects.Rectangle(
       this.scene,
       this.position.x,
       this.position.y,
       32,
       60,
-      Phaser.Display.Color.HexStringToColor('#00aa22').color
+      color.color,
+      color.alpha
     )
+    this.rectangle.setAlpha(color.alpha)
     this.scene.add.existing(this.rectangle)
   }
 
   preUpdate() {
     if (!this.rectangle) {
       this.create()
-    }
-    if (this.isLocalPlayer) {
-      app.movement.update(this.scene.input)
     }
     if (
       this.rectangle.x !== this.position.x ||
