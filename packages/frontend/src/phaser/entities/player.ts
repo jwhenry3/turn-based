@@ -1,8 +1,12 @@
+import { Character } from '../../networking/schemas/Character'
+
 export class Player extends Phaser.GameObjects.GameObject {
   rectangle: Phaser.GameObjects.Rectangle
-  _position = { x: -1, y: -1 }
+
+  model: Character
+
   get position() {
-    return this._position
+    return this.model?.position || { x: -1, y: -1 }
   }
   create() {
     // Using a circle for collision

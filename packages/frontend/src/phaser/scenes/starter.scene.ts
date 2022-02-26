@@ -1,12 +1,18 @@
 import { app } from '../../ui/app'
+import { NetworkedScene } from './networked.scene'
+import { SceneConnector } from './scene.connector'
 
-export class StarterScene extends Phaser.Scene {
+export class StarterScene extends NetworkedScene {
+  attempts = 0
+  timeout: any
+
+  connector = new SceneConnector('starter')
+
   create() {
-    console.log('create', app.entities)
-    app.entities.players.onChange = (e) => {
+    this.connector.entities.players.onChange = (e) => {
       console.log('players changed', e)
     }
-    app.entities.npcs.onChange = (e) => {
+    this.connector.entities.npcs.onChange = (e) => {
       console.log('npcs changed', e)
     }
   }

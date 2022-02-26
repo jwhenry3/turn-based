@@ -8,6 +8,7 @@ import { BackgroundScene } from '../phaser/scenes/background.scene'
 import { LobbyScene } from '../phaser/scenes/lobby.scene'
 import { StarterScene } from '../phaser/scenes/starter.scene'
 import { app } from './app'
+import { World } from './World'
 const GameContainer = styled.div`
   position: fixed;
   top: 0;
@@ -42,24 +43,11 @@ export default function Mmorpg() {
       update('lobby')
     }
   }
-  const renderMap = () => {
-    try {
-      maps[scene] = maps[scene] || lazy(() => import('./maps/' + scene))
-      const Component = maps[scene]
-      return (
-        <Suspense fallback={<div>Loading map...</div>}>
-          <Component />
-        </Suspense>
-      )
-    } catch (e) {
-      return <div>Map Not Found</div>
-    }
-  }
   return (
     <div>
       <GameContainer ref={(node) => onRef(node)} />
       {scene === 'lobby' && lobby && <Lobby />}
-      {scene && scene !== 'lobby' && renderMap()}
+      {scene && scene !== 'lobby' && <World />}
     </div>
   )
 }
