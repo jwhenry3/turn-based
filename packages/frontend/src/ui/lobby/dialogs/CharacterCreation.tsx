@@ -9,7 +9,6 @@ import {
   TextField,
 } from '@mui/material'
 import { useState } from 'react'
-import { GithubPicker, SliderPicker, HuePicker } from 'react-color'
 export const CharacterCreationPanel = styled.div`
   display: flex;
 `

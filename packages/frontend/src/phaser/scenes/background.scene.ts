@@ -1,4 +1,4 @@
-import { app } from '../app'
+import { app } from '../../ui/app'
 
 export class BackgroundScene extends Phaser.Scene {
   create() {

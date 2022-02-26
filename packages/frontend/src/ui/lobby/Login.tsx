@@ -1,7 +1,6 @@
 import styled from '@emotion/styled'
 import { Button, FormHelperText, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useLobby } from '../../networking/use-lobby'
 import { app } from '../app'
 import { Register } from './Register'
 
@@ -18,7 +17,6 @@ export const LoginForm = styled.form`
   flex-direction: column;
 `
 export function Login() {
-  const lobby = useLobby()
   const [isRegister, setIsRegister] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')

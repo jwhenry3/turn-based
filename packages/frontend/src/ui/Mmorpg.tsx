@@ -1,12 +1,12 @@
 import styled from '@emotion/styled'
 import 'phaser'
 import { lazy, Suspense, useRef, useState } from 'react'
-import { useSceneState } from '../networking/state/use-scene-state'
+import { useSceneState } from '../phaser/use-scene-state'
 import { useLobby } from '../networking/use-lobby'
 import Lobby from './lobby/Lobby'
-import { BackgroundScene } from './scenes/background.scene'
-import { LobbyScene } from './scenes/lobby.scene'
-import { StarterScene } from './scenes/starter.scene'
+import { BackgroundScene } from '../phaser/scenes/background.scene'
+import { LobbyScene } from '../phaser/scenes/lobby.scene'
+import { StarterScene } from '../phaser/scenes/starter.scene'
 import { app } from './app'
 const GameContainer = styled.div`
   position: fixed;
@@ -17,7 +17,7 @@ const GameContainer = styled.div`
 `
 const maps: Record<string, Function> = {}
 export default function Mmorpg() {
-  useLobby(true)
+  useLobby()
   const { scene, update } = useSceneState()
   const onRef = (node) => {
     if (!app.game) {

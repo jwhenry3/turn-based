@@ -1,12 +1,10 @@
 import { Button } from '@mui/material'
 import { useState } from 'react'
-import { useLobby } from '../../networking/use-lobby'
 import { app } from '../app'
 import { CharacterList } from './CharacterList'
 import { CharacterCreation } from './dialogs/CharacterCreation'
 
 export function Characters() {
-  const lobby = useLobby()
   const [createOpen, setCreateOpen] = useState(false)
   const onCreate = ({ name }) => {
     const details = {

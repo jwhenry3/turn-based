@@ -1,70 +1,47 @@
 import { MapSchema } from '@colyseus/schema'
-import { Client, Room } from 'colyseus.js'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { app } from '../ui/app'
-import { mapRegions } from './maps'
 import { Character } from './schemas/Character'
 import { Npc } from './schemas/Npc'
-import { useAuthState } from './state/use-auth-state'
-import { useRegion } from './use-region'
-
-const maps: Record<string, { room: Room }> = {}
 
 export function useMap(name: string, root: boolean = false) {
-  const { token, characterId } = useAuthState()
-  const { region } = useRegion(mapRegions[name])
-  const map = useRef<Room | undefined>(maps[name]?.room)
-
-  const connect = async (data: { timeout: any }) => {
-    try {
-      const client = region.current as Client
-      let room = await client.joinOrCreate(name, {
-        token,
-        characterId,
-      })
-      maps[name] = { room }
-      map.current = room
-      app.entities = room.state as {
-        players: MapSchema<Character>
-        npcs: MapSchema<Npc>
-      }
-
-      room.onLeave(async (code) => {
-        console.log('Disconnected', code)
-        const reconnectCodes = [1000, 1006, 1002, 1003]
-        if (reconnectCodes.includes(code) && map.current === room) {
-          map.current = undefined
-          data.timeout = setTimeout(() => connect(data), 5000)
-        }
-      })
-      return room
-    } catch (e) {
-      map.current = undefined
-      data.timeout = setTimeout(() => connect(data), 5000)
-    }
-  }
+  const [attempts, setAttempts] = useState(0)
   useEffect(() => {
-    if (root) {
-      maps[name] = {
-        room: undefined,
-      }
-      const data = { timeout: undefined }
-      connect(data)
-      return () => {
-        if (typeof data.timeout !== 'undefined') {
-          clearTimeout(data.timeout)
+    let timeout
+    if (!app.regions[app.regionMaps[name]]) {
+      throw new Error('invalid map name')
+    }
+    ;(async () => {
+      try {
+        const client = app.regions[app.regionMaps[name]]
+        let room = await client.joinOrCreate(name, {
+          token: app.auth.token,
+          characterId: app.auth.characterId,
+        })
+        app.rooms[name] = room
+        app.entities = room.state as {
+          players: MapSchema<Character>
+          npcs: MapSchema<Npc>
         }
-        if (typeof map.current !== 'undefined') {
-          map.current.connection.close()
-          map.current = undefined
-          maps[name] = {
-            room: undefined,
+
+        room.onLeave(async (code) => {
+          console.log('Disconnected', code)
+          const reconnectCodes = [1000, 1006, 1002, 1003]
+          if (reconnectCodes.includes(code)) {
+            timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
           }
-        }
+        })
+        return room
+      } catch (e) {
+        timeout = setTimeout(() => setAttempts(attempts + 1), 5000)
       }
+    })()
+    return () => {
+      if (typeof timeout !== 'undefined') {
+        clearTimeout(timeout)
+      }
+      app.rooms[name]?.connection.close()
+      app.rooms[name] = undefined
     }
   }, [])
-
-  // todo: expose high-level api for interacting with the server (move, chat, etc)
-  return { region, map }
 }
