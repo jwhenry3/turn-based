@@ -1,6 +1,6 @@
 import { throws } from 'assert'
 import { NpcData } from '../rooms/fixture.models'
-import { Npc, PositionData } from '../schemas/schemas'
+import Npc, { PositionData } from '../schemas/schemas'
 import { NpcMovement } from './npc-movement'
 
 export class NpcWander extends NpcMovement {

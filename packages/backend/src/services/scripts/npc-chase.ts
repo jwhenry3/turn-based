@@ -1,7 +1,7 @@
 import { MapSchema } from '@colyseus/schema'
 import { Subject, from, takeUntil, map } from 'rxjs'
 import { NpcData } from '../rooms/fixture.models'
-import { Character, Npc, PositionData } from '../schemas/schemas'
+import Npc, { Character, PositionData } from '../schemas/schemas'
 import { NpcMovement } from './npc-movement'
 import { NpcWander } from './npc-wander'
 
@@ -18,6 +18,15 @@ export class NpcChase extends NpcMovement {
 
   get isChasing() {
     return !!this.chaseTarget
+  }
+
+  get chaseRange() {
+    return {
+      x: this.npc.position.x - this.data.chaseRadius,
+      y: this.npc.position.y - this.data.chaseRadius,
+      width: this.data.chaseRadius * 2,
+      height: this.data.chaseRadius * 2,
+    }
   }
 
   constructor(
@@ -46,32 +55,15 @@ export class NpcChase extends NpcMovement {
       this.chaseCooldownCurrentTick <= 0 &&
       !this.wander.goingHome
     ) {
-      await new Promise((resolve) => {
-        from(this.players.keys())
-          .pipe(takeUntil(until))
-          .pipe(map((key) => this.players.get(key)))
-          .subscribe({
-            next: (player) => {
-              if (this.isWithinRange(player.position, this.data.wanderRadius)) {
-                this.chaseTarget = player
-                console.log('new chase target', player.name)
-                resolve(player)
-              }
-            },
-            complete: () => resolve(undefined),
-          })
+      this.npc.hash.find(this.chaseRange, (selector) => {
+        if (!this.chaseTarget && selector.entity instanceof Character) {
+          this.chaseTarget = selector.entity
+        }
       })
     }
     if (!this.wander.goingHome && this.chaseCooldownCurrentTick > 0) {
       this.chaseCooldownCurrentTick--
     }
-  }
-
-  isWithinRange(position: { x: number; y: number }, radius: number) {
-    if (!position || !this.npc.position) return false
-    const diffX = Math.abs(position.x - this.npc.position.x)
-    const diffY = Math.abs(position.y - this.npc.position.y)
-    return diffX * diffX + diffY * diffY <= radius * radius
   }
 
   getMovementVector() {

@@ -11,9 +11,11 @@ export class NpcEntity extends MovableEntity<Npc> {
       this.position.x,
       this.position.y,
       32,
-      60,
+      64,
       Phaser.Display.Color.HexStringToColor('#ff8822').color
     )
+    this.rectangle.originX = 16
+    this.rectangle.originY = 48
     this.scene.add.existing(this.rectangle)
   }
 

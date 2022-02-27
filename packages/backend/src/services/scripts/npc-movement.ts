@@ -1,5 +1,5 @@
 import { NpcData } from '../rooms/fixture.models'
-import { Npc, PositionData } from '../schemas/schemas'
+import Npc, { PositionData } from '../schemas/schemas'
 
 export class NpcMovement {
   outOfBounds = false
@@ -14,6 +14,7 @@ export class NpcMovement {
     const diffY = Math.round(position.y - this.npc.position.y)
     // give padding room so the npc doesn't layer over the player initially
     if (Math.abs(diffX) > 16 || Math.abs(diffY) > 16) {
+      // todo: soften angle for more fluid turning
       const horizontal = diffX > 1 ? 1 : diffX < -1 ? -1 : 0
       const vertical = diffY > 1 ? 1 : diffY < -1 ? -1 : 0
       this.npc.position.movement.horizontal = horizontal as any
@@ -25,6 +26,14 @@ export class NpcMovement {
       this.stop()
     }
   }
+
+  isWithinRange(position: { x: number; y: number }, radius: number) {
+    if (!position || !this.npc.position) return false
+    const diffX = Math.abs(position.x - this.npc.position.x)
+    const diffY = Math.abs(position.y - this.npc.position.y)
+    return diffX * diffX + diffY * diffY <= radius * radius
+  }
+
   isWithinBounds() {
     const diffX = Math.abs(this.data.x - this.npc.position.nextX)
     const diffY = Math.abs(this.data.y - this.npc.position.nextY)

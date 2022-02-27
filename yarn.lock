@@ -11835,6 +11835,11 @@ sparse-bitfield@^3.0.3:
   dependencies:
     memory-pager "^1.0.2"
 
+spatial-hash@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/spatial-hash/-/spatial-hash-0.0.4.tgz#fcdb0286d1083e6b748e8610b2ee8e348d6abee4"
+  integrity sha1-/NsChtEIPmt0joYQsu6ONI1qvuQ=
+
 spdy-transport@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/spdy-transport/-/spdy-transport-3.0.0.tgz#00d4863a6400ad75df93361a1608605e5dcdcf31"

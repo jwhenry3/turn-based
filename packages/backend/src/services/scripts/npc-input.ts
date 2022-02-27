@@ -1,7 +1,5 @@
-import { MapSchema } from '@colyseus/schema'
-import { from, map, Subject, takeUntil } from 'rxjs'
 import { NpcData } from '../rooms/fixture.models'
-import { Character, Npc, PositionData } from '../schemas/schemas'
+import Npc, { PositionData } from '../schemas/schemas'
 import { NpcChase } from './npc-chase'
 import { NpcWander } from './npc-wander'
 

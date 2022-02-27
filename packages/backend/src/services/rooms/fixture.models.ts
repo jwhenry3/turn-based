@@ -18,6 +18,7 @@ export class NpcType {
   patrolPath: [number, number][] = []
   dropData: DropData[] = []
   isAggressive = false
+  speed: number = 0
   chaseRadius: number = 0
 
   constructor(data: Partial<NpcType>) {

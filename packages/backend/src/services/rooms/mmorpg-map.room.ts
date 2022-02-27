@@ -5,9 +5,11 @@ import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
 import { createCharacter } from '../schemas/factories/character'
-import { Character, Npc, PositionData } from '../schemas/schemas'
+import Npc, { Character, PositionData } from '../schemas/schemas'
 import { NpcInput } from '../scripts/npc-input'
 import { NpcData } from './fixture.models'
+import SpatialHash from 'spatial-hash'
+import { SpatialNode } from './spacial/node'
 
 export class MmorpgMapState extends Schema {
   @type({ map: Character })
@@ -32,6 +34,16 @@ export class MmorpgMapRoom extends Room {
   update$ = new Subject<void>()
   stopUpdates$ = new Subject<void>()
 
+  hash = new SpatialHash(
+    {
+      x: 0,
+      y: 0,
+      width: 4096,
+      height: 4096,
+    },
+    16
+  )
+
   spawnNpcs(npcs: NpcData[]) {
     from(npcs).subscribe((data) => {
       const npc = new Npc({
@@ -41,14 +53,19 @@ export class MmorpgMapRoom extends Room {
       })
       npc.position.x = data.x
       npc.position.y = data.y
+      npc.position.owner = npc
+      const node = new SpatialNode(npc)
+      this.hash.insert(node)
+      npc.hash = this.hash
+      npc.node = node
       const input = new NpcInput(npc, data, this.movementUpdates)
       if (data.isAggressive) {
         input.chase.players = this.state.players
       }
       this.state.npcs.set(npc.npcId, npc)
-      this.update$
-        .pipe(takeUntil(this.stopUpdates$))
-        .subscribe(() => input.update())
+      this.update$.pipe(takeUntil(this.stopUpdates$)).subscribe(() => {
+        input.update()
+      })
     })
   }
   onCreate({ npcs }: { npcs: NpcData[] }): void | Promise<any> {
@@ -58,6 +75,9 @@ export class MmorpgMapRoom extends Room {
       this.update$.next()
       // iterate async to avoid blocking the server
       from(this.movementUpdates).subscribe((position: PositionData) => {
+        if (position?.owner?.node) {
+          this.hash.update(position.owner.node)
+        }
         if (position.isPlayerPosition) {
           position.getNextPosition()
         }
@@ -96,7 +116,6 @@ export class MmorpgMapRoom extends Room {
   }
 
   async onAuth(client, options, request) {
-    console.log('auth', client.sessionId)
     if (!options.characterId) {
       client.send('character id not provided')
       return
@@ -128,6 +147,12 @@ export class MmorpgMapRoom extends Room {
       this.state.playersByClient.set(client.sessionId, oldCharacter)
     } else {
       const character = createCharacter(characterModel, client.sessionId)
+      const node = new SpatialNode<Character>(character)
+      character.position.owner = character
+      character.node = node
+      character.hash = this.hash
+      this.hash.insert(node)
+
       character.position.isPlayerPosition = true
       this.state.players.set(character.name, character)
       this.state.playersByClient.set(client.sessionId, character)

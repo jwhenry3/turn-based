@@ -1,6 +1,7 @@
 import { Client } from '@colyseus/core'
 import { ArraySchema, filter, MapSchema, Schema, type } from '@colyseus/schema'
-import { AccountTokenModel } from '../data/account'
+import { SpatialNode } from '../rooms/spacial/node'
+import SpatialHash from 'spatial-hash'
 
 export class Movement extends Schema {
   @type('string')
@@ -30,6 +31,8 @@ export class PositionData extends Schema {
   isWithinBounds = true
 
   isPlayerPosition = false
+
+  owner: Character | Npc
 
   getNextPosition() {
     const angle = Math.atan2(this.movement.vertical, this.movement.horizontal)
@@ -228,6 +231,9 @@ export class Character extends Schema {
 
   @type(Inventory)
   inventory: Inventory = new Inventory()
+
+  node: SpatialNode<Character>
+  hash: SpatialHash
 }
 
 export class ItemDrop extends Schema {
@@ -237,7 +243,7 @@ export class ItemDrop extends Schema {
   itemId: string
 }
 
-export class Npc extends Schema {
+export default class Npc extends Schema {
   @type('string')
   npcId: string
 
@@ -257,6 +263,9 @@ export class Npc extends Schema {
 
   @type(PositionData)
   position: PositionData = new PositionData()
+
+  node: SpatialNode<Npc>
+  hash: SpatialHash
 }
 export class AccountToken extends Schema {
   @type('string')

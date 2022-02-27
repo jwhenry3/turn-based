@@ -35,6 +35,7 @@ export const starterNpcs: NpcData[] = [
     ...npcTypes.npc,
     name: 'Sarah',
     isAggressive: true,
+    chaseRadius: 128,
     x: 700,
     y: 200,
   }),
