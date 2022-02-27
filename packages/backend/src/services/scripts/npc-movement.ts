@@ -9,11 +9,11 @@ export class NpcMovement {
     public movementUpdates: PositionData[]
   ) {}
 
-  moveTowards(position: { x: number; y: number }) {
+  moveTowards(position: { x: number; y: number }, offset: number = 0) {
     const diffX = Math.round(position.x - this.npc.position.x)
     const diffY = Math.round(position.y - this.npc.position.y)
     // give padding room so the npc doesn't layer over the player initially
-    if (Math.abs(diffX) > 16 || Math.abs(diffY) > 16) {
+    if (Math.abs(diffX) > offset || Math.abs(diffY) > offset) {
       // todo: soften angle for more fluid turning
       const horizontal = diffX > 1 ? 1 : diffX < -1 ? -1 : 0
       const vertical = diffY > 1 ? 1 : diffY < -1 ? -1 : 0
@@ -44,7 +44,7 @@ export class NpcMovement {
     return !this.outOfBounds
   }
   headTowardsOrigin() {
-    this.moveTowards(this.data)
+    this.moveTowards(this.data, 16)
   }
 
   stop() {

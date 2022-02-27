@@ -25,7 +25,7 @@ export class NpcWander extends NpcMovement {
   async calculateMovement() {
     if (!this.goingHome && this.wandering && !this.isWithinBounds()) {
       // change direction until the next position is not out of bounds
-      await this.getMovementVector()
+      this.headTowardsOrigin()
     }
   }
 
@@ -39,8 +39,10 @@ export class NpcWander extends NpcMovement {
       Math.abs(diffY) > Math.round(this.data.wanderRadius / 2)
     ) {
       this.goingHome = true
+      this.npc.position.speed = 1
       this.headTowardsOrigin()
     } else {
+      this.npc.position.speed = 3
       this.stop()
       this.wandering = false
       this.goingHome = false

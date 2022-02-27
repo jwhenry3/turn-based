@@ -14,8 +14,11 @@ export class NpcEntity extends MovableEntity<Npc> {
       64,
       Phaser.Display.Color.HexStringToColor('#ff8822').color
     )
+    this.rectangle.setDepth(
+      Math.round(this.rectangle.y - this.rectangle.height)
+    )
     this.rectangle.originX = 16
-    this.rectangle.originY = 48
+    this.rectangle.originY = 56
     this.scene.add.existing(this.rectangle)
   }
 
@@ -28,10 +31,12 @@ export class NpcEntity extends MovableEntity<Npc> {
       this.rectangle.x !== this.position.x ||
       this.rectangle.y !== this.position.y
     ) {
-      this.rectangle?.setPosition(
-        lerp(this.rectangle.x, this.position.x, 0.5),
-        lerp(this.rectangle.y, this.position.y, 0.5)
-      )
+      const newX = lerp(this.rectangle.x, this.position.x, 0.5)
+      const newY = lerp(this.rectangle.y, this.position.y, 0.5)
+      this.rectangle.setPosition(newX, newY)
     }
+    this.rectangle.setDepth(
+      Math.round(this.rectangle.y - this.rectangle.height)
+    )
   }
 }

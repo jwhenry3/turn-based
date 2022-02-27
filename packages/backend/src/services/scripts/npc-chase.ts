@@ -12,6 +12,9 @@ export class NpcChase extends NpcMovement {
   chaseTickIncrement = 10
   tick = 0
 
+  waitMax = 10
+  waitTick = 0
+
   get isChasing() {
     return !!this.chaseTarget
   }
@@ -39,19 +42,23 @@ export class NpcChase extends NpcMovement {
       if (
         !this.isWithinRange(this.chaseTarget.position, this.data.wanderRadius)
       ) {
-        this.wander.goHome()
-        this.chaseTarget = null
-        this.chaseCooldownCurrentTick = this.chaseCooldown
+        this.waitTick++
+        if (this.waitTick > this.waitMax) {
+          this.wander.goHome()
+          this.chaseTarget = null
+          this.waitTick = 0
+        }
       }
     }
-    if (
-      !this.chaseTarget &&
-      this.chaseCooldownCurrentTick <= 0 &&
-      !this.wander.goingHome
-    ) {
+    if (!this.chaseTarget || this.waitTick > 0) {
       this.npc.hash.find(this.chaseRange, (selector) => {
-        if (!this.chaseTarget && selector.entity instanceof Character) {
+        if (
+          (!this.chaseTarget || this.waitTick > 0) &&
+          selector.entity instanceof Character
+        ) {
           this.chaseTarget = selector.entity
+          this.npc.position.speed = 3
+          this.waitTick = 0
         }
       })
     }
@@ -62,7 +69,7 @@ export class NpcChase extends NpcMovement {
 
   getMovementVector() {
     if (!this.chaseTarget) return
-    this.moveTowards(this.chaseTarget.position)
+    this.moveTowards(this.chaseTarget.position, 32)
   }
 
   execute() {
@@ -71,9 +78,11 @@ export class NpcChase extends NpcMovement {
       if (this.tick % this.chaseTickIncrement === 0) {
         this.detectPlayers()
       }
-      this.getMovementVector()
-      if (this.chaseTarget) {
-        this.npc.position.getNextPosition()
+      if (this.waitTick === 0) {
+        this.getMovementVector()
+        if (this.chaseTarget) {
+          this.npc.position.getNextPosition()
+        }
       }
     }
   }

@@ -18,7 +18,7 @@ export class MovementInput {
     if (!this.enabled) {
       return
     }
-    const movement = [0, 0]
+    const movement: [number, number] = [0, 0]
     if (this.keys.left.isDown) {
       movement[0] = -1
     }
@@ -35,10 +35,10 @@ export class MovementInput {
     const pads = input.gamepad.getAll()
     if (pads.length > 0) {
       for (const pad of pads) {
-        const x = pad.getAxisValue(0)
-        const y = pad.getAxisValue(1)
-        movement[0] = x
-        movement[1] = y
+        const x = Math.round(pad.getAxisValue(0) * 1.5)
+        const y = Math.round(pad.getAxisValue(1) * 1.5)
+        movement[0] = x > 0 ? 1 : x < 0 ? -1 : 0
+        movement[1] = y > 0 ? 1 : y < 0 ? -1 : 0
       }
     }
     if (movement[0] !== this.movement[0] || movement[1] !== this.movement[1]) {
