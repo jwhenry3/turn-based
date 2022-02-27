@@ -34,6 +34,7 @@ export const starterNpcs: NpcData[] = [
     npcId: '5',
     ...npcTypes.npc,
     name: 'Sarah',
+    isAggressive: true,
     x: 700,
     y: 200,
   }),

@@ -42,6 +42,9 @@ export class MmorpgMapRoom extends Room {
       npc.position.x = data.x
       npc.position.y = data.y
       const input = new NpcInput(npc, data, this.movementUpdates)
+      if (data.isAggressive) {
+        input.chase.players = this.state.players
+      }
       this.state.npcs.set(npc.npcId, npc)
       this.update$
         .pipe(takeUntil(this.stopUpdates$))

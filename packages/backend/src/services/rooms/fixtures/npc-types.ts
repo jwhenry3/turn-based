@@ -6,5 +6,6 @@ export const npcTypes: Record<string, NpcType> = {
     name: 'NPC',
     canWander: true,
     wanderRadius: 64,
+    isAggressive: false
   }),
 }

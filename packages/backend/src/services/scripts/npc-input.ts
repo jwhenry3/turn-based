@@ -16,6 +16,7 @@ export class NpcInput {
   ) {
     this.wander = new NpcWander(npc, data, movementUpdates)
     this.chase = new NpcChase(npc, data, movementUpdates, this.wander)
+    this.npc.position.speed = 3
   }
 
   async update() {
