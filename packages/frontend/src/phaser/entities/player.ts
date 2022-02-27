@@ -1,7 +1,6 @@
 import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
 import { lerp } from '../behaviors/lerp'
-import { NetworkedScene } from '../scenes/networked.scene'
 import { MovableEntity } from './movable'
 
 export class PlayerEntity extends MovableEntity<Character> {
@@ -11,11 +10,8 @@ export class PlayerEntity extends MovableEntity<Character> {
     return this.model.currentClientId === this.scene.connector.room.sessionId
   }
 
-  constructor(public model: Character, public scene: NetworkedScene) {
-    super(model, scene)
-  }
-
   create() {
+    console.log('player create')
     if (this.isLocalPlayer) {
       app.movement.create(this.scene.input)
       app.movement.enabled = true

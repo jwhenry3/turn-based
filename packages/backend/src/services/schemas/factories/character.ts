@@ -3,7 +3,7 @@ import {
   Appearance,
   Character,
   Movement,
-  Position,
+  PositionData,
   Statistics,
 } from '../schemas'
 import { CharacterModel } from '../../data/character'
@@ -23,7 +23,7 @@ export function createCharacter(model: CharacterModel, clientId: string) {
     skinColor,
     gender,
   })
-  char.position = new Position({
+  char.position = new PositionData({
     x: model.position.x,
     y: model.position.y,
     map: model.position.map,

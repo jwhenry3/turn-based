@@ -1,12 +1,13 @@
 import { Client, Room } from '@colyseus/core'
 import { MapSchema, Schema, type } from '@colyseus/schema'
-import { from, Subject, takeUntil } from 'rxjs'
+import { from, mergeMap, Subject, takeUntil } from 'rxjs'
 import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
 import { createCharacter } from '../schemas/factories/character'
-import { Character, Npc, Position } from '../schemas/schemas'
+import { Character, Npc, PositionData } from '../schemas/schemas'
 import { NpcInput } from '../scripts/npc-input'
+import { NpcData } from './fixture.models'
 
 export class MmorpgMapState extends Schema {
   @type({ map: Character })
@@ -24,45 +25,42 @@ export class MmorpgMapRoom extends Room {
 
   interval: any
 
-  movementUpdates: Position[] = []
+  movementUpdates: PositionData[] = []
 
   created = false
 
   update$ = new Subject<void>()
   stopUpdates$ = new Subject<void>()
 
-  spawnNpcs(count: number) {
-    from(Array(count).keys()).subscribe((index) => {
+  spawnNpcs(npcs: NpcData[]) {
+    from(npcs).subscribe((data) => {
       const npc = new Npc({
-        npcId: 'test' + index,
-        npcTypeId: 'npc',
-        name: 'Test NPC ' + index,
+        npcId: data.npcId,
+        npcTypeId: data.npcTypeId,
+        name: data.name,
       })
-      const input = new NpcInput(npc, this.movementUpdates)
+      npc.position.x = data.x
+      npc.position.y = data.y
+      const input = new NpcInput(npc, data, this.movementUpdates)
       this.state.npcs.set(npc.npcId, npc)
       this.update$
         .pipe(takeUntil(this.stopUpdates$))
         .subscribe(() => input.update())
     })
   }
-
-  onCreate(options: any): void | Promise<any> {
+  onCreate({ npcs }: { npcs: NpcData[] }): void | Promise<any> {
     this.setState(new MmorpgMapState())
-    this.spawnNpcs(1000)
+    this.spawnNpcs(npcs || [])
     this.interval = setInterval(() => {
       this.update$.next()
       // iterate async to avoid blocking the server
-      from(this.movementUpdates).subscribe((position) => {
-        const speed = 4
-        const angle = Math.atan2(
-          position.movement.vertical,
-          position.movement.horizontal
-        )
-        const newX = Math.round(position.x + Math.cos(angle) * speed)
-        const newY = Math.round(position.y + Math.sin(angle) * speed)
-        if (newX > 16 && newY > 16) {
-          position.x = newX
-          position.y = newY
+      from(this.movementUpdates).subscribe((position: PositionData) => {
+        if (position.isPlayerPosition) {
+          position.getNextPosition()
+        }
+        if (position.nextX > 16 && position.nextY > 16) {
+          position.x = Math.round(position.nextX)
+          position.y = Math.round(position.nextY)
         }
       })
     }, 1000 / 30)
@@ -127,6 +125,7 @@ export class MmorpgMapRoom extends Room {
       this.state.playersByClient.set(client.sessionId, oldCharacter)
     } else {
       const character = createCharacter(characterModel, client.sessionId)
+      character.position.isPlayerPosition = true
       this.state.players.set(character.name, character)
       this.state.playersByClient.set(client.sessionId, character)
     }

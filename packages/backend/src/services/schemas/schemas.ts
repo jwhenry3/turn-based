@@ -10,16 +10,32 @@ export class Movement extends Schema {
   @type('number')
   vertical: 1 | -1 | 0 = 0
 }
-export class Position extends Schema {
+export class PositionData extends Schema {
   @type('string')
   map: string = 'starter'
   @type('number')
   x = 100
   @type('number')
   y = 100
+  @type('number')
+  speed = 4
 
   @type(Movement)
   movement: Movement = new Movement()
+
+  nextX = 100
+
+  nextY = 100
+
+  isWithinBounds = true
+
+  isPlayerPosition = false
+
+  getNextPosition() {
+    const angle = Math.atan2(this.movement.vertical, this.movement.horizontal)
+    this.nextX = Math.round(this.x + Math.cos(angle) * this.speed)
+    this.nextY = Math.round(this.y + Math.sin(angle) * this.speed)
+  }
 }
 
 export class Appearance extends Schema {
@@ -207,8 +223,8 @@ export class Character extends Schema {
   @type(Statistics)
   stats: Statistics = new Statistics()
 
-  @type(Position)
-  position: Position = new Position()
+  @type(PositionData)
+  position: PositionData = new PositionData()
 
   @type(Inventory)
   inventory: Inventory = new Inventory()
@@ -239,8 +255,8 @@ export class Npc extends Schema {
   @type(Statistics)
   stats: Statistics = new Statistics()
 
-  @type(Position)
-  position: Position = new Position()
+  @type(PositionData)
+  position: PositionData = new PositionData()
 }
 export class AccountToken extends Schema {
   @type('string')
