@@ -9,12 +9,8 @@ export class NpcChase extends NpcMovement {
   chaseTarget: Character
   chaseCooldown = 10
   chaseCooldownCurrentTick = 0
-
   chaseTickIncrement = 10
-
   tick = 0
-
-  players: MapSchema<Character>
 
   get isChasing() {
     return !!this.chaseTarget
@@ -39,8 +35,6 @@ export class NpcChase extends NpcMovement {
   }
 
   async detectPlayers() {
-    if (!this.players) return
-    const until = new Subject()
     if (this.chaseTarget) {
       if (
         !this.isWithinRange(this.chaseTarget.position, this.data.wanderRadius)

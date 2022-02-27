@@ -59,9 +59,6 @@ export class MmorpgMapRoom extends Room {
       npc.hash = this.hash
       npc.node = node
       const input = new NpcInput(npc, data, this.movementUpdates)
-      if (data.isAggressive) {
-        input.chase.players = this.state.players
-      }
       this.state.npcs.set(npc.npcId, npc)
       this.update$.pipe(takeUntil(this.stopUpdates$)).subscribe(() => {
         input.update()
