@@ -25,7 +25,6 @@ export class BattlePlayer extends Schema {
 }
 
 export class BattleNpcType extends Schema {
-  @type('string')
   battleNpcTypeId: string
 
   element:
@@ -48,8 +47,10 @@ export class BattleNpcType extends Schema {
   }
 }
 export class BattleNpc extends BattleNpcType {
-  @type('number')
+  @type('string')
   battleNpcId: string
+  @type('string')
+  battleNpcTypeId: string
 
   @type('string')
   element:
@@ -75,6 +76,7 @@ export class BattleNpc extends BattleNpcType {
 
   constructor(data: Partial<BattleNpc>) {
     super(data)
+    this.battleNpcId = v4()
   }
 
   update(tick: number) {
@@ -100,6 +102,7 @@ export class Battle extends Schema {
 
   update$ = new Subject<number>()
   destroy$ = new Subject<void>()
+  completed = new Subject<void>()
 
   constructor(...args: any[]) {
     super(...args)
@@ -123,23 +126,33 @@ export class Battle extends Schema {
       }
     }
   }
+  watchUpdate(entity: BattlePlayer | BattleNpc) {
+    this.update$
+      .pipe(
+        takeUntil(this.destroy$),
+        takeUntil(this.completed),
+        takeUntil(entity.destroy$)
+      )
+      .subscribe((tick) => entity.update(tick))
+  }
+
   addEnemy(option: BattleNpc) {
     const enemy = new BattleNpc(option)
-    this.update$
-      .pipe(takeUntil(this.destroy$), takeUntil(enemy.destroy$))
-      .subscribe((tick) => enemy.update(tick))
+    this.watchUpdate(enemy)
+    this.npcs.set(option.battleNpcId, enemy)
   }
 
   addPlayer(character: Character) {
     const player = new BattlePlayer(character)
-    this.update$
-      .pipe(takeUntil(this.destroy$), takeUntil(player.destroy$))
-      .subscribe((tick) => player.update(tick))
+    this.watchUpdate(player)
     this.players.set(character.characterId, player)
   }
   removePlayer(character: Character) {
     this.players[character.characterId]?.destroy$.next()
     delete this.players[character.characterId]
+    if (this.players.size === 0) {
+      this.completed.next()
+    }
   }
   update() {
     this.battleTick++
