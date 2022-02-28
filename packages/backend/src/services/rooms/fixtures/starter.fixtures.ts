@@ -1,3 +1,4 @@
+import { BattleNpc } from '../../schemas/battles'
 import { NpcData } from '../fixture.models'
 import { npcTypes } from './npc-types'
 
@@ -38,6 +39,12 @@ export const starterNpcs: NpcData[] = [
     chaseRadius: 128,
     x: 700,
     y: 200,
+    triggersBattle: true,
+    battleNpcs: [
+      new BattleNpc({
+        name: 'Test Battle Npc',
+      }),
+    ],
   }),
   new NpcData({
     npcId: '6',
