@@ -57,6 +57,8 @@ export class BattleNpc extends BattleNpcType {
   battleNpcId: string
   @type('string')
   battleNpcTypeId: string
+  @type('string')
+  name: string
 
   @type('string')
   element:

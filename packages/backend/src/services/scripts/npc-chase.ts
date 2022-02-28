@@ -44,9 +44,8 @@ export class NpcChase extends NpcMovement {
       ) {
         this.waitTick++
         if (this.waitTick > this.waitMax) {
+          this.stopChase()
           this.wander.goHome()
-          this.chaseTarget = null
-          this.waitTick = 0
         }
       }
     }
@@ -65,6 +64,11 @@ export class NpcChase extends NpcMovement {
     if (!this.wander.goingHome && this.chaseCooldownCurrentTick > 0) {
       this.chaseCooldownCurrentTick--
     }
+  }
+  stopChase() {
+    this.chaseTarget = null
+    this.waitTick = 0
+    this.npc.position.speed = 3
   }
 
   getMovementVector() {

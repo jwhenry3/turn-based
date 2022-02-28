@@ -1,4 +1,5 @@
 import { Subject, takeUntil } from 'rxjs'
+import { BattleNpc } from '../schemas/battles'
 import { Character } from '../schemas/schemas'
 
 export class DropData {
@@ -10,7 +11,6 @@ export class DropData {
     Object.assign(this, data)
   }
 }
-
 
 export class NpcType {
   npcTypeId: string
@@ -25,11 +25,16 @@ export class NpcType {
   chaseRadius: number = 0
 
   triggersBattle = false
-  battleNpcs = []
+  battleNpcs: BattleNpc[] = []
   randomizeBattleNpcs = false
+
+  despawnOnPlayerCollision = false
 
   constructor(data: Partial<NpcType>) {
     Object.assign(this, data)
+    if (this.triggersBattle) {
+      this.despawnOnPlayerCollision = true
+    }
   }
 }
 

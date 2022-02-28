@@ -266,6 +266,13 @@ export default class Npc extends Schema {
 
   node: SpatialNode<Npc>
   hash: SpatialHash
+
+  @type('boolean')
+  despawned: boolean = false
+
+  respawnTime = 1000
+  respawnTimer = 0
+
 }
 export class AccountToken extends Schema {
   @type('string')
