@@ -5,16 +5,22 @@ import { DropData } from '../rooms/fixture.models'
 import { v4 } from 'uuid'
 
 export class BattlePlayer extends Schema {
+  @type('string')
+  characterId: string
+  @type('number')
   health = 100
+  @type('number')
   mana = 100
 
   cooldown = 0
 
   destroy$ = new Subject<void>()
+  @type('number')
   status: string[] = []
 
   constructor(public character: Character, ...args: any[]) {
     super(args)
+    this.characterId = character.characterId
   }
 
   update(tick: number) {
@@ -145,11 +151,11 @@ export class Battle extends Schema {
   addPlayer(character: Character) {
     const player = new BattlePlayer(character)
     this.watchUpdate(player)
-    this.players.set(character.characterId, player)
+    this.players.set(character.currentClientId, player)
   }
   removePlayer(character: Character) {
-    this.players[character.characterId]?.destroy$.next()
-    delete this.players[character.characterId]
+    this.players[character.currentClientId]?.destroy$.next()
+    delete this.players[character.currentClientId]
     if (this.players.size === 0) {
       this.completed.next()
     }

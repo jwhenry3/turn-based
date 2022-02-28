@@ -1,5 +1,5 @@
 import { Client, Room } from '@colyseus/core'
-import { MapSchema, Schema, type } from '@colyseus/schema'
+import { filterChildren, MapSchema, Schema, type } from '@colyseus/schema'
 import { from, mergeMap, Subject, takeUntil } from 'rxjs'
 import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
@@ -10,6 +10,7 @@ import { NpcInput } from '../scripts/npc-input'
 import { NpcData } from './fixture.models'
 import SpatialHash from 'spatial-hash'
 import { SpatialNode } from './spacial/node'
+import { Battle } from '../schemas/battles'
 
 export class MmorpgMapState extends Schema {
   @type({ map: Character })
@@ -19,6 +20,12 @@ export class MmorpgMapState extends Schema {
 
   @type({ map: Npc })
   npcs = new MapSchema<Npc>()
+
+  @filterChildren((battle: Battle, client) => {
+    return battle.players.has(client.sessionId)
+  })
+  @type({ map: Battle })
+  battles = new MapSchema<Battle>()
 }
 
 export class MmorpgMapRoom extends Room {
