@@ -16,7 +16,7 @@ export class BattlePlayer extends Schema {
   cooldown = 0
 
   destroy$ = new Subject<void>()
-  @type({array: 'string'})
+  @type({ array: 'string' })
   status: ArraySchema<string> = new ArraySchema<string>()
 
   constructor(public character: Character, ...args: any[]) {
@@ -149,15 +149,16 @@ export class Battle extends Schema {
 
   addPlayer(character: Character) {
     const player = new BattlePlayer(character)
+    character.isInBattle = true
     this.watchUpdate(player)
     this.players.set(character.currentClientId, player)
   }
   removePlayer(character: Character) {
     this.players[character.currentClientId]?.destroy$.next()
-    delete this.players[character.currentClientId]
+    character.isInBattle = false
+    this.players.delete(character.currentClientId)
     if (this.players.size === 0) {
-      this.completed$.next()
-      this.onComplete()
+      this.complete()
     }
   }
   update() {
@@ -166,6 +167,11 @@ export class Battle extends Schema {
   }
 
   complete() {
+    if (this.players.size > 0) {
+      this.players.forEach((player) => {
+        this.removePlayer(player.character)
+      })
+    }
     this.completed$.next()
     this.onComplete()
   }

@@ -59,7 +59,6 @@ export class MmorpgMapRoom extends Room {
       npcData.maxEnemies
     )
     battle.addPlayer(player)
-    player.isInBattle = true
     battle.onComplete = () => {
       this.state.battles.delete(battle.battleId)
     }
@@ -110,6 +109,19 @@ export class MmorpgMapRoom extends Room {
     character: Character,
     { horizontal, vertical }: { horizontal: 1 | -1 | 0; vertical: 1 | -1 | 0 }
   ) {
+    // characters do not move while in battle, since it is turn based
+    console.log(character.isInBattle)
+    if (character.isInBattle) {
+      character.position.movement.horizontal = 0
+      character.position.movement.vertical = 0
+      if (this.movementUpdates.includes(character.position)) {
+        this.movementUpdates.splice(
+          this.movementUpdates.indexOf(character.position),
+          1
+        )
+      }
+      return
+    }
     character.position.movement.horizontal = horizontal
     character.position.movement.vertical = vertical
     if (horizontal !== 0 || vertical !== 0) {
@@ -143,7 +155,7 @@ export class MmorpgMapRoom extends Room {
       }
     })
     this.onMessage('character:zone', (client, { map }) => {})
-    this.onMessage('character:battle:leave', (client, { x, y }) => {
+    this.onMessage('character:battle:leave', (client) => {
       const character = this.state.playersByClient.get(client.sessionId)
       this.state.battles.forEach((battle) => {
         if (battle.players.has(character.currentClientId)) {

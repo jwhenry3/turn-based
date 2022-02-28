@@ -23,6 +23,8 @@ export class NetworkedScene extends Phaser.Scene {
   async stop() {
     this.disconnect()
     this.scene.stop(this.name)
+    this.playerObjects = {}
+    this.npcObjects = {}
   }
 
   handleEntities() {
@@ -61,10 +63,10 @@ export class NetworkedScene extends Phaser.Scene {
 
     this.connector.battles.onAdd = (e) => {
       console.log('added battle', e.toJSON())
-      const battleScene = this.game.scene.add(
-        'battle',
-        BattleScene
-      ) as BattleScene
+      let battleScene = this.game.scene.getScene('battle') as BattleScene
+      if (!battleScene) {
+        battleScene = this.game.scene.add('battle', BattleScene) as BattleScene
+      }
       battleScene.battle = e
       this.game.scene.start('battle')
     }

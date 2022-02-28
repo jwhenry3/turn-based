@@ -1,3 +1,5 @@
+import { app } from '../../ui/app';
+
 export class MovementInput {
   movement = [0, 0]
 
@@ -48,27 +50,29 @@ export class MovementInput {
       movement[0] = x
       movement[1] = y
     }
-    if (this.keys.left.isDown) {
-      movement[0] = -1
-      this.mouseDestination = undefined
-    }
-    if (this.keys.right.isDown) {
-      movement[0] = 1
-      this.mouseDestination = undefined
-    }
-    if (this.keys.up.isDown) {
-      movement[1] = -1
-      this.mouseDestination = undefined
-    }
-    if (this.keys.down.isDown) {
-      movement[1] = 1
-      this.mouseDestination = undefined
-    }
-    if (input.activePointer.isDown && this.mouseTick === 0) {
-      this.mouseTick = this.mouseCooldown
-      this.mouseDestination = {
-        x: input.activePointer.worldX,
-        y: input.activePointer.worldY,
+    if (app.gameHasFocus) {
+      if (this.keys.left.isDown) {
+        movement[0] = -1
+        this.mouseDestination = undefined
+      }
+      if (this.keys.right.isDown) {
+        movement[0] = 1
+        this.mouseDestination = undefined
+      }
+      if (this.keys.up.isDown) {
+        movement[1] = -1
+        this.mouseDestination = undefined
+      }
+      if (this.keys.down.isDown) {
+        movement[1] = 1
+        this.mouseDestination = undefined
+      }
+      if (input.activePointer.isDown && this.mouseTick === 0) {
+        this.mouseTick = this.mouseCooldown
+        this.mouseDestination = {
+          x: input.activePointer.worldX,
+          y: input.activePointer.worldY,
+        }
       }
     }
     if (this.mouseTick > 0) {

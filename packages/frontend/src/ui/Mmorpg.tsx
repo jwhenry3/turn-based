@@ -45,7 +45,11 @@ export default function Mmorpg() {
   }
   return (
     <div>
-      <GameContainer ref={(node) => onRef(node)} />
+      <GameContainer
+        ref={(node) => onRef(node)}
+        onMouseLeave={() => (app.gameHasFocus = false)}
+        onMouseEnter={() => (app.gameHasFocus = true)}
+      />
       {scene === 'lobby' && lobby && lobby.state && <Lobby />}
       {scene && scene !== 'lobby' && <World />}
     </div>

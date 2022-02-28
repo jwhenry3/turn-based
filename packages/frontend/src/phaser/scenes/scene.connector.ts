@@ -11,6 +11,8 @@ export class SceneConnector {
   room: Room
   entities: { players: MapSchema<Character>; npcs: MapSchema<Npc> }
   battles: MapSchema<Battle>
+
+  onDisconnect = () => null
   constructor(public name: string) {}
 
   async connect() {
@@ -28,10 +30,7 @@ export class SceneConnector {
       }
 
       this.room.onLeave(async (code) => {
-        const reconnectCodes = [1000, 1006, 1002, 1003]
-        if (reconnectCodes.includes(code)) {
-          this.timeout = setTimeout(() => this.connect(), 5000)
-        }
+        this.onDisconnect()
       })
     } catch (e) {
       this.timeout = setTimeout(() => this.connect(), 5000)

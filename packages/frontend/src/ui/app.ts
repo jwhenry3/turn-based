@@ -8,6 +8,7 @@ import { LobbyScene } from '../phaser/scenes/lobby.scene'
 import { StarterScene } from '../phaser/scenes/starter.scene'
 
 export const app = {
+  gameHasFocus: false,
   auth: {
     token: '',
     characterId: '',

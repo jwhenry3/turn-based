@@ -74,7 +74,7 @@ export class NpcChase extends NpcMovement {
 
   getMovementVector() {
     if (!this.chaseTarget) return
-    this.moveTowards(this.chaseTarget.position, 32)
+    this.moveTowards(this.chaseTarget.position, 16)
   }
 
   execute() {
