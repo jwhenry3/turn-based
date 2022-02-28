@@ -1,5 +1,6 @@
 import { MapSchema } from '@colyseus/schema'
 import { Room } from 'colyseus.js'
+import { Battle } from '../../networking/schemas/Battle'
 import { Character } from '../../networking/schemas/Character'
 import { Npc } from '../../networking/schemas/Npc'
 import { app } from '../../ui/app'
@@ -9,6 +10,7 @@ export class SceneConnector {
   timeout: any
   room: Room
   entities: { players: MapSchema<Character>; npcs: MapSchema<Npc> }
+  battles: MapSchema<Battle>
   constructor(public name: string) {}
 
   async connect() {
@@ -19,6 +21,7 @@ export class SceneConnector {
         characterId: app.auth.characterId,
       })
       app.rooms.starter = this.room
+      this.battles = this.room.state.battles
       this.entities = this.room.state as {
         players: MapSchema<Character>
         npcs: MapSchema<Npc>

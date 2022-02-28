@@ -1,4 +1,4 @@
-import { MapSchema, Schema, type } from '@colyseus/schema'
+import { ArraySchema, MapSchema, Schema, type } from '@colyseus/schema'
 import { Subject, takeUntil } from 'rxjs'
 import { Character } from './schemas'
 import { DropData } from '../rooms/fixture.models'
@@ -12,11 +12,12 @@ export class BattlePlayer extends Schema {
   @type('number')
   mana = 100
 
+  @type('number')
   cooldown = 0
 
   destroy$ = new Subject<void>()
-  @type('number')
-  status: string[] = []
+  @type({array: 'string'})
+  status: ArraySchema<string> = new ArraySchema<string>()
 
   constructor(public character: Character, ...args: any[]) {
     super(args)
@@ -109,8 +110,8 @@ export class Battle extends Schema {
   battleTick = 0
 
   update$ = new Subject<number>()
-  destroy$ = new Subject<void>()
-  completed = new Subject<void>()
+  completed$ = new Subject<void>()
+  onComplete = () => null
 
   constructor(...args: any[]) {
     super(...args)
@@ -136,11 +137,7 @@ export class Battle extends Schema {
   }
   watchUpdate(entity: BattlePlayer | BattleNpc) {
     this.update$
-      .pipe(
-        takeUntil(this.destroy$),
-        takeUntil(this.completed),
-        takeUntil(entity.destroy$)
-      )
+      .pipe(takeUntil(this.completed$), takeUntil(entity.destroy$))
       .subscribe((tick) => entity.update(tick))
   }
 
@@ -159,7 +156,8 @@ export class Battle extends Schema {
     this.players[character.currentClientId]?.destroy$.next()
     delete this.players[character.currentClientId]
     if (this.players.size === 0) {
-      this.completed.next()
+      this.completed$.next()
+      this.onComplete()
     }
   }
   update() {
@@ -167,7 +165,8 @@ export class Battle extends Schema {
     this.update$.next(this.battleTick)
   }
 
-  destroy() {
-    this.destroy$.next()
+  complete() {
+    this.completed$.next()
+    this.onComplete()
   }
 }

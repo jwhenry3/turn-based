@@ -57,6 +57,13 @@ export class NetworkedScene extends Phaser.Scene {
       this.npcObjects[e.npcId]?.destroy()
       delete this.npcObjects[e.npcId]
     }
+
+    this.connector.battles.onAdd = (e) => {
+      console.log('added battle', e.toJSON())
+    }
+    this.connector.battles.onRemove = (e) => {
+      console.log('removed battle', e.toJSON())
+    }
   }
 
   disconnect() {

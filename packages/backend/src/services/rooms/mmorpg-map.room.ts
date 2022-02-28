@@ -18,14 +18,11 @@ export class MmorpgMapState extends Schema {
   @type({ map: Character })
   playersByClient = new MapSchema<Character>()
 
-  @filterChildren((npc: Npc) => {
-    return !npc.despawned
-  })
   @type({ map: Npc })
   npcs = new MapSchema<Npc>()
 
-  @filterChildren((battle: Battle, client) => {
-    return battle.players.has(client.sessionId)
+  @filterChildren((client, key, battle: Battle) => {
+    return battle.players?.has(client.sessionId)
   })
   @type({ map: Battle })
   battles = new MapSchema<Battle>()
@@ -69,6 +66,22 @@ export class MmorpgMapRoom extends Room {
       npc.hash = this.hash
       npc.node = node
       const input = new NpcInput(npc, data, this.movementUpdates)
+      input.onPlayerCollide = (player: Character) => {
+        if (data.triggersBattle) {
+          const battle = new Battle()
+          battle.addEnemies(
+            data.battleNpcs,
+            data.randomizeBattleNpcs,
+            data.maxEnemies
+          )
+          battle.addPlayer(player)
+          battle.onComplete = () => {
+            console.log('Battle Ended')
+            this.state.battles.delete(battle.battleId)
+          }
+          this.state.battles.set(battle.battleId, battle)
+        }
+      }
       this.state.npcs.set(npc.npcId, npc)
       this.update$.pipe(takeUntil(this.stopUpdates$)).subscribe(() => {
         input.update()

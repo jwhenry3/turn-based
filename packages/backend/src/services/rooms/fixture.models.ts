@@ -26,6 +26,7 @@ export class NpcType {
 
   triggersBattle = false
   battleNpcs: BattleNpc[] = []
+  maxEnemies = 0 // provided when randomize is enabled
   randomizeBattleNpcs = false
 
   despawnOnPlayerCollision = false
