@@ -1,3 +1,6 @@
+import { Subject, takeUntil } from 'rxjs'
+import { Character } from '../schemas/schemas'
+
 export class DropData {
   itemId?: string
   type: 'exp' | 'currency' | 'item' = 'item'
@@ -8,6 +11,7 @@ export class DropData {
   }
 }
 
+
 export class NpcType {
   npcTypeId: string
   graphicsId: string
@@ -16,10 +20,13 @@ export class NpcType {
   wanderRadius: number = 0
   canPatrol: boolean = false
   patrolPath: [number, number][] = []
-  dropData: DropData[] = []
   isAggressive = false
   speed: number = 0
   chaseRadius: number = 0
+
+  triggersBattle = false
+  battleNpcs = []
+  randomizeBattleNpcs = false
 
   constructor(data: Partial<NpcType>) {
     Object.assign(this, data)

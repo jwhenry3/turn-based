@@ -7,6 +7,7 @@ export const npcTypes: Record<string, NpcType> = {
     canWander: true,
     wanderRadius: 128,
     isAggressive: false,
-
+    triggersBattle: true,
+    
   }),
 }

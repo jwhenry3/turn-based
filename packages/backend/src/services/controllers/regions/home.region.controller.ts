@@ -23,7 +23,6 @@ export class HomeRegionController
       .enableRealtimeListing()
     this.server.define('town', MmorpgMapRoom).enableRealtimeListing()
     this.server.define('wilds', MmorpgMapRoom).enableRealtimeListing()
-    this.server.define('battle', MmorpgBattleRoom)
     this.server.listen(9201)
     // throw new Error('Method not implemented.')
   }
