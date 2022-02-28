@@ -51,6 +51,21 @@ export class MmorpgMapRoom extends Room {
     16
   )
 
+  startBattle(npcData: NpcData, player: Character) {
+    const battle = new Battle()
+    battle.addEnemies(
+      npcData.battleNpcs,
+      npcData.randomizeBattleNpcs,
+      npcData.maxEnemies
+    )
+    battle.addPlayer(player)
+    player.isInBattle = true
+    battle.onComplete = () => {
+      this.state.battles.delete(battle.battleId)
+    }
+    this.state.battles.set(battle.battleId, battle)
+  }
+
   spawnNpcs(npcs: NpcData[]) {
     from(npcs).subscribe((data) => {
       const npc = new Npc({
@@ -68,18 +83,7 @@ export class MmorpgMapRoom extends Room {
       const input = new NpcInput(npc, data, this.movementUpdates)
       input.onPlayerCollide = (player: Character) => {
         if (data.triggersBattle) {
-          const battle = new Battle()
-          battle.addEnemies(
-            data.battleNpcs,
-            data.randomizeBattleNpcs,
-            data.maxEnemies
-          )
-          battle.addPlayer(player)
-          battle.onComplete = () => {
-            console.log('Battle Ended')
-            this.state.battles.delete(battle.battleId)
-          }
-          this.state.battles.set(battle.battleId, battle)
+          this.startBattle(data, player)
         }
       }
       this.state.npcs.set(npc.npcId, npc)
@@ -88,6 +92,40 @@ export class MmorpgMapRoom extends Room {
       })
     })
   }
+
+  moveEntity(position: PositionData) {
+    if (position?.owner?.node) {
+      this.hash.update(position.owner.node)
+    }
+    if (position.isPlayerPosition) {
+      position.getNextPosition()
+    }
+    if (position.nextX > 16 && position.nextY > 16) {
+      position.x = Math.round(position.nextX)
+      position.y = Math.round(position.nextY)
+    }
+  }
+
+  setPlayerMovement(
+    character: Character,
+    { horizontal, vertical }: { horizontal: 1 | -1 | 0; vertical: 1 | -1 | 0 }
+  ) {
+    character.position.movement.horizontal = horizontal
+    character.position.movement.vertical = vertical
+    if (horizontal !== 0 || vertical !== 0) {
+      if (!this.movementUpdates.includes(character.position)) {
+        this.movementUpdates.push(character.position)
+      }
+    } else {
+      if (this.movementUpdates.includes(character.position)) {
+        this.movementUpdates.splice(
+          this.movementUpdates.indexOf(character.position),
+          1
+        )
+      }
+    }
+  }
+
   onCreate({ npcs }: { npcs: NpcData[] }): void | Promise<any> {
     this.setState(new MmorpgMapState())
     this.spawnNpcs(npcs || [])
@@ -95,39 +133,24 @@ export class MmorpgMapRoom extends Room {
       this.update$.next()
       // iterate async to avoid blocking the server
       from(this.movementUpdates).subscribe((position: PositionData) => {
-        if (position?.owner?.node) {
-          this.hash.update(position.owner.node)
-        }
-        if (position.isPlayerPosition) {
-          position.getNextPosition()
-        }
-        if (position.nextX > 16 && position.nextY > 16) {
-          position.x = Math.round(position.nextX)
-          position.y = Math.round(position.nextY)
-        }
+        this.moveEntity(position)
       })
     }, 1000 / 30)
     this.onMessage('character:move', (client, { horizontal, vertical }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {
-        character.position.movement.horizontal = horizontal
-        character.position.movement.vertical = vertical
-        if (horizontal !== 0 || vertical !== 0) {
-          if (!this.movementUpdates.includes(character.position)) {
-            this.movementUpdates.push(character.position)
-          }
-        } else {
-          if (this.movementUpdates.includes(character.position)) {
-            this.movementUpdates.splice(
-              this.movementUpdates.indexOf(character.position),
-              1
-            )
-          }
-        }
+        this.setPlayerMovement(character, { horizontal, vertical })
       }
     })
     this.onMessage('character:zone', (client, { map }) => {})
-    this.onMessage('character:battle', (client, { x, y }) => {})
+    this.onMessage('character:battle:leave', (client, { x, y }) => {
+      const character = this.state.playersByClient.get(client.sessionId)
+      this.state.battles.forEach((battle) => {
+        if (battle.players.has(character.currentClientId)) {
+          battle.removePlayer(character)
+        }
+      })
+    })
   }
 
   onDispose() {

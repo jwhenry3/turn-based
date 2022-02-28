@@ -48,7 +48,10 @@ export class NpcInput {
       }
 
       this.npc.hash.find(this.collideRange, (selector) => {
-        if (selector.entity instanceof Character) {
+        if (
+          selector.entity instanceof Character &&
+          !selector.entity.isInBattle
+        ) {
           this.onPlayerCollide(selector.entity)
           if (this.data.triggersBattle || this.data.despawnOnPlayerCollision) {
             this.despawn()

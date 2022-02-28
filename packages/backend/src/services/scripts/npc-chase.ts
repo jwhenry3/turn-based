@@ -53,7 +53,8 @@ export class NpcChase extends NpcMovement {
       this.npc.hash.find(this.chaseRange, (selector) => {
         if (
           (!this.chaseTarget || this.waitTick > 0) &&
-          selector.entity instanceof Character
+          selector.entity instanceof Character &&
+          !selector.entity.isInBattle
         ) {
           this.chaseTarget = selector.entity
           this.npc.position.speed = 3

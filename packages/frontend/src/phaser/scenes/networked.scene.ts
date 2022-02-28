@@ -1,6 +1,7 @@
 import { app } from '../../ui/app'
 import { NpcEntity } from '../entities/Npc'
 import { PlayerEntity } from '../entities/player'
+import { BattleScene } from './battle.scene'
 import { SceneConnector } from './scene.connector'
 
 export class NetworkedScene extends Phaser.Scene {
@@ -60,9 +61,16 @@ export class NetworkedScene extends Phaser.Scene {
 
     this.connector.battles.onAdd = (e) => {
       console.log('added battle', e.toJSON())
+      const battleScene = this.game.scene.add(
+        'battle',
+        BattleScene
+      ) as BattleScene
+      battleScene.battle = e
+      this.game.scene.start('battle')
     }
     this.connector.battles.onRemove = (e) => {
       console.log('removed battle', e.toJSON())
+      this.game.scene.stop('battle')
     }
   }
 

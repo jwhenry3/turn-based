@@ -214,6 +214,9 @@ export class Character extends Schema {
   @type('string')
   name: string
 
+  @type('boolean')
+  isInBattle: boolean = false
+
   @type('string')
   status: 'connected' | 'reconnecting' | 'disconnected' = 'connected'
 
