@@ -8,7 +8,7 @@
 import { Schema, type, ArraySchema, MapSchema, SetSchema, DataChange } from '@colyseus/schema';
 import { Appearance } from './Appearance'
 import { Statistics } from './Statistics'
-import { Position } from './Position'
+import { PositionData } from './PositionData'
 import { Inventory } from './Inventory'
 
 export class Character extends Schema {
@@ -20,6 +20,6 @@ export class Character extends Schema {
     @type("boolean") public inBattle!: boolean;
     @type(Appearance) public appearance: Appearance = new Appearance();
     @type(Statistics) public stats: Statistics = new Statistics();
-    @type(Position) public position: Position = new Position();
+    @type(PositionData) public position: PositionData = new PositionData();
     @type(Inventory) public inventory: Inventory = new Inventory();
 }

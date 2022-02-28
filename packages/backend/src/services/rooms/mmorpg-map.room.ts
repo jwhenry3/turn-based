@@ -18,6 +18,9 @@ export class MmorpgMapState extends Schema {
   @type({ map: Character })
   playersByClient = new MapSchema<Character>()
 
+  @filterChildren((npc: Npc) => {
+    return !npc.despawned
+  })
   @type({ map: Npc })
   npcs = new MapSchema<Npc>()
 

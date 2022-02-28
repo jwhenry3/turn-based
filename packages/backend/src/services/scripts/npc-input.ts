@@ -27,30 +27,35 @@ export class NpcInput {
     this.npc.position.speed = 3
   }
 
-  respawn() {
-    this.npc.despawned = false
+  despawn() {
+    this.npc.despawned = true
+    this.npc.respawnTimer = this.npc.respawnTime
     this.npc.position.x = this.data.x
     this.npc.position.y = this.data.y
     this.chase.stopChase()
     this.wander.stopWander()
   }
 
-  async update() {
-    this.chase.execute()
-    if (this.data.canWander && !this.chase.chaseTarget) {
-      this.wander.execute()
-    }
+  respawn() {
+    this.npc.despawned = false
+  }
 
-    this.npc.hash.find(this.collideRange, (selector) => {
-      if (selector.entity instanceof Character) {
-        this.onPlayerCollide(selector.entity)
-        if (this.data.triggersBattle || this.data.despawnOnPlayerCollision) {
-          this.npc.despawned = true
-          this.npc.respawnTimer = this.npc.respawnTime
-        }
+  async update() {
+    if (!this.npc.despawned) {
+      this.chase.execute()
+      if (this.data.canWander && !this.chase.chaseTarget) {
+        this.wander.execute()
       }
-    })
-    if (this.npc.despawned) {
+
+      this.npc.hash.find(this.collideRange, (selector) => {
+        if (selector.entity instanceof Character) {
+          this.onPlayerCollide(selector.entity)
+          if (this.data.triggersBattle || this.data.despawnOnPlayerCollision) {
+            this.despawn()
+          }
+        }
+      })
+    } else {
       if (this.npc.respawnTimer > 0) {
         this.npc.respawnTimer--
       } else {
