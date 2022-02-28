@@ -62,8 +62,4 @@ export class NetworkedScene extends Phaser.Scene {
   disconnect() {
     this.connector.disconnect()
   }
-
-  handleInput() {
-    app.movement.update(this.input)
-  }
 }

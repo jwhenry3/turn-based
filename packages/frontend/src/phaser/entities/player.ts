@@ -43,8 +43,8 @@ export class PlayerEntity extends MovableEntity<Character> {
     if (!this.rectangle) {
       this.create()
     }
-    if (this.isLocalPlayer) {
-      app.movement.update(this.scene.input)
+    if (this.isLocalPlayer && this.rectangle) {
+      app.movement.update(this.scene.input, this.rectangle)
     }
     if (
       this.rectangle.x !== this.position.x ||

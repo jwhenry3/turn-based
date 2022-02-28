@@ -7,7 +7,4 @@ export class StarterScene extends NetworkedScene {
 
   connector = new SceneConnector('starter')
 
-  update() {
-    this.handleInput()
-  }
 }
