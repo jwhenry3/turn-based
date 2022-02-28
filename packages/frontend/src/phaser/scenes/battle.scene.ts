@@ -1,9 +1,72 @@
+import { MapSchema } from '@colyseus/schema'
 import { Battle } from '../../networking/schemas/Battle'
+import { BattleScenePlayer } from '../entities/battle/battle-player'
+import { PlayerEntity } from '../entities/player'
+import { SceneConnector } from './scene.connector'
 
 export class BattleScene extends Phaser.Scene {
   battle: Battle
+  connector: SceneConnector
 
-  create() {}
+  rectangle: Phaser.GameObjects.Rectangle
 
-  update() {}
+  players: Record<string, BattleScenePlayer> = {}
+  playerEntities: Record<string, PlayerEntity> = {}
+
+  battleLocations = {
+    players: [
+      [200, 200],
+      [300, 300],
+      [400, 200],
+      [500, 300],
+    ],
+  }
+
+  create() {
+    this.cameras.main.transparent = false
+    this.cameras.main.setBackgroundColor('#000')
+    this.rectangle = this.add.rectangle(
+      650 + 160,
+      300 + 150,
+      1300,
+      600,
+      Phaser.Display.Color.HexStringToColor('#00aa22').color
+    )
+    const focus = this.add.rectangle(
+      650 + 160,
+      300 + 150,
+      1,
+      1,
+      Phaser.Display.Color.HexStringToColor('#00f').color
+    )
+    this.cameras.main.startFollow(focus)
+    this.cameras.main.setZoom(window.innerWidth / 1300)
+    this.battle.players.forEach((player) => {
+      this.players[player.characterId] = new BattleScenePlayer(
+        player,
+        this,
+        this.connector
+      )
+    })
+    this.battle.players.onAdd = (player) => {
+      this.players[player.characterId] = new BattleScenePlayer(
+        player,
+        this,
+        this.connector
+      )
+      player.character = this.playerEntities[player.characterId].model
+      this.add.existing(this.players[player.characterId])
+    }
+    this.battle.players.onRemove = (player) => {
+      this.players[player.characterId].destroy()
+      delete this.players[player.characterId]
+    }
+  }
+  lastWidth = 1300
+  update() {
+    if (window.innerWidth !== this.lastWidth) {
+      this.cameras.main.setZoom(window.innerWidth / 1300)
+      this.lastWidth = window.innerWidth
+    }
+  }
 }

@@ -15,12 +15,18 @@ export class BattlePlayer extends Schema {
   @type('number')
   cooldown = 0
 
+  character: Character
+
   destroy$ = new Subject<void>()
   @type({ array: 'string' })
   status: ArraySchema<string> = new ArraySchema<string>()
 
-  constructor(public character: Character, ...args: any[]) {
+  @type('number')
+  battleLocation = 0
+
+  constructor(character: Character, ...args: any[]) {
     super(args)
+    this.character = character
     this.characterId = character.characterId
   }
 
@@ -150,6 +156,7 @@ export class Battle extends Schema {
   addPlayer(character: Character) {
     const player = new BattlePlayer(character)
     character.isInBattle = true
+    player.battleLocation = this.players.size
     this.watchUpdate(player)
     this.players.set(character.currentClientId, player)
   }

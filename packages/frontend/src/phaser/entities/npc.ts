@@ -18,7 +18,7 @@ export class NpcEntity extends MovableEntity<Npc> {
       Math.round(this.rectangle.y - this.rectangle.height)
     )
     this.rectangle.originX = 16
-    this.rectangle.originY = 56
+    this.rectangle.originY = 60
     this.scene.add.existing(this.rectangle)
   }
 
@@ -47,5 +47,9 @@ export class NpcEntity extends MovableEntity<Npc> {
         Math.round(this.rectangle.y - this.rectangle.height)
       )
     }
+  }
+  destroy() {
+    super.destroy()
+    this.rectangle.destroy()
   }
 }

@@ -109,32 +109,21 @@ export class MmorpgMapRoom extends Room {
     character: Character,
     { horizontal, vertical }: { horizontal: 1 | -1 | 0; vertical: 1 | -1 | 0 }
   ) {
-    // characters do not move while in battle, since it is turn based
-    console.log(character.isInBattle)
-    if (character.isInBattle) {
-      character.position.movement.horizontal = 0
-      character.position.movement.vertical = 0
-      if (this.movementUpdates.includes(character.position)) {
-        this.movementUpdates.splice(
-          this.movementUpdates.indexOf(character.position),
-          1
-        )
-      }
-      return
-    }
-    character.position.movement.horizontal = horizontal
-    character.position.movement.vertical = vertical
-    if (horizontal !== 0 || vertical !== 0) {
+    if (!character.isInBattle && (horizontal !== 0 || vertical !== 0)) {
+      character.position.movement.horizontal = horizontal
+      character.position.movement.vertical = vertical
       if (!this.movementUpdates.includes(character.position)) {
         this.movementUpdates.push(character.position)
       }
-    } else {
-      if (this.movementUpdates.includes(character.position)) {
-        this.movementUpdates.splice(
-          this.movementUpdates.indexOf(character.position),
-          1
-        )
-      }
+      return
+    }
+    if (this.movementUpdates.includes(character.position)) {
+      character.position.movement.horizontal = 0
+      character.position.movement.vertical = 0
+      this.movementUpdates.splice(
+        this.movementUpdates.indexOf(character.position),
+        1
+      )
     }
   }
 
@@ -160,6 +149,7 @@ export class MmorpgMapRoom extends Room {
       this.state.battles.forEach((battle) => {
         if (battle.players.has(character.currentClientId)) {
           battle.removePlayer(character)
+          character.isInBattle = false
         }
       })
     })
@@ -240,6 +230,12 @@ export class MmorpgMapRoom extends Room {
       // }
     } catch (e) {
       if (character) {
+        character.isInBattle = false
+        this.state.battles.forEach((battle) => {
+          if (battle.players[character.characterId]) {
+            this.state.battles.delete(battle)
+          }
+        })
         character.status = 'disconnected'
         if (this.movementUpdates.includes(character.position)) {
           this.movementUpdates.splice(

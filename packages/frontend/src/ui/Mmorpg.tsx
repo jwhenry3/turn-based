@@ -29,8 +29,10 @@ export default function Mmorpg() {
         scale: {
           mode: Phaser.Scale.RESIZE,
           parent: node,
-          width: '100%',
-          height: '100%',
+          width: 1600,
+          height: 900,
+          autoCenter: Phaser.Scale.Center.CENTER_BOTH,
+          autoRound: true,
         },
         input: {
           gamepad: true,

@@ -32,7 +32,6 @@ export class NetworkedScene extends Phaser.Scene {
       this.connector.entities.players.toJSON()
     )) {
       const e = this.connector.entities.players[characterId]
-      // console.log('player added!', e.toJSON())
       this.playerObjects[e.characterId] = new PlayerEntity(e, this)
       this.add.existing(this.playerObjects[e.characterId])
     }
@@ -42,12 +41,16 @@ export class NetworkedScene extends Phaser.Scene {
       this.add.existing(this.npcObjects[e.npcId])
     }
     this.connector.entities.players.onAdd = (e) => {
-      // console.log('player added!', e.toJSON())
+      console.log('added', e)
       this.playerObjects[e.characterId] = new PlayerEntity(e, this)
       this.add.existing(this.playerObjects[e.characterId])
     }
+    this.connector.entities.players.onChange = (e) => {
+      console.log('changed', e)
+      this.playerObjects[e.characterId].model = e
+    }
     this.connector.entities.players.onRemove = (e) => {
-      // console.log('player removed!', e.toJSON())
+      console.log('removed', e)
       this.playerObjects[e.characterId]?.destroy()
       delete this.playerObjects[e.characterId]
     }
@@ -56,23 +59,23 @@ export class NetworkedScene extends Phaser.Scene {
       this.add.existing(this.npcObjects[e.npcId])
     }
     this.connector.entities.npcs.onRemove = (e) => {
-      console.log('npc removed!', e.toJSON())
       this.npcObjects[e.npcId]?.destroy()
       delete this.npcObjects[e.npcId]
     }
 
     this.connector.battles.onAdd = (e) => {
-      console.log('added battle', e.toJSON())
       let battleScene = this.game.scene.getScene('battle') as BattleScene
       if (!battleScene) {
         battleScene = this.game.scene.add('battle', BattleScene) as BattleScene
       }
+      battleScene.playerEntities = this.playerObjects
+      battleScene.connector = this.connector
       battleScene.battle = e
       this.game.scene.start('battle')
     }
     this.connector.battles.onRemove = (e) => {
-      console.log('removed battle', e.toJSON())
       this.game.scene.stop('battle')
+      this.cameras.main.setZoom(1)
     }
   }
 

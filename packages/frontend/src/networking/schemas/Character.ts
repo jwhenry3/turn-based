@@ -16,6 +16,7 @@ export class Character extends Schema {
     @type("string") public characterId!: string;
     @type("string") public currentClientId!: string;
     @type("string") public name!: string;
+    @type("boolean") public isInBattle!: boolean;
     @type("string") public status!: string;
     @type("boolean") public inBattle!: boolean;
     @type(Appearance) public appearance: Appearance = new Appearance();
