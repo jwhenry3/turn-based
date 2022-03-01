@@ -26,16 +26,15 @@ export class PlayerEntity extends MovableEntity<Character> {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e) => {
-      if (this.model.inBattle && !this.isLocalPlayer) {
-        console.log('prompt for joining battle')
+      if (app.selected === this) {
+        app.movement.mouseDestination = {
+          x: this.position.x,
+          y: this.position.y,
+        }
       }
-      if (this.isLocalPlayer) {
-        console.log(e)
-      }
+      app.selected = this
     })
-    this.rectangle.setDepth(
-      Math.round(this.rectangle.y)
-    )
+    this.rectangle.setDepth(Math.round(this.rectangle.y))
     this.rectangle.originX = 16
     this.rectangle.originY = 60
     this.scene.add.existing(this.rectangle)
@@ -75,6 +74,15 @@ export class PlayerEntity extends MovableEntity<Character> {
     this.rectangle.setDepth(
       Math.round(this.rectangle.y - this.rectangle.height)
     )
+    if (app.selected === this) {
+      this.rectangle.setStrokeStyle(
+        4,
+        Phaser.Display.Color.HexStringToColor('#eee').color,
+        0.5
+      )
+    } else {
+      this.rectangle.setStrokeStyle(0)
+    }
   }
   destroy() {
     super.destroy()

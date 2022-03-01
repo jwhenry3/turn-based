@@ -1,4 +1,5 @@
 import { Npc } from '../../networking/schemas/Npc'
+import { app } from '../../ui/app'
 import { lerp } from '../behaviors/lerp'
 import { MovableEntity } from './movable'
 
@@ -14,9 +15,20 @@ export class NpcEntity extends MovableEntity<Npc> {
       64,
       Phaser.Display.Color.HexStringToColor('#ff8822').color
     )
-    this.rectangle.setDepth(
-      Math.round(this.rectangle.y)
+    this.rectangle.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, 32, 64),
+      Phaser.Geom.Rectangle.Contains
     )
+    this.rectangle.on('pointerdown', (e) => {
+      if (app.selected === this) {
+        app.movement.mouseDestination = {
+          x: this.position.x,
+          y: this.position.y,
+        }
+      }
+      app.selected = this
+    })
+    this.rectangle.setDepth(Math.round(this.rectangle.y))
     this.rectangle.originX = 16
     this.rectangle.originY = 60
     this.scene.add.existing(this.rectangle)
@@ -46,6 +58,15 @@ export class NpcEntity extends MovableEntity<Npc> {
       this.rectangle.setDepth(
         Math.round(this.rectangle.y - this.rectangle.height)
       )
+    }
+    if (app.selected === this) {
+      this.rectangle.setStrokeStyle(
+        4,
+        Phaser.Display.Color.HexStringToColor('#eee').color,
+        0.5
+      )
+    } else {
+      this.rectangle.setStrokeStyle(0)
     }
   }
   destroy() {

@@ -26,6 +26,7 @@ export class StarterScene extends NetworkedScene {
     )
     this.rectangle.on('pointerdown', (e: Phaser.Input.Pointer) => {
       const input = app.movement
+      app.selected = undefined
       if (input.mouseTick === 0) {
         input.mouseTick = input.mouseCooldown
         e.updateWorldPoint(this.input.scene.cameras.main)

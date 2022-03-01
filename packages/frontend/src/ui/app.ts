@@ -14,6 +14,7 @@ export const app = {
     characterId: '',
   },
   game: undefined as Phaser.Game | undefined,
+  selected: undefined,
   movement: new MovementInput(),
   messages: {
     lobby: new Subject<{ type: string; message: any }>(),

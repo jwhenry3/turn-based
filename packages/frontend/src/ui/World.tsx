@@ -7,8 +7,11 @@ import { app } from './app'
 export function World() {
   const oldMap = useRef<string>('')
   const { scene, update } = useSceneState()
+  const onLogout = (e) => {
+    app.rooms.lobby.send('account:logout')
+    update('lobby')
+  }
   const onLeave = (e) => {
-    e.preventDefault()
     app.rooms.starter.send('character:battle:leave')
   }
   useEffect(() => {
@@ -36,7 +39,8 @@ export function World() {
   // Todo: hud and game UI goes here
   return (
     <>
-      {scene} <Button onClick={onLeave}>Leave Battle</Button>
+      <Button onClick={onLogout}>Logout</Button>{' '}
+      <Button onClick={onLeave}>Leave Battle</Button>
     </>
   )
 }
