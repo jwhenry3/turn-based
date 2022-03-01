@@ -10,11 +10,25 @@ export class NetworkedScene extends Phaser.Scene {
   playerObjects: Record<string, PlayerEntity> = {}
   npcObjects: Record<string, NpcEntity> = {}
 
+  destinationPointer: Phaser.GameObjects.Arc
+
   async connect() {
     await this.connector.connect()
   }
 
-  
+  create() {
+    this.destinationPointer = this.add.arc(
+      0,
+      0,
+      8,
+      0,
+      360,
+      false,
+      Phaser.Display.Color.HexStringToColor('#55f').color,
+      0.2
+    )
+    this.destinationPointer.setVisible(false)
+  }
 
   async start() {
     await this.connect()
@@ -78,6 +92,18 @@ export class NetworkedScene extends Phaser.Scene {
     this.connector.battles.onRemove = (e) => {
       this.game.scene.stop('battle')
       this.cameras.main.setZoom(1)
+    }
+  }
+
+  update() {
+    if (app.movement.mouseDestination) {
+      this.destinationPointer.setPosition(
+        app.movement.mouseDestination.x,
+        app.movement.mouseDestination.y
+      )
+      this.destinationPointer.setVisible(true)
+    } else {
+      this.destinationPointer.setVisible(false)
     }
   }
 

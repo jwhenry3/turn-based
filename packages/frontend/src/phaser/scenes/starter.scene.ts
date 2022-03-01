@@ -12,6 +12,7 @@ export class StarterScene extends NetworkedScene {
 
   rectangle: Phaser.GameObjects.Rectangle
   create() {
+    super.create()
     this.rectangle = this.add.rectangle(
       this.width / 2,
       this.height / 2,

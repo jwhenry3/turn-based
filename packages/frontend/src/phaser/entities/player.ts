@@ -35,8 +35,7 @@ export class PlayerEntity extends MovableEntity<Character> {
       app.selected = this
     })
     this.rectangle.setDepth(Math.round(this.rectangle.y))
-    this.rectangle.originX = 16
-    this.rectangle.originY = 60
+    this.rectangle.setOrigin(0.5, 0.75)
     this.scene.add.existing(this.rectangle)
     if (this.isLocalPlayer) {
       this.scene.cameras.main.startFollow(this.rectangle, false, 0.05, 0.05)
@@ -71,9 +70,7 @@ export class PlayerEntity extends MovableEntity<Character> {
       const newY = lerp(this.rectangle.y, this.position.y, 0.2)
       this.rectangle.setPosition(newX, newY)
     }
-    this.rectangle.setDepth(
-      Math.round(this.rectangle.y - this.rectangle.height)
-    )
+    this.rectangle.setDepth(Math.round(this.rectangle.y))
     if (app.selected === this) {
       this.rectangle.setStrokeStyle(
         4,

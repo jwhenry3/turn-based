@@ -29,8 +29,7 @@ export class NpcEntity extends MovableEntity<Npc> {
       app.selected = this
     })
     this.rectangle.setDepth(Math.round(this.rectangle.y))
-    this.rectangle.originX = 16
-    this.rectangle.originY = 60
+    this.rectangle.setOrigin(0.5, 0.75)
     this.scene.add.existing(this.rectangle)
   }
 
@@ -55,9 +54,7 @@ export class NpcEntity extends MovableEntity<Npc> {
         const newY = lerp(this.rectangle.y, this.position.y, 0.5)
         this.rectangle.setPosition(newX, newY)
       }
-      this.rectangle.setDepth(
-        Math.round(this.rectangle.y - this.rectangle.height)
-      )
+      this.rectangle.setDepth(Math.round(this.rectangle.y))
     }
     if (app.selected === this) {
       this.rectangle.setStrokeStyle(
