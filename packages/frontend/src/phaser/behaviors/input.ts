@@ -67,14 +67,6 @@ export class MovementInput {
         movement[1] = 1
         this.mouseDestination = undefined
       }
-      if (input.activePointer.isDown && this.mouseTick === 0) {
-        this.mouseTick = this.mouseCooldown
-        input.activePointer.updateWorldPoint(input.scene.cameras.main)
-        this.mouseDestination = {
-          x: input.activePointer.worldX,
-          y: input.activePointer.worldY,
-        }
-      }
     }
     if (this.mouseTick > 0) {
       this.mouseTick--

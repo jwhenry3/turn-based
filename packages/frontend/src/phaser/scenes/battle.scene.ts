@@ -13,6 +13,10 @@ export class BattleScene extends Phaser.Scene {
   players: Record<string, BattleScenePlayer> = {}
   playerEntities: Record<string, PlayerEntity> = {}
 
+  width = 1024
+  lastWidth = this.width
+  height = 600
+
   battleLocations = {
     players: [
       [200, 200],
@@ -26,21 +30,21 @@ export class BattleScene extends Phaser.Scene {
     this.cameras.main.transparent = false
     this.cameras.main.setBackgroundColor('#000')
     this.rectangle = this.add.rectangle(
-      650 + 160,
-      300 + 150,
-      1300,
-      600,
+      this.width / 2,
+      this.height / 2,
+      this.width,
+      this.height,
       Phaser.Display.Color.HexStringToColor('#00aa22').color
     )
     const focus = this.add.rectangle(
-      650 + 160,
-      300 + 150,
+      this.width / 2,
+      this.height / 2,
       1,
       1,
       Phaser.Display.Color.HexStringToColor('#00f').color
     )
     this.cameras.main.startFollow(focus)
-    this.cameras.main.setZoom(window.innerWidth / 1300)
+    this.cameras.main.setZoom(window.innerWidth / 1024)
     this.battle.players.forEach((player) => {
       this.players[player.characterId] = new BattleScenePlayer(
         player,
@@ -62,10 +66,9 @@ export class BattleScene extends Phaser.Scene {
       delete this.players[player.characterId]
     }
   }
-  lastWidth = 1300
   update() {
     if (window.innerWidth !== this.lastWidth) {
-      this.cameras.main.setZoom(window.innerWidth / 1300)
+      this.cameras.main.setZoom(window.innerWidth / this.width)
       this.lastWidth = window.innerWidth
     }
   }

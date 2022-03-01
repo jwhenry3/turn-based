@@ -1,7 +1,8 @@
 import { Client } from '@colyseus/core'
-import { ArraySchema, filter, MapSchema, Schema, type } from '@colyseus/schema'
+import { ArraySchema, filter, filterChildren, MapSchema, Schema, type } from '@colyseus/schema'
 import { SpatialNode } from '../rooms/spacial/node'
 import SpatialHash from 'spatial-hash'
+import { Battle } from './battles'
 
 export class Movement extends Schema {
   @type('string')
@@ -58,7 +59,7 @@ export class Appearance extends Schema {
 
 export class Attribute extends Schema {
   @type('number')
-  base: number = 0
+  baseAmount: number = 0
   @type('number')
   fromPoints: number = 0
   @type('number')
@@ -90,19 +91,19 @@ export class Statistics extends Schema {
   @type(Attribute)
   maxMp: Attribute = new Attribute({ base: 100 })
   @type(Attribute)
-  str: Attribute = new Attribute({ base: 5 })
+  strength: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  dex: Attribute = new Attribute({ base: 5 })
+  dexterity: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  vit: Attribute = new Attribute({ base: 5 })
+  vitality: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  agi: Attribute = new Attribute({ base: 5 })
+  agility: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  int: Attribute = new Attribute({ base: 5 })
+  intelligence: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  mnd: Attribute = new Attribute({ base: 5 })
+  mind: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
-  chr: Attribute = new Attribute({ base: 5 })
+  charisma: Attribute = new Attribute({ base: 5 })
 }
 export class Effect extends Schema {
   @type('string')
@@ -302,4 +303,30 @@ export class Account extends Schema {
   @filter((account, client) => account.currentClientId === client.sessionId)
   @type({ array: Character })
   characterList: ArraySchema<Character> = new ArraySchema<Character>()
+}
+
+
+export class MmorpgMapState extends Schema {
+  @type({ map: Character })
+  players = new MapSchema<Character>()
+  @type({ map: Character })
+  playersByClient = new MapSchema<Character>()
+
+  @type({ map: Npc })
+  npcs = new MapSchema<Npc>()
+
+  @filterChildren((client, key, battle: Battle) => {
+    return battle.players?.has(client.sessionId)
+  })
+  @type({ map: Battle })
+  battles = new MapSchema<Battle>()
+}
+
+
+export class LobbyState extends Schema {
+  @filterChildren((client, key, value: Account, root) => {
+    return value.currentClientId === client.sessionId
+  })
+  @type({ map: Account })
+  accounts = new MapSchema<Account>()
 }

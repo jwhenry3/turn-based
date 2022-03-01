@@ -19,10 +19,22 @@ export class PlayerEntity extends MovableEntity<Character> {
       this.position.y,
       32,
       64,
-      Phaser.Display.Color.HexStringToColor('#00aa22').color
+      Phaser.Display.Color.HexStringToColor('#55f').color
     )
+    this.rectangle.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, 32, 64),
+      Phaser.Geom.Rectangle.Contains
+    )
+    this.rectangle.on('pointerdown', (e) => {
+      if (this.model.inBattle && !this.isLocalPlayer) {
+        console.log('prompt for joining battle')
+      }
+      if (this.isLocalPlayer) {
+        console.log(e)
+      }
+    })
     this.rectangle.setDepth(
-      Math.round(this.rectangle.y - this.rectangle.height)
+      Math.round(this.rectangle.y)
     )
     this.rectangle.originX = 16
     this.rectangle.originY = 60

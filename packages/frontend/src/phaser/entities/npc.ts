@@ -15,7 +15,7 @@ export class NpcEntity extends MovableEntity<Npc> {
       Phaser.Display.Color.HexStringToColor('#ff8822').color
     )
     this.rectangle.setDepth(
-      Math.round(this.rectangle.y - this.rectangle.height)
+      Math.round(this.rectangle.y)
     )
     this.rectangle.originX = 16
     this.rectangle.originY = 60

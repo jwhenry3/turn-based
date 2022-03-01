@@ -14,6 +14,8 @@ export class NetworkedScene extends Phaser.Scene {
     await this.connector.connect()
   }
 
+  
+
   async start() {
     await this.connect()
     this.handleEntities()

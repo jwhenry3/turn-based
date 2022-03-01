@@ -5,28 +5,13 @@ import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
 import { createCharacter } from '../schemas/factories/character'
-import Npc, { Character, PositionData } from '../schemas/schemas'
+import Npc, { Character, MmorpgMapState, PositionData } from '../schemas/schemas'
 import { NpcInput } from '../scripts/npc-input'
 import { NpcData } from './fixture.models'
 import SpatialHash from 'spatial-hash'
 import { SpatialNode } from './spacial/node'
 import { Battle } from '../schemas/battles'
 
-export class MmorpgMapState extends Schema {
-  @type({ map: Character })
-  players = new MapSchema<Character>()
-  @type({ map: Character })
-  playersByClient = new MapSchema<Character>()
-
-  @type({ map: Npc })
-  npcs = new MapSchema<Npc>()
-
-  @filterChildren((client, key, battle: Battle) => {
-    return battle.players?.has(client.sessionId)
-  })
-  @type({ map: Battle })
-  battles = new MapSchema<Battle>()
-}
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}

@@ -5,7 +5,9 @@
   "scripts": {
     "backend:dev": "nx serve backend",
     "frontend:dev": "next dev packages/frontend",
-    "schemas": "yarn frontend:schemas && yarn frontend:schemas:battles",
+    "schemas": "yarn frontend:schemas && yarn frontend:schemas:battles && yarn unity:schemas && yarn unity:schemas:battles",
+    "unity:schemas": "npx schema-codegen packages/backend/src/services/schemas/schemas.ts --output ../UnityProjects/MMORPG/Assets/App/Networking/Schema --csharp --namespace Mmorpg",
+    "unity:schemas:battles": "npx schema-codegen packages/backend/src/services/schemas/battles.ts --output ../UnityProjects/MMORPG/Assets/App/Networking/Schema --csharp --namespace Mmorpg",
     "frontend:schemas": "npx schema-codegen packages/backend/src/services/schemas/schemas.ts --output packages/frontend/src/networking/schemas --ts",
     "frontend:schemas:battles": "npx schema-codegen packages/backend/src/services/schemas/battles.ts --output packages/frontend/src/networking/schemas --ts"
   },

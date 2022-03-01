@@ -7,20 +7,12 @@ import {
   type,
 } from '@colyseus/schema'
 import { LobbyOptions } from '@colyseus/core/build/rooms/LobbyRoom'
-import { Account, Character } from '../schemas/schemas'
+import { Account, Character, LobbyState } from '../schemas/schemas'
 import { createCharacter } from '../schemas/factories/character'
 import { createAccount } from '../schemas/factories/account'
 import { AccountModel } from '../data/account'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
-
-class LobbyState extends Schema {
-  @filterChildren((client, key, value: Account, root) => {
-    return value.currentClientId === client.sessionId
-  })
-  @type({ map: Account })
-  accounts = new MapSchema<Account>()
-}
 
 export class MmorpgLobbyRoom extends Room {
   accountModels: Record<string, AccountModel> = {}
