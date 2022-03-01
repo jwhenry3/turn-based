@@ -1,33 +1,27 @@
-import { BattlePlayer } from '../../../networking/schemas/BattlePlayer'
+import { BattleNpc } from '../../../networking/schemas/BattleNpc'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
 
-export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
+export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
   rectangle: Phaser.GameObjects.Rectangle
 
   constructor(
-    public model: BattlePlayer,
+    public model: BattleNpc,
     public scene: BattleScene,
     public connector: SceneConnector
   ) {
     super(scene, 'sprite')
   }
 
-  get isLocalPlayer() {
-    return (
-      this.model.character.currentClientId === this.connector.room.sessionId
-    )
-  }
-
   create() {
     const location =
-      this.scene.battleLocations.players[this.model.battleLocation]
+      this.scene.battleLocations.enemies[this.model.battleLocation]
     this.rectangle = this.scene.add.rectangle(
       location[0],
       location[1],
       32,
       64,
-      Phaser.Display.Color.HexStringToColor('#55f').color
+      Phaser.Display.Color.HexStringToColor('#f50').color
     )
     this.rectangle.setDepth(
       Math.round(this.rectangle.y - this.rectangle.height)

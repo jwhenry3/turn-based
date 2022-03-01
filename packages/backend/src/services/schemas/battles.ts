@@ -66,6 +66,8 @@ export class BattleNpc extends BattleNpcType {
   battleNpcTypeId: string
   @type('string')
   name: string
+  @type('number')
+  battleLocation = 0
 
   @type('string')
   element:
@@ -149,6 +151,7 @@ export class Battle extends Schema {
 
   addEnemy(option: BattleNpc) {
     const enemy = new BattleNpc(option)
+    enemy.battleLocation = this.npcs.size
     this.watchUpdate(enemy)
     this.npcs.set(option.battleNpcId, enemy)
   }

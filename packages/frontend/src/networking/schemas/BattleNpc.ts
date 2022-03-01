@@ -12,6 +12,7 @@ export class BattleNpc extends BattleNpcType {
     @type("string") public battleNpcId!: string;
     @type("string") public battleNpcTypeId!: string;
     @type("string") public name!: string;
+    @type("number") public battleLocation!: number;
     @type("string") public element!: string;
     @type("number") public health!: number;
     @type("number") public level!: number;
