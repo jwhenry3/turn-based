@@ -20,10 +20,8 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
   }
 
   create() {
-    console.log('battle player created')
     const location =
       this.scene.battleLocations.players[this.model.battleLocation]
-    console.log(location)
     this.rectangle = this.scene.add.rectangle(
       location[0],
       location[1],

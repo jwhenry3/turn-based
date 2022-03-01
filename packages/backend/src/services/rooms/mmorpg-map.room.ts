@@ -5,13 +5,16 @@ import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
 import { createCharacter } from '../schemas/factories/character'
-import Npc, { Character, MmorpgMapState, PositionData } from '../schemas/schemas'
+import Npc, {
+  Character,
+  MmorpgMapState,
+  PositionData,
+} from '../schemas/schemas'
 import { NpcInput } from '../scripts/npc-input'
 import { NpcData } from './fixture.models'
 import SpatialHash from 'spatial-hash'
 import { SpatialNode } from './spacial/node'
 import { Battle } from '../schemas/battles'
-
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -129,12 +132,21 @@ export class MmorpgMapRoom extends Room {
       }
     })
     this.onMessage('character:zone', (client, { map }) => {})
+    this.onMessage('character:battle:join', (client, { battleId }) => {
+      const character = this.state.playersByClient.get(client.sessionId)
+      if (character) {
+        this.state.battles.forEach((battle) => {
+          if (battle.battleId === battleId) {
+            battle.addPlayer(character)
+          }
+        })
+      }
+    })
     this.onMessage('character:battle:leave', (client) => {
       const character = this.state.playersByClient.get(client.sessionId)
       this.state.battles.forEach((battle) => {
         if (battle.players.has(character.currentClientId)) {
           battle.removePlayer(character)
-          character.isInBattle = false
         }
       })
     })

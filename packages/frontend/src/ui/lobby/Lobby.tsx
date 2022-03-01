@@ -30,6 +30,7 @@ export const LobbyTitle = mStyled(Typography)({
 export default function Lobby() {
   const [state, setState] = useState({ account: undefined })
   useEffect(() => {
+    app.game.input.keyboard.enabled = false
     app.rooms.lobby.state.accounts.onAdd = (e) => {
       setState({ account: e })
     }

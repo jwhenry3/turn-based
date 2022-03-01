@@ -79,17 +79,42 @@ export class NetworkedScene extends Phaser.Scene {
       delete this.npcObjects[e.npcId]
     }
 
-    this.connector.battles.onAdd = (e) => {
-      let battleScene = this.game.scene.getScene('battle') as BattleScene
-      if (!battleScene) {
-        battleScene = this.game.scene.add('battle', BattleScene) as BattleScene
+    this.connector.battles.onAdd = (b) => {
+      b.players.onAdd = (p) => {
+        let battleScene = this.game.scene.getScene('battle') as BattleScene
+        if (p.characterId === app.auth.characterId) {
+          if (!battleScene) {
+            battleScene = this.game.scene.add(
+              'battle',
+              BattleScene
+            ) as BattleScene
+          }
+          battleScene.playerEntities = this.playerObjects
+          battleScene.addPlayer(p)
+          battleScene.connector = this.connector
+          battleScene.battle = b
+          this.game.scene.start('battle')
+          b.players.onRemove = (p) => {
+            if (p.characterId === app.auth.characterId) {
+              this.game.scene.stop('battle')
+              this.cameras.main.setZoom(1)
+            } else {
+              battleScene.removePlayer(p)
+            }
+          }
+          return
+        }
+        if (battleScene?.battle.battleId === b.battleId) {
+          battleScene.addPlayer(p)
+        }
       }
-      battleScene.playerEntities = this.playerObjects
-      battleScene.connector = this.connector
-      battleScene.battle = e
-      this.game.scene.start('battle')
+    }
+    this.connector.battles.onChange = (e) => {
+      console.log(e)
     }
     this.connector.battles.onRemove = (e) => {
+      let battleScene = this.game.scene.getScene('battle') as BattleScene
+      if (battleScene?.battle.battleId !== e.battleId) return
       this.game.scene.stop('battle')
       this.cameras.main.setZoom(1)
     }

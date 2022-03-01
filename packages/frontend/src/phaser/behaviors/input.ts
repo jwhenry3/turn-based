@@ -3,7 +3,6 @@ import { app } from '../../ui/app';
 export class MovementInput {
   movement = [0, 0]
 
-  enabled = false
   keys: Record<string, Phaser.Input.Keyboard.Key> = {}
 
   mouseDestination?: { x: number; y: number } = undefined
@@ -41,9 +40,6 @@ export class MovementInput {
   }
 
   update(input: Phaser.Input.InputPlugin, position: { x: number; y: number }) {
-    if (!this.enabled) {
-      return
-    }
     const movement: [number, number] = [0, 0]
     if (this.mouseDestination) {
       const [x, y] = this.moveTowards(position, 4)
@@ -51,6 +47,7 @@ export class MovementInput {
       movement[1] = y
     }
     if (app.gameHasFocus) {
+      input.keyboard.enabled = true
       if (this.keys.left.isDown) {
         movement[0] = -1
         this.mouseDestination = undefined
@@ -67,6 +64,8 @@ export class MovementInput {
         movement[1] = 1
         this.mouseDestination = undefined
       }
+    } else {
+      input.keyboard.enabled = false
     }
     if (this.mouseTick > 0) {
       this.mouseTick--

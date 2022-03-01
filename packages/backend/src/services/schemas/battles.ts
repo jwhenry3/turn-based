@@ -156,6 +156,7 @@ export class Battle extends Schema {
   addPlayer(character: Character) {
     const player = new BattlePlayer(character)
     character.isInBattle = true
+    character.battleId = this.battleId
     player.battleLocation = this.players.size
     this.watchUpdate(player)
     this.players.set(character.currentClientId, player)
@@ -163,6 +164,7 @@ export class Battle extends Schema {
   removePlayer(character: Character) {
     this.players[character.currentClientId]?.destroy$.next()
     character.isInBattle = false
+    character.battleId = undefined
     this.players.delete(character.currentClientId)
     if (this.players.size === 0) {
       this.complete()

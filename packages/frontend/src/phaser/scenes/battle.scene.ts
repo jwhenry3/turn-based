@@ -46,25 +46,21 @@ export class BattleScene extends Phaser.Scene {
     this.cameras.main.startFollow(focus)
     this.cameras.main.setZoom(window.innerWidth / 1024)
     this.battle.players.forEach((player) => {
-      this.players[player.characterId] = new BattleScenePlayer(
-        player,
-        this,
-        this.connector
-      )
+      this.addPlayer(player)
     })
-    this.battle.players.onAdd = (player) => {
-      this.players[player.characterId] = new BattleScenePlayer(
-        player,
-        this,
-        this.connector
-      )
-      player.character = this.playerEntities[player.characterId].model
-      this.add.existing(this.players[player.characterId])
-    }
-    this.battle.players.onRemove = (player) => {
-      this.players[player.characterId].destroy()
-      delete this.players[player.characterId]
-    }
+  }
+  addPlayer(player) {
+    this.players[player.characterId] = new BattleScenePlayer(
+      player,
+      this,
+      this.connector
+    )
+    player.character = this.playerEntities[player.characterId].model
+    this.add.existing(this.players[player.characterId])
+  }
+  removePlayer(player) {
+    this.players[player.characterId].destroy()
+    delete this.players[player.characterId]
   }
   update() {
     if (window.innerWidth !== this.lastWidth) {

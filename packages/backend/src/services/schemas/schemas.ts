@@ -1,5 +1,12 @@
 import { Client } from '@colyseus/core'
-import { ArraySchema, filter, filterChildren, MapSchema, Schema, type } from '@colyseus/schema'
+import {
+  ArraySchema,
+  filter,
+  filterChildren,
+  MapSchema,
+  Schema,
+  type,
+} from '@colyseus/schema'
 import { SpatialNode } from '../rooms/spacial/node'
 import SpatialHash from 'spatial-hash'
 import { Battle } from './battles'
@@ -219,10 +226,10 @@ export class Character extends Schema {
   isInBattle: boolean = false
 
   @type('string')
-  status: 'connected' | 'reconnecting' | 'disconnected' = 'connected'
+  battleId: string
 
-  @type('boolean')
-  inBattle: boolean = false
+  @type('string')
+  status: 'connected' | 'reconnecting' | 'disconnected' = 'connected'
 
   @type(Appearance)
   appearance: Appearance = new Appearance()
@@ -276,7 +283,6 @@ export default class Npc extends Schema {
 
   respawnTime = 1000
   respawnTimer = 0
-
 }
 export class AccountToken extends Schema {
   @type('string')
@@ -305,7 +311,6 @@ export class Account extends Schema {
   characterList: ArraySchema<Character> = new ArraySchema<Character>()
 }
 
-
 export class MmorpgMapState extends Schema {
   @type({ map: Character })
   players = new MapSchema<Character>()
@@ -315,13 +320,9 @@ export class MmorpgMapState extends Schema {
   @type({ map: Npc })
   npcs = new MapSchema<Npc>()
 
-  @filterChildren((client, key, battle: Battle) => {
-    return battle.players?.has(client.sessionId)
-  })
   @type({ map: Battle })
   battles = new MapSchema<Battle>()
 }
-
 
 export class LobbyState extends Schema {
   @filterChildren((client, key, value: Account, root) => {

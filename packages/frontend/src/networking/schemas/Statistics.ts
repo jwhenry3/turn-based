@@ -16,11 +16,11 @@ export class Statistics extends Schema {
     @type("number") public availableStatPoints!: number;
     @type(Attribute) public maxHp: Attribute = new Attribute();
     @type(Attribute) public maxMp: Attribute = new Attribute();
-    @type(Attribute) public str: Attribute = new Attribute();
-    @type(Attribute) public dex: Attribute = new Attribute();
-    @type(Attribute) public vit: Attribute = new Attribute();
-    @type(Attribute) public agi: Attribute = new Attribute();
-    @type(Attribute) public int: Attribute = new Attribute();
-    @type(Attribute) public mnd: Attribute = new Attribute();
-    @type(Attribute) public chr: Attribute = new Attribute();
+    @type(Attribute) public strength: Attribute = new Attribute();
+    @type(Attribute) public dexterity: Attribute = new Attribute();
+    @type(Attribute) public vitality: Attribute = new Attribute();
+    @type(Attribute) public agility: Attribute = new Attribute();
+    @type(Attribute) public intelligence: Attribute = new Attribute();
+    @type(Attribute) public mind: Attribute = new Attribute();
+    @type(Attribute) public charisma: Attribute = new Attribute();
 }

@@ -45,15 +45,20 @@ export default function Mmorpg() {
       update('lobby')
     }
   }
+  const onFocusChange = (value: boolean) => {
+    console.log('focus change', value)
+  }
   return (
     <div>
       <GameContainer
         ref={(node) => onRef(node)}
-        onMouseLeave={() => (app.gameHasFocus = false)}
-        onMouseEnter={() => (app.gameHasFocus = true)}
+        onMouseLeave={() => onFocusChange(false)}
+        onMouseEnter={() => onFocusChange(true)}
       />
-      {scene === 'lobby' && lobby && lobby.state && <Lobby />}
-      {scene && scene !== 'lobby' && <World />}
+      <div onMouseEnter={() => onFocusChange(false)}>
+        {scene === 'lobby' && lobby && lobby.state && <Lobby />}
+        {scene && scene !== 'lobby' && <World />}
+      </div>
     </div>
   )
 }

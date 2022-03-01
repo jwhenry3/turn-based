@@ -9,7 +9,7 @@ import { Schema, type, ArraySchema, MapSchema, SetSchema, DataChange } from '@co
 
 
 export class Attribute extends Schema {
-    @type("number") public base!: number;
+    @type("number") public baseAmount!: number;
     @type("number") public fromPoints!: number;
     @type("number") public fromEquipment!: number;
     @type("number") public fromBuffs!: number;

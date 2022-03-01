@@ -1,10 +1,13 @@
 import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
 import { lerp } from '../behaviors/lerp'
+import { BattleScenePlayer } from './battle/battle-player'
 import { MovableEntity } from './movable'
 
 export class PlayerEntity extends MovableEntity<Character> {
   rectangle: Phaser.GameObjects.Rectangle
+
+  battleId?: string
 
   get isLocalPlayer() {
     return this.model.currentClientId === this.scene.connector.room.sessionId
@@ -26,7 +29,14 @@ export class PlayerEntity extends MovableEntity<Character> {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e) => {
+      console.log(this.battleId)
       if (app.selected === this) {
+        if (this.model.battleId) {
+          this.scene.connector.room.send('character:battle:join', {
+            battleId: this.model.battleId,
+          })
+          return
+        }
         app.movement.mouseDestination = {
           x: this.position.x,
           y: this.position.y,
@@ -42,7 +52,6 @@ export class PlayerEntity extends MovableEntity<Character> {
       this.scene.cameras.main.setDeadzone(128, 128)
       this.scene.cameras.main.setZoom(1)
       app.movement.create(this.scene.input)
-      app.movement.enabled = true
       app.movement.onChange = ([horizontal, vertical]) => {
         this.scene.connector.room.send('character:move', {
           horizontal,
@@ -79,6 +88,15 @@ export class PlayerEntity extends MovableEntity<Character> {
       )
     } else {
       this.rectangle.setStrokeStyle(0)
+    }
+    if (this.model.isInBattle) {
+      this.rectangle.setFillStyle(
+        Phaser.Display.Color.HexStringToColor('#f50').color
+      )
+    } else {
+      this.rectangle.setFillStyle(
+        Phaser.Display.Color.HexStringToColor('#55f').color
+      )
     }
   }
   destroy() {
