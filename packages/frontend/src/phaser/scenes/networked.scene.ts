@@ -102,7 +102,6 @@ export class NetworkedScene extends Phaser.Scene {
             b.players.onRemove = (p) => {
               if (p.characterId === app.auth.characterId) {
                 this.game.scene.stop('battle')
-                this.cameras.main.setZoom(1)
               } else {
                 battleScene.removePlayer(p)
               }
@@ -121,7 +120,6 @@ export class NetworkedScene extends Phaser.Scene {
         let battleScene = this.game.scene.getScene('battle') as BattleScene
         if (battleScene?.battle.battleId !== e.battleId) return
         this.game.scene.stop('battle')
-        this.cameras.main.setZoom(1)
       }
     }
   }
@@ -136,6 +134,11 @@ export class NetworkedScene extends Phaser.Scene {
     } else {
       this.destinationPointer.setVisible(false)
     }
+    const zoom1 = window.innerWidth / 600
+    const zoom2 = window.innerHeight / 600
+    const zoom = zoom1 < zoom2 ? zoom1 : zoom2
+    // adjust zoom to properly scope the area around the player to make it consistent across devices
+    this.cameras.main.setZoom(zoom < 0.5 ? 0.5 : zoom)
   }
 
   disconnect() {

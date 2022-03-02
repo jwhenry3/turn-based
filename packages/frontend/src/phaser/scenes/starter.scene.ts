@@ -1,4 +1,5 @@
 import { app } from '../../ui/app'
+import { blurAll } from '../behaviors/blurAll'
 import { NetworkedScene } from './networked.scene'
 import { SceneConnector } from './scene.connector'
 
@@ -26,6 +27,8 @@ export class StarterScene extends NetworkedScene {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e: Phaser.Input.Pointer) => {
+      if (e.downElement.tagName.toLowerCase() !== 'canvas') return
+      blurAll()
       const input = app.movement
       app.selected = undefined
       if (input.mouseTick === 0) {

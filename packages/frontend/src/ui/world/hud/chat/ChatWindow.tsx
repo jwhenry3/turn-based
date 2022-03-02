@@ -4,10 +4,11 @@ import { WindowPanel } from '../WindowPanel'
 import { ChatHistory } from './ChatHistory'
 import { ChatInput } from './ChatInput'
 import { ChatToggle } from './ChatToggle'
+import { useChatToggleState } from './use-chat-toggle'
 
 export const ChatContainer = styled.div`
   position: fixed;
-  bottom: 8px;
+  bottom: 56px;
   left: 8px;
   display: flex;
   flex-direction: column;
@@ -17,22 +18,21 @@ export const ChatWindowContainer = styled.div`
   height: 200px;
   display: flex;
   flex-direction: column;
-  @media(max-width: 600px) {
+  @media (max-width: 600px) {
     width: 100vw;
-    padding-right:16px;
+    padding-right: 16px;
   }
 `
 export function ChatWindow() {
-  const [opened, setOpened] = useState(false)
+  const { opened } = useChatToggleState()
   return (
-    <ChatContainer>
+    <ChatContainer style={{ display: opened ? 'flex' : 'none', overflow: 'hidden' }}>
       <ChatWindowContainer>
-        <WindowPanel style={{ display: opened ? 'flex' : 'none' }}>
+        <WindowPanel>
           <ChatHistory />
           <ChatInput />
         </WindowPanel>
       </ChatWindowContainer>
-      <ChatToggle opened={opened} onToggle={setOpened} />
     </ChatContainer>
   )
 }

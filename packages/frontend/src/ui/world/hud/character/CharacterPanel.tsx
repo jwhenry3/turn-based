@@ -5,7 +5,7 @@ import { Mana } from './Mana'
 import { Name } from './Name'
 export const CharacterContainer = styled.div`
   position: fixed;
-  top: 48px;
+  top: 8px;
   left: 8px;
   /* background-color: rgba(0, 0, 0, 0.75); */
   color: #fff;

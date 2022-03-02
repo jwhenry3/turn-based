@@ -15,7 +15,9 @@ export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
 
   create() {
     const location =
-      this.scene.battleLocations.enemies[this.model.battleLocation]
+      this.scene.battleLocations.enemies[
+        this.scene.positionOrder[this.model.battleLocation]
+      ]
     this.rectangle = this.scene.add.rectangle(
       location[0],
       location[1],

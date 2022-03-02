@@ -1,11 +1,12 @@
-import styled from '@emotion/styled'
+import { MdOutlineChatBubble } from 'react-icons/md'
+import { ToggleButton } from '../ToggleButton'
+import { useChatToggleState } from './use-chat-toggle'
 
-export const ToggleButton = styled.div`
-  background-color: rgba(0, 0, 0, 0.5);
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-`
-export function ChatToggle({ opened, onToggle }) {
-  return <ToggleButton onClick={() => onToggle(!opened)}></ToggleButton>
+export function ChatToggle() {
+  const { opened, toggleOpen } = useChatToggleState()
+  return (
+    <ToggleButton opened={opened} onToggle={toggleOpen}>
+      <MdOutlineChatBubble size={24} onClick={() => toggleOpen(!opened)} />
+    </ToggleButton>
+  )
 }

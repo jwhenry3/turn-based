@@ -1,7 +1,7 @@
 import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
+import { blurAll } from '../behaviors/blurAll'
 import { lerp } from '../behaviors/lerp'
-import { BattleScenePlayer } from './battle/battle-player'
 import { MovableEntity } from './movable'
 import { PetEntity } from './pet'
 
@@ -31,6 +31,8 @@ export class PlayerEntity extends MovableEntity<Character> {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e) => {
+      if (e.downElement.tagName.toLowerCase() !== 'canvas') return
+      blurAll()
       if (app.selected === this) {
         if (this.model.battleId) {
           this.scene.connector.room.send('character:battle:join', {

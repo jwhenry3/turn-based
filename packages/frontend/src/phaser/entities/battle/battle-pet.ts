@@ -18,10 +18,10 @@ export class BattleScenePet extends Phaser.GameObjects.GameObject {
 
   create() {
     const location =
-      this.scene.battleLocations.players[this.owner.model.battleLocation]
+      this.scene.battleLocations.players[this.scene.positionOrder[this.owner.model.battleLocation]]
     this.rectangle = this.scene.add.rectangle(
       location[0] - 64,
-      location[1] + 32,
+      location[1],
       32,
       64,
       Phaser.Display.Color.HexStringToColor('#8af').color

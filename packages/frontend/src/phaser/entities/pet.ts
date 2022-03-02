@@ -1,5 +1,6 @@
 import { PetNpc } from '../../networking/schemas/PetNpc'
 import { app } from '../../ui/app'
+import { blurAll } from '../behaviors/blurAll'
 import { lerp } from '../behaviors/lerp'
 import { MovableEntity } from './movable'
 import { PlayerEntity } from './player'
@@ -23,6 +24,9 @@ export class PetEntity extends MovableEntity<PetNpc> {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e) => {
+      if (e.downElement.tagName.toLowerCase() !== 'canvas') return
+      blurAll()
+      e.downElement.focus()
       if (app.selected === this) {
         app.movement.mouseDestination = {
           x: this.position.x,

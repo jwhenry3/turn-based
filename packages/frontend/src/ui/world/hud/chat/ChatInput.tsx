@@ -1,4 +1,7 @@
 import styled from '@emotion/styled'
+import { useState } from 'react'
+import { app } from '../../../app'
+import { useChatHistoryState } from './use-chat-history'
 
 export const ChatInputContainer = styled.div`
   display: flex;
@@ -21,9 +24,30 @@ export const ChatInputField = styled.input`
     -1px 0 #000, 1px 0 #000, 0 1px #000, 0 -1px #000;
 `
 export function ChatInput() {
+  const [text, setText] = useState('')
+  const { addMessage } = useChatHistoryState()
+  const onKey = (e) => {
+    if (e.key.toLowerCase() === 'enter') {
+      addMessage({
+        messageId: new Date().valueOf() + '',
+        type: 'player',
+        character: {
+          characterId: app.auth.characterId,
+          name: 'Test User',
+        },
+        message: text,
+      })
+      setText('')
+    }
+  }
   return (
     <ChatInputContainer>
-      <ChatInputField type="text" />
+      <ChatInputField
+        type="text"
+        onKeyUp={onKey}
+        onChange={(e) => setText(e.target.value)}
+        value={text}
+      />
     </ChatInputContainer>
   )
 }

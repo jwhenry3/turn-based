@@ -1,5 +1,6 @@
 import { Npc } from '../../networking/schemas/Npc'
 import { app } from '../../ui/app'
+import { blurAll } from '../behaviors/blurAll'
 import { lerp } from '../behaviors/lerp'
 import { MovableEntity } from './movable'
 
@@ -20,6 +21,9 @@ export class NpcEntity extends MovableEntity<Npc> {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e) => {
+      if (e.downElement.tagName.toLowerCase() !== 'canvas') return
+      blurAll()
+      e.downElement.focus()
       if (app.selected === this) {
         app.movement.mouseDestination = {
           x: this.position.x,

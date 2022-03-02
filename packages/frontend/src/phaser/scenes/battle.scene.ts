@@ -19,27 +19,52 @@ export class BattleScene extends Phaser.Scene {
   enemies: Record<string, BattleSceneEnemy> = {}
   playerEntities: Record<string, PlayerEntity> = {}
 
-  width = 1024
+  width = 800
   lastWidth = this.width
   height = 600
-
   battleLocations = {
-    players: [
-      [120, 400],
-      [180, 450],
-      [240, 500],
-      [300, 550],
-    ],
+    players: [],
 
-    enemies: [
-      [this.width - 120, this.height - 400],
-      [this.width - 180, this.height - 450],
-      [this.width - 240, this.height - 500],
-      [this.width - 300, this.height - 550],
-    ],
+    enemies: [],
+  }
+
+  positionOrder = [1, 2, 3, 0, 4, 5, 6, 7]
+
+  createPositions() {
+    const playerPositions = []
+    const npcPositions = []
+    for (let i = 0; i < 8; i++) {
+      let baseX = 108 + (i - 5) * 64
+      let baseY = 360 + (i - 5) * 64
+      if (i < 5) {
+        baseX = 108 + 64 + i * 64
+        baseY = 236 + i * 64
+      }
+      playerPositions.push([baseX, baseY])
+      npcPositions.push([this.width - baseX + 64, this.height - baseY])
+    }
+    this.battleLocations.players = playerPositions
+    this.battleLocations.enemies = npcPositions
+  }
+  createPositionsAlt() {
+    const playerPositions = []
+    const npcPositions = []
+    for (let i = 0; i < 8; i++) {
+      let baseX = 108 + (i % 2) * 128
+      let baseY = 120 + (i) * 32
+      // if (i < 5) {
+      //   baseX = 108 + 64 + i * 64
+      //   baseY = 236 + i * 64
+      // }
+      playerPositions.push([baseX, baseY])
+      npcPositions.push([this.width - baseX + 64, this.height - baseY])
+    }
+    this.battleLocations.players = playerPositions
+    this.battleLocations.enemies = npcPositions
   }
 
   create() {
+    this.createPositionsAlt()
     this.cameras.main.transparent = false
     this.cameras.main.setBackgroundColor('#000')
     this.rectangle = this.add.rectangle(
@@ -57,14 +82,46 @@ export class BattleScene extends Phaser.Scene {
       Phaser.Display.Color.HexStringToColor('#00f').color
     )
     this.cameras.main.startFollow(focus)
-    this.cameras.main.setZoom(window.innerWidth / 1024)
+    this.zoom()
     this.battle.players.forEach((player) => {
       this.addPlayer(player)
     })
     this.battle.npcs.forEach((npc) => {
       this.addEnemy(npc)
     })
+    // placeholders for debug
+    for (const [x, y] of this.battleLocations.players) {
+      const rect1 = this.add.rectangle(
+        x,
+        y,
+        32,
+        64,
+        Phaser.Display.Color.HexStringToColor('#00f').color,
+        0.5
+      )
+      const rect2 = this.add.rectangle(
+        x - 64,
+        y,
+        32,
+        64,
+        Phaser.Display.Color.HexStringToColor('#3af').color,
+        0.5
+      )
+      rect1.setOrigin(0.5, 0.75)
+      rect2.setOrigin(0.5, 0.75)
+    }
+    for (const [x, y] of this.battleLocations.enemies) {
+      const rect1 = this.add.rectangle(
+        x,
+        y,
+        32,
+        64,
+        Phaser.Display.Color.HexStringToColor('#f00').color
+      )
+      rect1.setOrigin(0.5, 0.75)
+    }
   }
+
   addPlayer(player: BattlePlayer) {
     this.players[player.characterId] = new BattleScenePlayer(
       player,
@@ -80,7 +137,8 @@ export class BattleScene extends Phaser.Scene {
         this,
         this.connector
       )
-      this.players[player.characterId].pet.owner = this.players[player.characterId]
+      this.players[player.characterId].pet.owner =
+        this.players[player.characterId]
       this.add.existing(this.players[player.characterId].pet)
     }
   }
@@ -98,8 +156,14 @@ export class BattleScene extends Phaser.Scene {
   }
   update() {
     if (window.innerWidth !== this.lastWidth) {
-      this.cameras.main.setZoom(window.innerWidth / this.width)
-      this.lastWidth = window.innerWidth
+      this.zoom()
     }
+  }
+  zoom() {
+    const zoom = window.innerWidth / this.width
+    const zoom1 = window.innerHeight / (this.height * 1.2)
+    this.cameras.main.setZoom(
+      zoom > zoom1 ? (zoom1 > 1 ? 1 : zoom1) : zoom > 1 ? 1 : zoom
+    )
   }
 }

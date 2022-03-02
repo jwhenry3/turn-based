@@ -10,6 +10,10 @@ export const HudContainer = styled.div`
   right: 0;
   bottom: 0;
   z-index: 100;
+  pointer-events: none;
+  > * {
+    pointer-events: all;
+  }
 `
 export function WorldHud() {
   return (
