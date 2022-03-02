@@ -7,7 +7,6 @@
 
 import { Schema, type, ArraySchema, MapSchema, SetSchema, DataChange } from '@colyseus/schema';
 import { ItemDrop } from './ItemDrop'
-import { Statistics } from './Statistics'
 import { PositionData } from './PositionData'
 
 export class Npc extends Schema {
@@ -15,7 +14,6 @@ export class Npc extends Schema {
     @type("string") public npcTypeId!: string;
     @type("string") public name!: string;
     @type([ ItemDrop ]) public drops: ArraySchema<ItemDrop> = new ArraySchema<ItemDrop>();
-    @type(Statistics) public stats: Statistics = new Statistics();
     @type(PositionData) public position: PositionData = new PositionData();
     @type("boolean") public despawned!: boolean;
 }

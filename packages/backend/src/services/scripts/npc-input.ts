@@ -1,11 +1,13 @@
 import { NpcData } from '../rooms/fixture.models'
 import Npc, { Character, PositionData } from '../schemas/schemas'
 import { NpcChase } from './npc-chase'
+import { NpcFollow } from './npc-follow'
 import { NpcWander } from './npc-wander'
 
 export class NpcInput {
   wander: NpcWander
   chase: NpcChase
+  follow: NpcFollow
   get collideRange() {
     return {
       x: this.npc.position.x - 16,
@@ -24,6 +26,7 @@ export class NpcInput {
   ) {
     this.wander = new NpcWander(npc, data, movementUpdates)
     this.chase = new NpcChase(npc, data, movementUpdates, this.wander)
+    this.follow = new NpcFollow(npc, data, movementUpdates, this.wander)
     this.npc.position.speed = 3
   }
 
@@ -39,14 +42,8 @@ export class NpcInput {
   respawn() {
     this.npc.despawned = false
   }
-
-  async update() {
-    if (!this.npc.despawned) {
-      this.chase.execute()
-      if (this.data.canWander && !this.chase.chaseTarget) {
-        this.wander.execute()
-      }
-
+  handleCollisions() {
+    if (this.npc.hash) {
       this.npc.hash.find(this.collideRange, (selector) => {
         if (
           selector.entity instanceof Character &&
@@ -58,6 +55,15 @@ export class NpcInput {
           }
         }
       })
+    }
+  }
+
+  async update() {
+    if (!this.npc.despawned) {
+      this.follow.execute()
+      this.chase.execute()
+      this.wander.execute()
+      this.handleCollisions()
     } else {
       if (this.npc.respawnTimer > 0) {
         this.npc.respawnTimer--

@@ -68,7 +68,8 @@ export class BattleScene extends Phaser.Scene {
       this,
       this.connector
     )
-    player.character = this.playerEntities[player.characterId].model
+    this.players[player.characterId].character =
+      this.playerEntities[player.characterId].model
     this.add.existing(this.players[player.characterId])
   }
   addEnemy(enemy: BattleNpc) {

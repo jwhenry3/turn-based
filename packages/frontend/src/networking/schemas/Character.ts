@@ -10,6 +10,7 @@ import { Appearance } from './Appearance'
 import { Statistics } from './Statistics'
 import { PositionData } from './PositionData'
 import { Inventory } from './Inventory'
+import { PetNpc } from './PetNpc'
 
 export class Character extends Schema {
     @type("string") public accountId!: string;
@@ -23,4 +24,5 @@ export class Character extends Schema {
     @type(Statistics) public stats: Statistics = new Statistics();
     @type(PositionData) public position: PositionData = new PositionData();
     @type(Inventory) public inventory: Inventory = new Inventory();
+    @type(PetNpc) public pet: PetNpc = new PetNpc();
 }

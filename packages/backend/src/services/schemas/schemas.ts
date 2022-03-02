@@ -212,6 +212,50 @@ export class Inventory extends Schema {
   equipmentProfiles: MapSchema<EquipmentProfile> = new MapSchema<EquipmentProfile>()
 }
 
+export class ItemDrop extends Schema {
+  @type('number')
+  rate: number
+  @type('string')
+  itemId: string
+}
+
+export default class Npc extends Schema {
+  @type('string')
+  npcId: string
+
+  @type('string')
+  npcTypeId: string
+
+  @type('string')
+  name: string
+
+  // Not visible on client
+  @filter(() => false)
+  @type({ array: ItemDrop })
+  drops: ArraySchema<ItemDrop> = new ArraySchema<ItemDrop>()
+
+
+  @type(PositionData)
+  position: PositionData = new PositionData()
+
+  node: SpatialNode<Npc>
+  hash: SpatialHash
+
+  @type('boolean')
+  despawned: boolean = false
+
+  respawnTime = 1000
+  respawnTimer = 0
+}
+
+export class PetNpc extends Npc {
+  @type('string')
+  characterId: string
+
+  @type(Statistics)
+  stats: Statistics = new Statistics()
+}
+
 export class Character extends Schema {
   @type('string')
   accountId: string
@@ -243,47 +287,14 @@ export class Character extends Schema {
   @type(Inventory)
   inventory: Inventory = new Inventory()
 
+  @type(PetNpc)
+  pet: PetNpc
+
   node: SpatialNode<Character>
   hash: SpatialHash
 }
 
-export class ItemDrop extends Schema {
-  @type('number')
-  rate: number
-  @type('string')
-  itemId: string
-}
 
-export default class Npc extends Schema {
-  @type('string')
-  npcId: string
-
-  @type('string')
-  npcTypeId: string
-
-  @type('string')
-  name: string
-
-  // Not visible on client
-  @filter(() => false)
-  @type({ array: ItemDrop })
-  drops: ArraySchema<ItemDrop> = new ArraySchema<ItemDrop>()
-
-  @type(Statistics)
-  stats: Statistics = new Statistics()
-
-  @type(PositionData)
-  position: PositionData = new PositionData()
-
-  node: SpatialNode<Npc>
-  hash: SpatialHash
-
-  @type('boolean')
-  despawned: boolean = false
-
-  respawnTime = 1000
-  respawnTimer = 0
-}
 export class AccountToken extends Schema {
   @type('string')
   token = ''

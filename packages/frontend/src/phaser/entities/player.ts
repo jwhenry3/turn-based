@@ -3,11 +3,13 @@ import { app } from '../../ui/app'
 import { lerp } from '../behaviors/lerp'
 import { BattleScenePlayer } from './battle/battle-player'
 import { MovableEntity } from './movable'
+import { PetEntity } from './pet'
 
 export class PlayerEntity extends MovableEntity<Character> {
   rectangle: Phaser.GameObjects.Rectangle
 
   battleId?: string
+  pet?: PetEntity
 
   get isLocalPlayer() {
     return this.model.currentClientId === this.scene.connector.room.sessionId
@@ -29,7 +31,6 @@ export class PlayerEntity extends MovableEntity<Character> {
       Phaser.Geom.Rectangle.Contains
     )
     this.rectangle.on('pointerdown', (e) => {
-      console.log(this.battleId)
       if (app.selected === this) {
         if (this.model.battleId) {
           this.scene.connector.room.send('character:battle:join', {
@@ -59,6 +60,21 @@ export class PlayerEntity extends MovableEntity<Character> {
         })
       }
     }
+    if (this.model.pet) {
+      console.log('added pet 1')
+      this.pet = new PetEntity(this.model.pet, this.scene)
+      this.scene.add.existing(this.pet)
+    }
+    this.model.listen('pet', (pet, previous) => {
+      if (pet && !previous) {
+        console.log('added pet 2')
+        this.pet = new PetEntity(pet, this.scene)
+        this.scene.add.existing(this.pet)
+      } else if (!pet && previous) {
+        this.pet.destroy()
+        this.pet = undefined
+      }
+    })
   }
   lastWidth = 1600
   preUpdate() {
@@ -83,17 +99,23 @@ export class PlayerEntity extends MovableEntity<Character> {
     if (app.selected === this) {
       this.rectangle.setStrokeStyle(
         4,
-        Phaser.Display.Color.HexStringToColor('#eee').color,
+        Phaser.Display.Color.HexStringToColor('#aaf').color,
         0.5
       )
     } else {
       this.rectangle.setStrokeStyle(0)
     }
     if (this.model.isInBattle) {
+      if (this.pet?.rectangle?.visible === false) {
+        this.pet.rectangle.setVisible(false)
+      }
       this.rectangle.setFillStyle(
         Phaser.Display.Color.HexStringToColor('#f50').color
       )
     } else {
+      if (this.pet?.rectangle?.visible === false) {
+        this.pet.rectangle.setVisible(true)
+      }
       this.rectangle.setFillStyle(
         Phaser.Display.Color.HexStringToColor('#55f').color
       )

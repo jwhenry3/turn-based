@@ -1,9 +1,11 @@
 import { BattlePlayer } from '../../../networking/schemas/BattlePlayer'
+import { Character } from '../../../networking/schemas/Character'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
 
 export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
   rectangle: Phaser.GameObjects.Rectangle
+  character: Character
 
   constructor(
     public model: BattlePlayer,
@@ -15,7 +17,7 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
 
   get isLocalPlayer() {
     return (
-      this.model.character.currentClientId === this.connector.room.sessionId
+      this.character.currentClientId === this.connector.room.sessionId
     )
   }
 

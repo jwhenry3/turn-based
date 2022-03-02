@@ -4,7 +4,7 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common'
 import { LobbyRoom, Server } from 'colyseus'
-import { starterNpcs } from '../../rooms/fixtures/starter.fixtures'
+import { starterMap } from '../../rooms/fixtures/maps/starter.map'
 import { MmorpgBattleRoom } from '../../rooms/mmorpg-battle.room'
 import { MmorpgMapRoom } from '../../rooms/mmorpg-map.room'
 
@@ -17,9 +17,7 @@ export class HomeRegionController
   onApplicationBootstrap() {
     this.server.define('lobby', LobbyRoom)
     this.server
-      .define('starter', MmorpgMapRoom, {
-        npcs: starterNpcs,
-      })
+      .define('starter', MmorpgMapRoom, { map: starterMap })
       .enableRealtimeListing()
     this.server.define('town', MmorpgMapRoom).enableRealtimeListing()
     this.server.define('wilds', MmorpgMapRoom).enableRealtimeListing()

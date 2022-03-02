@@ -1,4 +1,4 @@
-import { NpcType } from '../fixture.models'
+import { NpcType } from '../../fixture.models'
 
 export const npcTypes: Record<string, NpcType> = {
   npc: new NpcType({

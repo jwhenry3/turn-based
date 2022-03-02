@@ -1,6 +1,5 @@
 import { Client, Room } from '@colyseus/core'
-import { filterChildren, MapSchema, Schema, type } from '@colyseus/schema'
-import { from, mergeMap, Subject, takeUntil } from 'rxjs'
+import { filter, from, Subject, takeUntil } from 'rxjs'
 import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
@@ -8,6 +7,7 @@ import { createCharacter } from '../schemas/factories/character'
 import Npc, {
   Character,
   MmorpgMapState,
+  PetNpc,
   PositionData,
 } from '../schemas/schemas'
 import { NpcInput } from '../scripts/npc-input'
@@ -15,6 +15,9 @@ import { NpcData } from './fixture.models'
 import SpatialHash from 'spatial-hash'
 import { SpatialNode } from './spacial/node'
 import { Battle } from '../schemas/battles'
+import { npcTypes } from './fixtures/npcs/npc-types'
+import { MapConfig } from './fixtures/map.config'
+import { allNpcs } from './fixtures/npcs/all.npcs'
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -28,6 +31,7 @@ export class MmorpgMapRoom extends Room {
 
   update$ = new Subject<void>()
   stopUpdates$ = new Subject<void>()
+  stopPet$ = new Subject<string>()
 
   hash = new SpatialHash(
     {
@@ -53,10 +57,15 @@ export class MmorpgMapRoom extends Room {
     this.state.battles.set(battle.battleId, battle)
   }
 
-  spawnNpcs(npcs: NpcData[]) {
-    from(npcs).subscribe((data) => {
+  spawnNpcs(config: Partial<NpcData>[]) {
+    from(config).subscribe(({ npcId, x, y }) => {
+      const data = new NpcData({
+        ...allNpcs[npcId],
+        x,
+        y,
+      })
       const npc = new Npc({
-        npcId: data.npcId,
+        npcId: npcId,
         npcTypeId: data.npcTypeId,
         name: data.name,
       })
@@ -115,9 +124,9 @@ export class MmorpgMapRoom extends Room {
     }
   }
 
-  onCreate({ npcs }: { npcs: NpcData[] }): void | Promise<any> {
+  onCreate({ map }: { map: MapConfig }): void | Promise<any> {
     this.setState(new MmorpgMapState())
-    this.spawnNpcs(npcs || [])
+    this.spawnNpcs(map.npcs)
     this.interval = setInterval(() => {
       this.update$.next()
       // iterate async to avoid blocking the server
@@ -194,13 +203,53 @@ export class MmorpgMapRoom extends Room {
       character.node = node
       character.hash = this.hash
       this.hash.insert(node)
-
       character.position.isPlayerPosition = true
+      this.addPet(character)
       this.state.players.set(character.name, character)
       this.state.playersByClient.set(client.sessionId, character)
     }
     return characterModel
   }
+
+  addPet(character: Character) {
+    const data = new NpcData({
+      npcId: 'pet-1',
+      ...npcTypes.npc,
+      name: 'Pet',
+      x: 100,
+      y: 100,
+    })
+    const pet = new PetNpc({
+      npcId: data.npcId,
+      npcTypeId: data.npcTypeId,
+      name: data.name,
+    })
+    pet.characterId = character.characterId
+    character.pet = pet
+
+    const input = new NpcInput(pet, data, this.movementUpdates)
+    input.follow.startFollowing(character)
+    this.update$
+      .pipe(
+        takeUntil(this.stopUpdates$),
+        takeUntil(
+          this.stopPet$.pipe(
+            filter((characterId) => characterId === character.characterId)
+          )
+        )
+      )
+      .subscribe(() => {
+        input.update()
+      })
+  }
+
+  removePet(character: Character) {
+    if (character.pet) {
+      this.stopPet$.next(character.characterId)
+      character.pet = undefined
+    }
+  }
+
   async onJoin(
     client: Client,
     options?: any,
@@ -228,6 +277,7 @@ export class MmorpgMapRoom extends Room {
     } catch (e) {
       if (character) {
         character.isInBattle = false
+        this.stopPet$.next(character.characterId)
         this.state.battles.forEach((battle) => {
           if (battle.players[character.characterId]) {
             this.state.battles.delete(battle)
@@ -242,14 +292,8 @@ export class MmorpgMapRoom extends Room {
         }
       }
       delete this.connectedClients[client.sessionId]
-      this.state.players.forEach((v: Character, k) => {
-        if (v.currentClientId === client.sessionId) {
-          this.state.players.delete(v.characterId)
-        }
-      })
-      if (this.state.playersByClient[client.sessionId]) {
-        this.state.playersByClient.delete(client.sessionId)
-      }
+      this.state.players.delete(character.characterId)
+      this.state.playersByClient.delete(client.sessionId)
     }
   }
 }

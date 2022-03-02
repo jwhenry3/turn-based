@@ -1,9 +1,9 @@
-import { Npc } from '../../networking/schemas/Npc'
+import { PetNpc } from '../../networking/schemas/PetNpc'
 import { app } from '../../ui/app'
 import { lerp } from '../behaviors/lerp'
 import { MovableEntity } from './movable'
 
-export class NpcEntity extends MovableEntity<Npc> {
+export class PetEntity extends MovableEntity<PetNpc> {
   rectangle: Phaser.GameObjects.Rectangle
 
   create() {
@@ -13,7 +13,7 @@ export class NpcEntity extends MovableEntity<Npc> {
       this.position.y,
       32,
       64,
-      Phaser.Display.Color.HexStringToColor('#ff8822').color
+      Phaser.Display.Color.HexStringToColor('#8af').color
     )
     this.rectangle.setInteractive(
       new Phaser.Geom.Rectangle(0, 0, 32, 64),
@@ -59,7 +59,7 @@ export class NpcEntity extends MovableEntity<Npc> {
     if (app.selected === this) {
       this.rectangle.setStrokeStyle(
         4,
-        Phaser.Display.Color.HexStringToColor('#fa5').color,
+        Phaser.Display.Color.HexStringToColor('#aaf').color,
         0.5
       )
     } else {
