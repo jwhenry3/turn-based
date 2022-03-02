@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { WindowPanel } from '../WindowPanel'
 import { Health } from './Health'
 import { Mana } from './Mana'
 import { Name } from './Name'
@@ -14,17 +15,15 @@ export const CharacterContainer = styled.div`
   min-width: 240px;
   border-radius: 8px;
   width: 25vw;
+  @media(max-width: 420px) {
+    min-width: 50vw;
+    padding-right:16px;
+  }
 `
 export const ValuesWrapper = styled.div`
-  margin-top: -12px;
-  border-radius: 8px;
   padding: 8px;
-  padding-top: 8px;
-  background-color: rgba(0, 0, 0, 0.75);
 `
 export const ValuesContainer = styled.div`
-  /* transform: skew(-8deg, -8deg) rotate(8deg); */
-  border-radius: 4px;
   overflow: hidden;
   z-index: 2;
 `
@@ -32,12 +31,14 @@ export function CharacterPanel() {
   return (
     <CharacterContainer>
       <Name />
-      <ValuesWrapper>
-        <ValuesContainer>
-          <Health />
-          <Mana />
-        </ValuesContainer>
-      </ValuesWrapper>
+      <WindowPanel style={{ marginTop: '-12px' }}>
+        <ValuesWrapper>
+          <ValuesContainer>
+            <Health />
+            <Mana />
+          </ValuesContainer>
+        </ValuesWrapper>
+      </WindowPanel>
     </CharacterContainer>
   )
 }

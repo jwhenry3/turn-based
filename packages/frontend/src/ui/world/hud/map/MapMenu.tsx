@@ -7,8 +7,8 @@ export const MapMenuContainer = styled.div`
   width: 24px;
   height: 24px;
   border-radius: 12px;
-  bottom:-16px;
-  left:-16px;
+  bottom: -12px;
+  left: -12px;
 `
 export function MapMenu() {
   return <MapMenuContainer></MapMenuContainer>

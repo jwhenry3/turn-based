@@ -2,14 +2,9 @@ import styled from '@emotion/styled'
 
 export const ChatInputContainer = styled.div`
   display: flex;
-  background-color: rgba(160, 160, 255, 0.5);
-  border-radius: 8px;
+  background-color: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
   height: 32px;
-  margin-left: -8px;
-  margin-right: -8px;
-  margin-bottom: -8px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 `
 
 export const ChatInputField = styled.input`

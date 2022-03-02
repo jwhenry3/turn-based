@@ -6,7 +6,7 @@ export const ChatHistoryContainer = styled.div`
   display: flex;
   flex-direction: column-reverse;
   overflow: auto;
-  padding-bottom: 8px;
+  padding: 4px 8px;
 `
 export function ChatHistory() {
   return (
