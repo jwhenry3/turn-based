@@ -1,36 +1,30 @@
-import { BattlePlayer } from '../../../networking/schemas/BattlePlayer'
-import { Character } from '../../../networking/schemas/Character'
+import { BattlePet } from '../../../networking/schemas/BattlePet'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
-import { BattleScenePet } from './battle-pet'
+import { BattleScenePlayer } from './battle-player'
 
-export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
+export class BattleScenePet extends Phaser.GameObjects.GameObject {
   rectangle: Phaser.GameObjects.Rectangle
-  character: Character
 
-  pet: BattleScenePet
+  owner: BattleScenePlayer
 
   constructor(
-    public model: BattlePlayer,
+    public model: BattlePet,
     public scene: BattleScene,
     public connector: SceneConnector
   ) {
     super(scene, 'sprite')
   }
 
-  get isLocalPlayer() {
-    return this.character.currentClientId === this.connector.room.sessionId
-  }
-
   create() {
     const location =
-      this.scene.battleLocations.players[this.model.battleLocation]
+      this.scene.battleLocations.players[this.owner.model.battleLocation]
     this.rectangle = this.scene.add.rectangle(
-      location[0],
-      location[1],
+      location[0] - 64,
+      location[1] + 32,
       32,
       64,
-      Phaser.Display.Color.HexStringToColor('#55f').color
+      Phaser.Display.Color.HexStringToColor('#8af').color
     )
     this.rectangle.setDepth(
       Math.round(this.rectangle.y - this.rectangle.height)
@@ -47,6 +41,5 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
   destroy() {
     super.destroy()
     this.rectangle.destroy()
-    this.pet?.destroy()
   }
 }

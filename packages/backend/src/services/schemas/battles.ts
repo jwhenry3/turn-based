@@ -1,9 +1,33 @@
 import { ArraySchema, MapSchema, Schema, type } from '@colyseus/schema'
 import { Subject, takeUntil } from 'rxjs'
-import { Character } from './schemas'
+import { Character, PetNpc } from './schemas'
 import { DropData } from '../rooms/fixture.models'
 import { v4 } from 'uuid'
 
+export class BattlePet extends Schema {
+  @type('string')
+  characterId: string
+  @type('number')
+  health = 100
+  @type('number')
+  mana = 100
+  @type('number')
+  cooldown = 0
+
+  owner: Character
+
+  constructor(character: Character, ...args: any[]) {
+    super(args)
+    this.owner = character
+    this.characterId = character.characterId
+  }
+
+  update(tick: number) {
+    if (this.cooldown > 0) {
+      this.cooldown--
+    }
+  }
+}
 export class BattlePlayer extends Schema {
   @type('string')
   characterId: string
@@ -14,6 +38,9 @@ export class BattlePlayer extends Schema {
 
   @type('number')
   cooldown = 0
+
+  @type(BattlePet)
+  pet: BattlePet
 
   character: Character
 
@@ -160,6 +187,10 @@ export class Battle extends Schema {
     const player = new BattlePlayer(character)
     character.isInBattle = true
     character.battleId = this.battleId
+    if (character.pet) {
+      const pet = new BattlePet(character)
+      player.pet = pet
+    }
     player.battleLocation = this.players.size
     this.watchUpdate(player)
     this.players.set(character.currentClientId, player)

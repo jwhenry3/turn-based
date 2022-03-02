@@ -1,7 +1,10 @@
 import { MapSchema } from '@colyseus/schema'
 import { Battle } from '../../networking/schemas/Battle'
 import { BattleNpc } from '../../networking/schemas/BattleNpc'
+import { BattlePlayer } from '../../networking/schemas/BattlePlayer'
+import { Character } from '../../networking/schemas/Character'
 import { BattleSceneEnemy } from '../entities/battle/battle-enemy'
+import { BattleScenePet } from '../entities/battle/battle-pet'
 import { BattleScenePlayer } from '../entities/battle/battle-player'
 import { PlayerEntity } from '../entities/player'
 import { SceneConnector } from './scene.connector'
@@ -62,7 +65,7 @@ export class BattleScene extends Phaser.Scene {
       this.addEnemy(npc)
     })
   }
-  addPlayer(player) {
+  addPlayer(player: BattlePlayer) {
     this.players[player.characterId] = new BattleScenePlayer(
       player,
       this,
@@ -71,6 +74,15 @@ export class BattleScene extends Phaser.Scene {
     this.players[player.characterId].character =
       this.playerEntities[player.characterId].model
     this.add.existing(this.players[player.characterId])
+    if (player.pet) {
+      this.players[player.characterId].pet = new BattleScenePet(
+        player.pet,
+        this,
+        this.connector
+      )
+      this.players[player.characterId].pet.owner = this.players[player.characterId]
+      this.add.existing(this.players[player.characterId].pet)
+    }
   }
   addEnemy(enemy: BattleNpc) {
     this.enemies[enemy.battleNpcId] = new BattleSceneEnemy(

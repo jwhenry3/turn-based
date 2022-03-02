@@ -106,7 +106,7 @@ export class PlayerEntity extends MovableEntity<Character> {
       this.rectangle.setStrokeStyle(0)
     }
     if (this.model.isInBattle) {
-      if (this.pet?.rectangle?.visible === false) {
+      if (this.pet?.rectangle?.visible === true) {
         this.pet.rectangle.setVisible(false)
       }
       this.rectangle.setFillStyle(

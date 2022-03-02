@@ -6,14 +6,11 @@
 // 
 
 import { Schema, type, ArraySchema, MapSchema, SetSchema, DataChange } from '@colyseus/schema';
-import { BattlePet } from './BattlePet'
 
-export class BattlePlayer extends Schema {
+
+export class BattlePet extends Schema {
     @type("string") public characterId!: string;
     @type("number") public health!: number;
     @type("number") public mana!: number;
     @type("number") public cooldown!: number;
-    @type(BattlePet) public pet: BattlePet = new BattlePet();
-    @type([ "string" ]) public status: ArraySchema<string> = new ArraySchema<string>();
-    @type("number") public battleLocation!: number;
 }

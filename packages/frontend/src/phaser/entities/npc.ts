@@ -50,8 +50,8 @@ export class NpcEntity extends MovableEntity<Npc> {
         this.rectangle.x !== this.position.x ||
         this.rectangle.y !== this.position.y
       ) {
-        const newX = lerp(this.rectangle.x, this.position.x, 0.5)
-        const newY = lerp(this.rectangle.y, this.position.y, 0.5)
+        const newX = lerp(this.rectangle.x, this.position.x, 0.2)
+        const newY = lerp(this.rectangle.y, this.position.y, 0.2)
         this.rectangle.setPosition(newX, newY)
       }
       this.rectangle.setDepth(Math.round(this.rectangle.y))
