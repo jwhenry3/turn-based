@@ -1,13 +1,11 @@
-import { NpcData } from '../rooms/fixture.models'
-import Npc, { PositionData } from '../schemas/schemas'
+import { NpcInput } from '../npc-input'
+import { NpcPlugin } from '../npc.plugin'
 
-export class NpcMovement {
+export class NpcMovement extends NpcPlugin {
   outOfBounds = false
-  constructor(
-    public npc: Npc,
-    public data: NpcData,
-    public movementUpdates: PositionData[]
-  ) {}
+  constructor(public input: NpcInput) {
+    super(input)
+  }
 
   moveTowards(position: { x: number; y: number }, offset: number = 0) {
     const diffX = Math.round(position.x - this.npc.position.x)

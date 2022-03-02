@@ -1,8 +1,8 @@
 import { NpcData } from '../rooms/fixture.models'
-import Npc, { Character, PositionData } from '../schemas/schemas'
-import { NpcChase } from './npc-chase'
-import { NpcFollow } from './npc-follow'
-import { NpcWander } from './npc-wander'
+import { Npc, Character, PositionData } from '../schemas/schemas'
+import { NpcChase } from './plugins/npc-chase'
+import { NpcFollow } from './plugins/npc-follow'
+import { NpcWander } from './plugins/npc-wander'
 
 export class NpcInput {
   wander: NpcWander
@@ -24,9 +24,9 @@ export class NpcInput {
     public data: NpcData,
     public movementUpdates: PositionData[]
   ) {
-    this.wander = new NpcWander(npc, data, movementUpdates)
-    this.chase = new NpcChase(npc, data, movementUpdates, this.wander)
-    this.follow = new NpcFollow(npc, data, movementUpdates, this.wander)
+    this.wander = new NpcWander(this)
+    this.chase = new NpcChase(this)
+    this.follow = new NpcFollow(this)
     this.npc.position.speed = 3
   }
 

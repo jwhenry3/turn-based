@@ -4,7 +4,8 @@ import { CharacterModel } from '../data/character'
 import { Accounts } from '../data/helpers/accounts'
 import { Characters } from '../data/helpers/characters'
 import { createCharacter } from '../schemas/factories/character'
-import Npc, {
+import {
+  Npc,
   Character,
   MmorpgMapState,
   PetNpc,
@@ -18,6 +19,7 @@ import { Battle, BattlePlayer } from '../schemas/battles'
 import { npcTypes } from './fixtures/npcs/npc-types'
 import { MapConfig } from './fixtures/map.config'
 import { allNpcs } from './fixtures/npcs/all.npcs'
+import { createNpc } from '../schemas/factories/npc'
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -59,27 +61,13 @@ export class MmorpgMapRoom extends Room {
 
   spawnNpcs(config: Partial<NpcData>[]) {
     from(config).subscribe(({ npcId, x, y }) => {
-      const data = new NpcData({
-        ...allNpcs[npcId],
-        x,
-        y,
-      })
-      const npc = new Npc({
-        npcId: npcId,
-        npcTypeId: data.npcTypeId,
-        name: data.name,
-      })
-      npc.position.x = data.x
-      npc.position.y = data.y
-      npc.position.owner = npc
-      const node = new SpatialNode(npc)
-      this.hash.insert(node)
-      npc.hash = this.hash
-      npc.node = node
+      const { npc, data } = createNpc(npcId, x, y)
       const input = new NpcInput(npc, data, this.movementUpdates)
+      npc.hash = this.hash
+      this.hash.insert(npc.node)
       input.onPlayerCollide = (player: Character) => {
-        if (data.triggersBattle) {
-          this.startBattle(data, player)
+        if (input.data.triggersBattle) {
+          this.startBattle(input.data, player)
         }
       }
       this.state.npcs.set(npc.npcId, npc)

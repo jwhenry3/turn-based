@@ -1,6 +1,4 @@
-import { throws } from 'assert'
-import { NpcData } from '../rooms/fixture.models'
-import Npc, { PositionData } from '../schemas/schemas'
+import { NpcInput } from '../npc-input'
 import { NpcMovement } from './npc-movement'
 
 export class NpcWander extends NpcMovement {
@@ -12,12 +10,8 @@ export class NpcWander extends NpcMovement {
 
   goingHome = false
 
-  constructor(
-    public npc: Npc,
-    public data: NpcData,
-    public movementUpdates: PositionData[]
-  ) {
-    super(npc, data, movementUpdates)
+  constructor(input: NpcInput) {
+    super(input)
     this.wanderIncrement = 50 + Math.random() * 50
     this.wanderDuration = Math.random() * 20
   }
@@ -90,9 +84,6 @@ export class NpcWander extends NpcMovement {
   }
 
   execute() {
-    if (this.data.isAggressive) {
-      // console.log(this.wandering, this.goingHome, this.outOfBounds)
-    }
     if (!this.goingHome) {
       this.wander()
     } else {

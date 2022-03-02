@@ -219,7 +219,7 @@ export class ItemDrop extends Schema {
   itemId: string
 }
 
-export default class Npc extends Schema {
+export class Npc extends Schema {
   @type('string')
   npcId: string
 

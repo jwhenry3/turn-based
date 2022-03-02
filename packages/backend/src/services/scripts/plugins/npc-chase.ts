@@ -1,7 +1,6 @@
-import { MapSchema } from '@colyseus/schema'
-import { Subject, from, takeUntil, map } from 'rxjs'
-import { NpcData } from '../rooms/fixture.models'
-import Npc, { Character, PositionData } from '../schemas/schemas'
+import { NpcData } from '../../rooms/fixture.models'
+import { Npc, Character, PositionData } from '../../schemas/schemas'
+import { NpcInput } from '../npc-input'
 import { NpcMovement } from './npc-movement'
 import { NpcWander } from './npc-wander'
 
@@ -28,13 +27,8 @@ export class NpcChase extends NpcMovement {
     }
   }
 
-  constructor(
-    public npc: Npc,
-    public data: NpcData,
-    public movementUpdates: PositionData[],
-    public wander: NpcWander
-  ) {
-    super(npc, data, movementUpdates)
+  constructor(input: NpcInput) {
+    super(input)
   }
 
   async detectPlayers() {
@@ -45,7 +39,7 @@ export class NpcChase extends NpcMovement {
         this.waitTick++
         if (this.waitTick > this.waitMax) {
           this.stopChase()
-          this.wander.goHome()
+          this.input.wander.goHome()
         }
       }
     }
@@ -62,7 +56,7 @@ export class NpcChase extends NpcMovement {
         }
       })
     }
-    if (!this.wander.goingHome && this.chaseCooldownCurrentTick > 0) {
+    if (!this.input.wander.goingHome && this.chaseCooldownCurrentTick > 0) {
       this.chaseCooldownCurrentTick--
     }
   }

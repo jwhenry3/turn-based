@@ -44,79 +44,85 @@ export class NetworkedScene extends Phaser.Scene {
   }
 
   handleEntities() {
-    for (const characterId of Object.keys(
-      this.connector.entities.players.toJSON()
-    )) {
-      const e = this.connector.entities.players[characterId]
-      this.playerObjects[e.characterId] = new PlayerEntity(e, this)
-      this.add.existing(this.playerObjects[e.characterId])
-    }
-    for (const npcId of Object.keys(this.connector.entities.npcs.toJSON())) {
-      const e = this.connector.entities.npcs[npcId]
-      this.npcObjects[e.npcId] = new NpcEntity(e, this)
-      this.add.existing(this.npcObjects[e.npcId])
-    }
-    this.connector.entities.players.onAdd = (e) => {
-      console.log('added', e)
-      this.playerObjects[e.characterId] = new PlayerEntity(e, this)
-      this.add.existing(this.playerObjects[e.characterId])
-    }
-    this.connector.entities.players.onChange = (e) => {
-      console.log('changed', e)
-      this.playerObjects[e.characterId].model = e
-    }
-    this.connector.entities.players.onRemove = (e) => {
-      console.log('removed', e)
-      this.playerObjects[e.characterId]?.destroy()
-      delete this.playerObjects[e.characterId]
-    }
-    this.connector.entities.npcs.onAdd = (e) => {
-      this.npcObjects[e.npcId] = new NpcEntity(e, this)
-      this.add.existing(this.npcObjects[e.npcId])
-    }
-    this.connector.entities.npcs.onRemove = (e) => {
-      this.npcObjects[e.npcId]?.destroy()
-      delete this.npcObjects[e.npcId]
-    }
+    if (this.connector.entities?.players) {
+      for (const characterId of Object.keys(
+        this.connector.entities.players.toJSON()
+      )) {
+        const e = this.connector.entities.players[characterId]
+        this.playerObjects[e.characterId] = new PlayerEntity(e, this)
+        this.add.existing(this.playerObjects[e.characterId])
+      }
 
-    this.connector.battles.onAdd = (b) => {
-      b.players.onAdd = (p) => {
-        let battleScene = this.game.scene.getScene('battle') as BattleScene
-        if (p.characterId === app.auth.characterId) {
-          if (!battleScene) {
-            battleScene = this.game.scene.add(
-              'battle',
-              BattleScene
-            ) as BattleScene
-          }
-          battleScene.playerEntities = this.playerObjects
-          battleScene.addPlayer(p)
-          battleScene.connector = this.connector
-          battleScene.battle = b
-          this.game.scene.start('battle')
-          b.players.onRemove = (p) => {
-            if (p.characterId === app.auth.characterId) {
-              this.game.scene.stop('battle')
-              this.cameras.main.setZoom(1)
-            } else {
-              battleScene.removePlayer(p)
-            }
-          }
-          return
-        }
-        if (battleScene?.battle.battleId === b.battleId) {
-          battleScene.addPlayer(p)
-        }
+      this.connector.entities.players.onAdd = (e) => {
+        console.log('added', e)
+        this.playerObjects[e.characterId] = new PlayerEntity(e, this)
+        this.add.existing(this.playerObjects[e.characterId])
+      }
+      this.connector.entities.players.onChange = (e) => {
+        console.log('changed', e)
+        this.playerObjects[e.characterId].model = e
+      }
+      this.connector.entities.players.onRemove = (e) => {
+        console.log('removed', e)
+        this.playerObjects[e.characterId]?.destroy()
+        delete this.playerObjects[e.characterId]
       }
     }
-    this.connector.battles.onChange = (e) => {
-      console.log(e)
+    if (this.connector.entities?.npcs) {
+      for (const npcId of Object.keys(this.connector.entities.npcs.toJSON())) {
+        const e = this.connector.entities.npcs[npcId]
+        this.npcObjects[e.npcId] = new NpcEntity(e, this)
+        this.add.existing(this.npcObjects[e.npcId])
+      }
+      this.connector.entities.npcs.onAdd = (e) => {
+        this.npcObjects[e.npcId] = new NpcEntity(e, this)
+        this.add.existing(this.npcObjects[e.npcId])
+      }
+      this.connector.entities.npcs.onRemove = (e) => {
+        this.npcObjects[e.npcId]?.destroy()
+        delete this.npcObjects[e.npcId]
+      }
     }
-    this.connector.battles.onRemove = (e) => {
-      let battleScene = this.game.scene.getScene('battle') as BattleScene
-      if (battleScene?.battle.battleId !== e.battleId) return
-      this.game.scene.stop('battle')
-      this.cameras.main.setZoom(1)
+    if (this.connector.battles) {
+      this.connector.battles.onAdd = (b) => {
+        b.players.onAdd = (p) => {
+          let battleScene = this.game.scene.getScene('battle') as BattleScene
+          if (p.characterId === app.auth.characterId) {
+            if (!battleScene) {
+              battleScene = this.game.scene.add(
+                'battle',
+                BattleScene
+              ) as BattleScene
+            }
+            battleScene.playerEntities = this.playerObjects
+            battleScene.addPlayer(p)
+            battleScene.connector = this.connector
+            battleScene.battle = b
+            this.game.scene.start('battle')
+            b.players.onRemove = (p) => {
+              if (p.characterId === app.auth.characterId) {
+                this.game.scene.stop('battle')
+                this.cameras.main.setZoom(1)
+              } else {
+                battleScene.removePlayer(p)
+              }
+            }
+            return
+          }
+          if (battleScene?.battle.battleId === b.battleId) {
+            battleScene.addPlayer(p)
+          }
+        }
+      }
+      this.connector.battles.onChange = (e) => {
+        console.log(e)
+      }
+      this.connector.battles.onRemove = (e) => {
+        let battleScene = this.game.scene.getScene('battle') as BattleScene
+        if (battleScene?.battle.battleId !== e.battleId) return
+        this.game.scene.stop('battle')
+        this.cameras.main.setZoom(1)
+      }
     }
   }
 
