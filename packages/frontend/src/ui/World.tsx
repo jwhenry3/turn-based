@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { NetworkedScene } from '../phaser/scenes/networked.scene'
 import { useSceneState } from '../phaser/use-scene-state'
 import { app } from './app'
+import { WorldHud } from './world/hud/WorldHud'
 
 export function World() {
   const oldMap = useRef<string>('')
@@ -39,6 +40,7 @@ export function World() {
   // Todo: hud and game UI goes here
   return (
     <>
+      <WorldHud />
       <Button onClick={onLogout}>Logout</Button>{' '}
       <Button onClick={onLeave}>Leave Battle</Button>
     </>

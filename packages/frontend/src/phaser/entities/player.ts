@@ -123,6 +123,6 @@ export class PlayerEntity extends MovableEntity<Character> {
   }
   destroy() {
     super.destroy()
-    this.rectangle.destroy()
+    this.rectangle?.destroy()
   }
 }

@@ -68,6 +68,6 @@ export class NpcEntity extends MovableEntity<Npc> {
   }
   destroy() {
     super.destroy()
-    this.rectangle.destroy()
+    this.rectangle?.destroy()
   }
 }

@@ -63,6 +63,6 @@ export class PetEntity extends MovableEntity<PetNpc> {
   }
   destroy() {
     super.destroy()
-    this.rectangle.destroy()
+    this.rectangle?.destroy()
   }
 }
