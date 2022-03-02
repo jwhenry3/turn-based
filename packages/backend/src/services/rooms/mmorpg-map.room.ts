@@ -14,7 +14,7 @@ import { NpcInput } from '../scripts/npc-input'
 import { NpcData } from './fixture.models'
 import SpatialHash from 'spatial-hash'
 import { SpatialNode } from './spacial/node'
-import { Battle } from '../schemas/battles'
+import { Battle, BattlePlayer } from '../schemas/battles'
 import { npcTypes } from './fixtures/npcs/npc-types'
 import { MapConfig } from './fixtures/map.config'
 import { allNpcs } from './fixtures/npcs/all.npcs'
@@ -146,6 +146,14 @@ export class MmorpgMapRoom extends Room {
       if (character) {
         this.state.battles.forEach((battle) => {
           if (battle.battleId === battleId) {
+            let hasMoved = false
+            battle.players.forEach((player: BattlePlayer) => {
+              if (!hasMoved) {
+                character.position.x = player.character.position.x
+                character.position.y = player.character.position.y
+                hasMoved = true
+              }
+            })
             battle.addPlayer(character)
           }
         })
