@@ -46,25 +46,9 @@ export class BattleScene extends Phaser.Scene {
     this.battleLocations.players = playerPositions
     this.battleLocations.enemies = npcPositions
   }
-  createPositionsAlt() {
-    const playerPositions = []
-    const npcPositions = []
-    for (let i = 0; i < 8; i++) {
-      let baseX = 108 + (i % 2) * 128
-      let baseY = 120 + (i) * 32
-      // if (i < 5) {
-      //   baseX = 108 + 64 + i * 64
-      //   baseY = 236 + i * 64
-      // }
-      playerPositions.push([baseX, baseY])
-      npcPositions.push([this.width - baseX + 64, this.height - baseY])
-    }
-    this.battleLocations.players = playerPositions
-    this.battleLocations.enemies = npcPositions
-  }
 
   create() {
-    this.createPositionsAlt()
+    this.createPositions()
     this.cameras.main.transparent = false
     this.cameras.main.setBackgroundColor('#000')
     this.rectangle = this.add.rectangle(
