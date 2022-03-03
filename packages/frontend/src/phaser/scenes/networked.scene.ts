@@ -98,6 +98,7 @@ export class NetworkedScene extends Phaser.Scene {
             battleScene.addPlayer(p)
             battleScene.connector = this.connector
             battleScene.battle = b
+            app.movement.mouseDestination = undefined
             this.game.scene.start('battle')
             b.players.onRemove = (p) => {
               if (p.characterId === app.auth.characterId) {
