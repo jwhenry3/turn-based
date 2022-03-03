@@ -35,6 +35,15 @@ export const allNpcs = {
       new BattleNpc({
         name: 'Test Battle Npc',
       }),
+      new BattleNpc({
+        name: 'Test Battle Npc',
+      }),
+      new BattleNpc({
+        name: 'Test Battle Npc',
+      }),
+      new BattleNpc({
+        name: 'Test Battle Npc',
+      }),
     ],
   }),
   6: new NpcData({

@@ -168,11 +168,6 @@ export class BattleScene extends Phaser.Scene {
   }
 
   stop() {
-    this.battleLocations = {
-      players: [],
-
-      enemies: [],
-    }
     for (const id in this.players) {
       this.players[id].destroy()
     }
