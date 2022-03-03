@@ -49,10 +49,10 @@ export class NetworkedScene extends Phaser.Scene {
     }
     this.disconnect()
     this.scene.stop(this.name)
+    this.scene.stop('battle')
     this.playerObjects = {}
     this.npcObjects = {}
   }
-
 
   handleEntities() {
     this.connector.room.onMessage('chat:map', (message: ChatMessage) => {

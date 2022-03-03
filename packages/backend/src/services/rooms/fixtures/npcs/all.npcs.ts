@@ -31,19 +31,12 @@ export const allNpcs = {
     isAggressive: true,
     chaseRadius: 128,
     triggersBattle: true,
+    randomizeBattleNpcs: true,
+    maxEnemies: 8,
     battleNpcs: [
       new BattleNpc({
         name: 'Test Battle Npc',
-      }),
-      new BattleNpc({
-        name: 'Test Battle Npc',
-      }),
-      new BattleNpc({
-        name: 'Test Battle Npc',
-      }),
-      new BattleNpc({
-        name: 'Test Battle Npc',
-      }),
+      })
     ],
   }),
   6: new NpcData({

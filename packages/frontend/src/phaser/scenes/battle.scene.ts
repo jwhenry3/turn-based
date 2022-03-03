@@ -30,7 +30,7 @@ export class BattleScene extends Phaser.Scene {
 
   rows = [
     [-2, -1, 0, 1, 2],
-    [-1.5, 0, 1.5],
+    [-2, -1, 0, 1, 2],
   ]
   leftMin = 0
   gridSize = 64
@@ -45,16 +45,19 @@ export class BattleScene extends Phaser.Scene {
     const npcPositions = []
     for (let i = 0; i < this.rows.length; i++) {
       const row = this.rows[i]
+      let offset = 0
       for (let j = 0; j < row.length; j++) {
         const value = row[j]
         const x =
           this.leftMin +
-          ((i + j) % 2 === 0 ? 16 : -16) +
+          offset +
+          // ((i + j) % 2 === 0 ? 16 : -16) +
           (this.gridSize + this.spaceBetween * 2.5) * (this.rows.length - i)
         const y =
           this.center +
           this.verticalOffset -
-          (this.gridSize + this.spaceBetween * ((1 - i) * 0.75)) * value
+          (this.gridSize + (this.spaceBetween / 8) * ((1 - i) * 0.75)) * value
+        offset += 16
         playerPositions.push([x + j * -8, y])
         npcPositions.push([this.width - x - j * 8, y])
       }
@@ -169,7 +172,7 @@ export class BattleScene extends Phaser.Scene {
   }
   zoom() {
     const zoom = window.innerWidth / this.width
-    const zoom1 = window.innerHeight / (this.height)
+    const zoom1 = window.innerHeight / this.height
     this.cameras.main.setZoom(zoom > zoom1 ? zoom1 : zoom)
   }
 

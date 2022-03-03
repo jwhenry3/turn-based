@@ -170,11 +170,15 @@ export class Battle extends Schema {
     maxEnemies: number = 1
   ) {
     if (canRandomizeNpcOptions) {
-      const numberOfEnemies = Math.round(Math.random() * maxEnemies)
+      let numberOfEnemies = Math.round(Math.random() * maxEnemies) + 1
+      if (numberOfEnemies > maxEnemies) {
+        numberOfEnemies = maxEnemies
+      }
       for (let i = 0; i < numberOfEnemies; i++) {
-        this.addEnemy(
-          enemyOptions[Math.round(Math.random() * enemyOptions.length)]
+        const index = Math.abs(
+          Math.round(Math.random() * (enemyOptions.length - 1))
         )
+        this.addEnemy(new BattleNpc(enemyOptions[index]))
       }
     } else {
       for (let i = 0; i < enemyOptions.length; i++) {
@@ -189,13 +193,18 @@ export class Battle extends Schema {
   }
 
   addEnemy(option: BattleNpc) {
-    const randomized = this.shuffleArray(this.positionOrder)
-    const firstAvailable = randomized.find((i) => !this.addedEnemies[i])
     const enemy = new BattleNpc(option)
-    enemy.battleLocation = firstAvailable
-    this.addedEnemies[firstAvailable] = true
+    if (!enemy.battleLocation || this.addedEnemies[enemy.battleLocation]) {
+      const randomized = this.shuffleArray(this.positionOrder)
+      const firstAvailable = randomized.find((i) => !this.addedEnemies[i])
+      enemy.battleLocation = firstAvailable
+      this.addedEnemies[firstAvailable] = true
+    } else {
+      this.addedEnemies[enemy.battleLocation] = true
+    }
+    enemy.battleNpcId = v4()
     this.watchUpdate(enemy)
-    this.npcs.set(option.battleNpcId, enemy)
+    this.npcs.set(enemy.battleNpcId, enemy)
   }
 
   addPlayer(character: Character) {
