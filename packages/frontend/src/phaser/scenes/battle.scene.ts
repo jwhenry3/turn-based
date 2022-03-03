@@ -52,7 +52,8 @@ export class BattleScene extends Phaser.Scene {
           ((i + j) % 2 === 0 ? 16 : -16) +
           (this.gridSize + this.spaceBetween * 2.5) * (this.rows.length - i)
         const y =
-          this.center + this.verticalOffset -
+          this.center +
+          this.verticalOffset -
           (this.gridSize + this.spaceBetween * ((1 - i) * 0.75)) * value
         playerPositions.push([x + j * -8, y])
         npcPositions.push([this.width - x - j * 8, y])
@@ -168,10 +169,8 @@ export class BattleScene extends Phaser.Scene {
   }
   zoom() {
     const zoom = window.innerWidth / this.width
-    const zoom1 = window.innerHeight / (this.height * 1.2)
-    this.cameras.main.setZoom(
-      zoom > zoom1 ? (zoom1 > 1 ? 1 : zoom1) : zoom > 1 ? 1 : zoom
-    )
+    const zoom1 = window.innerHeight / (this.height)
+    this.cameras.main.setZoom(zoom > zoom1 ? zoom1 : zoom)
   }
 
   stop() {

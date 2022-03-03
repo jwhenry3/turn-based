@@ -1,12 +1,15 @@
 import { Button } from '@mui/material'
 import { useEffect, useRef } from 'react'
 import { NetworkedScene } from '../phaser/scenes/networked.scene'
+import { useBattle } from '../phaser/use-battle'
 import { useSceneState } from '../phaser/use-scene-state'
 import { app } from './app'
+import { BattleHud } from './battle/hud/BattleHud'
 import { WorldHud } from './world/hud/WorldHud'
 
 export function World() {
   const oldMap = useRef<string>('')
+  const { battle } = useBattle()
   const { scene, update } = useSceneState()
   const onLogout = (e) => {
     app.rooms.lobby.send('account:logout')
@@ -40,7 +43,8 @@ export function World() {
   // Todo: hud and game UI goes here
   return (
     <>
-      <WorldHud />
+      {!battle && <WorldHud />}
+      {battle && <BattleHud battle={battle} />}
       <Button onClick={onLogout}>Logout</Button>{' '}
       <Button onClick={onLeave}>Leave Battle</Button>
     </>

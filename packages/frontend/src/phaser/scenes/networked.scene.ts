@@ -5,6 +5,7 @@ import {
 } from '../../ui/world/hud/chat/use-chat-history'
 import { NpcEntity } from '../entities/Npc'
 import { PlayerEntity } from '../entities/player'
+import { useBattle } from '../use-battle'
 import { BattleScene } from './battle.scene'
 import { SceneConnector } from './scene.connector'
 
@@ -105,6 +106,7 @@ export class NetworkedScene extends Phaser.Scene {
                 BattleScene
               ) as BattleScene
             }
+            useBattle.getState().update(battleScene)
             battleScene.playerEntities = this.playerObjects
             battleScene.addPlayer(p)
             battleScene.connector = this.connector
@@ -129,6 +131,7 @@ export class NetworkedScene extends Phaser.Scene {
       this.connector.battles.onRemove = (e) => {
         let battleScene = this.game.scene.getScene('battle') as BattleScene
         if (battleScene?.battle.battleId !== e.battleId) return
+        useBattle.getState().update(undefined)
         battleScene.stop()
         this.game.scene.stop('battle')
       }

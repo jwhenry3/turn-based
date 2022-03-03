@@ -3,7 +3,7 @@ import { CharacterPanel } from './character/CharacterPanel'
 import { ChatWindow } from './chat/ChatWindow'
 import { MiniMap } from './map/MiniMap'
 import { MainMenu } from './menu/MainMenu'
-export const HudContainer = styled.div`
+ const HudContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
