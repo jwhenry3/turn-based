@@ -15,7 +15,9 @@ export class Statistics extends Schema {
     @type("number") public maxExpForCurrentLevel!: number;
     @type("number") public availableStatPoints!: number;
     @type(Attribute) public maxHp: Attribute = new Attribute();
+    @type(Attribute) public hp: Attribute = new Attribute();
     @type(Attribute) public maxMp: Attribute = new Attribute();
+    @type(Attribute) public mp: Attribute = new Attribute();
     @type(Attribute) public strength: Attribute = new Attribute();
     @type(Attribute) public dexterity: Attribute = new Attribute();
     @type(Attribute) public vitality: Attribute = new Attribute();

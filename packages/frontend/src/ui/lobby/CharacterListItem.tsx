@@ -11,6 +11,7 @@ export function CharacterListItem({ character }: { character: any }) {
     const account = app.rooms.lobby.state.accounts[app.rooms.lobby.sessionId]
     app.auth.token = account.token.token
     app.auth.characterId = character.characterId
+    app.character = character
     update(character.position.map)
   }
   return (

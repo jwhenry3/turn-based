@@ -1,4 +1,6 @@
 import styled from '@emotion/styled'
+import { useEffect, useState } from 'react'
+import { app } from '../../../app'
 import { GameText } from '../../text/Text'
 export const NameContainer = styled.div`
   position: relative;
@@ -11,7 +13,7 @@ export const NameContainer = styled.div`
 export function Name() {
   return (
     <NameContainer>
-      <GameText style={{ fontStyle: 'italic' }}>Name</GameText>
+      <GameText style={{ fontStyle: 'italic' }}>{app.character.name}</GameText>
     </NameContainer>
   )
 }

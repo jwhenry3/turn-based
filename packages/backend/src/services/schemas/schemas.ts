@@ -74,7 +74,15 @@ export class Attribute extends Schema {
   @type('number')
   fromBuffs: number = 0
   @type('number')
-  total: number
+  get total() {
+    return (
+      this.baseAmount + this.fromPoints + this.fromEquipment + this.fromBuffs
+    )
+  }
+
+  constructor(...args: any[]) {
+    super(...args)
+  }
 }
 
 export class Statistics extends Schema {
@@ -96,7 +104,11 @@ export class Statistics extends Schema {
   @type(Attribute)
   maxHp: Attribute = new Attribute({ base: 100 })
   @type(Attribute)
+  hp: Attribute = new Attribute({ base: 100 })
+  @type(Attribute)
   maxMp: Attribute = new Attribute({ base: 100 })
+  @type(Attribute)
+  mp: Attribute = new Attribute({ base: 100 })
   @type(Attribute)
   strength: Attribute = new Attribute({ base: 5 })
   @type(Attribute)
@@ -234,7 +246,6 @@ export class Npc extends Schema {
   @type({ array: ItemDrop })
   drops: ArraySchema<ItemDrop> = new ArraySchema<ItemDrop>()
 
-
   @type(PositionData)
   position: PositionData = new PositionData()
 
@@ -293,7 +304,6 @@ export class Character extends Schema {
   node: SpatialNode<Character>
   hash: SpatialHash
 }
-
 
 export class AccountToken extends Schema {
   @type('string')

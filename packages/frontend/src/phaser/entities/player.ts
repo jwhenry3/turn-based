@@ -51,6 +51,9 @@ export class PlayerEntity extends MovableEntity<Character> {
     this.rectangle.setOrigin(0.5, 0.75)
     this.scene.add.existing(this.rectangle)
     if (this.isLocalPlayer) {
+      app.character = this.model
+      console.log(this.model.stats.maxMp.toJSON())
+      app.updateCharacter.next()
       this.scene.cameras.main.startFollow(this.rectangle, false, 0.05, 0.05)
       this.scene.cameras.main.setDeadzone(128, 128)
       this.scene.cameras.main.setZoom(1)

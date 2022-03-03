@@ -31,9 +31,7 @@ export function createCharacter(model: CharacterModel, clientId: string) {
       facing: model.position.facing,
     }),
   })
-  char.stats = new Statistics({
-    // todo load stats from model
-  })
+  char.stats = new Statistics()
   char.position.map = 'starter'
   return char
 }
