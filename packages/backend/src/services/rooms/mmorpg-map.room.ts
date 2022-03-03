@@ -134,6 +134,10 @@ export class MmorpgMapRoom extends Room {
       if (character) {
         this.state.battles.forEach((battle) => {
           if (battle.battleId === battleId) {
+            if (battle.players.size >= 8) {
+              client.send('character:battle:full')
+              return
+            }
             let hasMoved = false
             battle.players.forEach((player: BattlePlayer) => {
               if (!hasMoved) {
