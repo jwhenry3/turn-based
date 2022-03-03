@@ -11,13 +11,13 @@ export function useLobby() {
     ;(async () => {
       try {
         const client = new Client('ws://localhost:9200')
-        console.log('Connecting to Lobby... attempt:', attempts + 1)
+        // console.log('Connecting to Lobby... attempt:', attempts + 1)
         let room = await client.joinOrCreate('lobby')
         app.rooms.lobby = room
         setLobby(room)
-        console.log('Connected!')
+        // console.log('Connected!')
         room.onLeave(async (code) => {
-          console.log('Disconnected', code)
+          // console.log('Disconnected', code)
           const reconnectCodes = [1000, 1006, 1002, 1003]
           if (reconnectCodes.includes(code)) {
             timeout = setTimeout(() => setAttempts(attempts + 1), 5000)

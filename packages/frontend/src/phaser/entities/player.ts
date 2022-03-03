@@ -16,7 +16,7 @@ export class PlayerEntity extends MovableEntity<Character> {
   }
 
   create() {
-    console.log('player create')
+    // console.log('player create')
     // Using a circle for collision
     this.rectangle = new Phaser.GameObjects.Rectangle(
       this.scene,
@@ -52,7 +52,7 @@ export class PlayerEntity extends MovableEntity<Character> {
     this.scene.add.existing(this.rectangle)
     if (this.isLocalPlayer) {
       app.character = this.model
-      console.log(this.model.stats.maxMp.toJSON())
+      // console.log(this.model.stats.maxMp.toJSON())
       app.updateCharacter.next()
       this.scene.cameras.main.startFollow(this.rectangle, false, 0.05, 0.05)
       this.scene.cameras.main.setDeadzone(128, 128)
@@ -66,13 +66,13 @@ export class PlayerEntity extends MovableEntity<Character> {
       }
     }
     if (this.model.pet) {
-      console.log('added pet 1')
+      // console.log('added pet 1')
       this.pet = new PetEntity(this.model.pet, this.scene)
       this.scene.add.existing(this.pet)
     }
     this.model.listen('pet', (pet, previous) => {
       if (pet && !previous) {
-        console.log('added pet 2')
+        // console.log('added pet 2')
         this.pet = new PetEntity(pet, this.scene)
         this.scene.add.existing(this.pet)
       } else if (!pet && previous) {

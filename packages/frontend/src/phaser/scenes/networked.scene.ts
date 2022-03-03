@@ -65,16 +65,16 @@ export class NetworkedScene extends Phaser.Scene {
       }
 
       this.connector.entities.players.onAdd = (e) => {
-        console.log('added', e)
+        // console.log('added', e)
         this.playerObjects[e.characterId] = new PlayerEntity(e, this)
         this.add.existing(this.playerObjects[e.characterId])
       }
       this.connector.entities.players.onChange = (e) => {
-        console.log('changed', e)
+        // console.log('changed', e)
         this.playerObjects[e.characterId].model = e
       }
       this.connector.entities.players.onRemove = (e) => {
-        console.log('removed', e)
+        // console.log('removed', e)
         this.playerObjects[e.characterId]?.destroy()
         delete this.playerObjects[e.characterId]
       }
@@ -125,9 +125,7 @@ export class NetworkedScene extends Phaser.Scene {
           }
         }
       }
-      this.connector.battles.onChange = (e) => {
-        console.log(e)
-      }
+
       this.connector.battles.onRemove = (e) => {
         let battleScene = this.game.scene.getScene('battle') as BattleScene
         if (battleScene?.battle.battleId !== e.battleId) return

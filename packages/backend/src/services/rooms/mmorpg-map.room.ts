@@ -270,7 +270,7 @@ export class MmorpgMapRoom extends Room {
     characterModel?: CharacterModel
   ): Promise<any> {
     if (characterModel) {
-      console.log('joined!')
+      // console.log('joined!')
     }
   }
 

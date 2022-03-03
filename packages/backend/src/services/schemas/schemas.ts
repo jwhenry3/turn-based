@@ -74,14 +74,12 @@ export class Attribute extends Schema {
   @type('number')
   fromBuffs: number = 0
   @type('number')
-  get total() {
-    return (
-      this.baseAmount + this.fromPoints + this.fromEquipment + this.fromBuffs
-    )
-  }
+  total: number = 0
 
-  constructor(...args: any[]) {
-    super(...args)
+  constructor(options?: Partial<Attribute>) {
+    super()
+    Object.assign(this, options)
+    this.total = this.baseAmount + this.fromPoints + this.fromBuffs
   }
 }
 
@@ -123,6 +121,11 @@ export class Statistics extends Schema {
   mind: Attribute = new Attribute({ baseAmount: 5 })
   @type(Attribute)
   charisma: Attribute = new Attribute({ baseAmount: 5 })
+
+  constructor(options?: Partial<Statistics>) {
+    super()
+    Object.assign(this, options)
+  }
 }
 export class Effect extends Schema {
   @type('string')

@@ -46,7 +46,7 @@ export default function Mmorpg() {
     }
   }
   const onFocusChange = (value: boolean) => {
-    console.log('focus change', value)
+    // console.log('focus change', value)
   }
   return (
     <div>

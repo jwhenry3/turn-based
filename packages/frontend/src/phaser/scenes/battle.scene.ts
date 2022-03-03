@@ -150,7 +150,7 @@ export class BattleScene extends Phaser.Scene {
   }
   removePlayer(player) {
     if (!this.players[player.characterId]) return
-    console.log('destroy', player.name)
+    // console.log('destroy', player.name)
     this.players[player.characterId].destroy()
     delete this.players[player.characterId]
   }

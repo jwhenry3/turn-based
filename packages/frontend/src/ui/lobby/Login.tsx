@@ -23,7 +23,7 @@ export function Login() {
   const [formError, setFormError] = useState('')
   useEffect(() => {
     const subscription = app.messages.lobby.subscribe(({ type, message }) => {
-      console.log(type, message)
+      // console.log(type, message)
       if (
         type === 'account:login:failure' ||
         type === 'account:register:failure'
@@ -50,7 +50,7 @@ export function Login() {
   const onLogin = (e) => {
     setFormError('')
     e.preventDefault()
-    console.log(app.rooms.lobby)
+    // console.log(app.rooms.lobby)
     app.rooms.lobby?.send('account:login', { username, password })
     return false
   }
