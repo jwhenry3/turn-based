@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { app } from '../../../app'
-import { GameText } from '../../text/Text'
+import { GameText } from '../../../world/text/Text'
 export const ManaContainer = styled.div`
   position: relative;
   padding: 2px 4px;
@@ -22,12 +22,12 @@ export const ManaAmount = styled.div`
   width: 100%;
   z-index: -1;
 `
-export function Mana() {
+export function Mana({ stats }) {
   return (
     <ManaContainer>
       <ManaAmount />
       <GameText>
-        {app.character.stats.mp.total} / {app.character.stats.maxMp.total}
+        {stats.mp.total} / {stats.maxMp.total}
       </GameText>
     </ManaContainer>
   )

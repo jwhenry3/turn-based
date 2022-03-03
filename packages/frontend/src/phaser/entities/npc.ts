@@ -1,14 +1,17 @@
 import { Npc } from '../../networking/schemas/Npc'
 import { app } from '../../ui/app'
 import { blurAll } from '../behaviors/blurAll'
-import { lerp } from '../behaviors/lerp'
 import { useSceneState } from '../use-scene-state'
 import { MovableEntity } from './movable'
+import { NamePlugin } from './plugins/name'
 
 export class NpcEntity extends MovableEntity<Npc> {
   rectangle: Phaser.GameObjects.Rectangle
+  namePlugin: NamePlugin = new NamePlugin(this.scene)
 
   create() {
+    this.namePlugin.create(this.model.name, this.position.x, this.position.y, 'rgba(255, 120, 0)')
+    console.log(this.model.name)
     this.rectangle = new Phaser.GameObjects.Rectangle(
       this.scene,
       this.position.x,
@@ -25,14 +28,14 @@ export class NpcEntity extends MovableEntity<Npc> {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       e.downElement.focus()
-      if (app.selected === this) {
+      if (app.target === this) {
         const scene = useSceneState.getState().scene
         app.rooms[scene].send('character:move:destination', {
           x: this.position.x,
           y: this.position.y,
         })
       }
-      app.selected = this
+      app.target = this
     })
     this.rectangle.setDepth(Math.round(this.rectangle.y))
     this.rectangle.setOrigin(0.5, 0.75)
@@ -61,7 +64,7 @@ export class NpcEntity extends MovableEntity<Npc> {
       }
       this.rectangle.setDepth(Math.round(this.rectangle.y))
     }
-    if (app.selected === this) {
+    if (app.target === this) {
       this.rectangle.setStrokeStyle(
         4,
         Phaser.Display.Color.HexStringToColor('#fa5').color,
@@ -70,9 +73,11 @@ export class NpcEntity extends MovableEntity<Npc> {
     } else {
       this.rectangle.setStrokeStyle(0)
     }
+    this.namePlugin.update(this.rectangle.x, this.rectangle.y)
   }
   destroy() {
     super.destroy()
     this.rectangle?.destroy()
+    this.namePlugin.destroy()
   }
 }

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { useEffect } from 'react'
 import { app } from '../../../app'
-import { GameText } from '../../text/Text'
+import { GameText } from '../../../world/text/Text'
 export const HealthContainer = styled.div`
   position: relative;
   padding: 2px 4px;
@@ -23,12 +23,12 @@ export const HealthAmount = styled.div`
   width: 100%;
   z-index: -1;
 `
-export function Health() {
+export function Health({ stats }) {
   return (
     <HealthContainer>
       <HealthAmount />
       <GameText>
-        {app.character.stats.hp.total} / {app.character.stats.maxHp.total}
+        {stats.hp.total} / {stats.maxHp.total}
       </GameText>
     </HealthContainer>
   )

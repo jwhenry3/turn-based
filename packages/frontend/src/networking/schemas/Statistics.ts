@@ -10,7 +10,6 @@ import { Attribute } from './Attribute'
 
 export class Statistics extends Schema {
     @type("number") public level!: number;
-    @type("number") public grantExpOnDeath!: number;
     @type("number") public currentExp!: number;
     @type("number") public maxExpForCurrentLevel!: number;
     @type("number") public availableStatPoints!: number;

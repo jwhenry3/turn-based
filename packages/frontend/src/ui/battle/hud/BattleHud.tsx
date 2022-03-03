@@ -3,6 +3,8 @@ import { Button } from '@mui/material'
 import { BattleScene } from '../../../phaser/scenes/battle.scene'
 import { useSceneState } from '../../../phaser/use-scene-state'
 import { app } from '../../app'
+import { CharacterPanel } from './character/CharacterPanel'
+import { TargetPanel } from './target/TargetPanel'
 
 const HudContainer = styled.div`
   position: fixed;
@@ -27,6 +29,8 @@ export function BattleHud({ battle }: { battle: BattleScene }) {
   return (
     <HudContainer>
       <Button onClick={onLeave}>Leave Battle</Button>
+      <TargetPanel />
+      <CharacterPanel />
     </HudContainer>
   )
 }

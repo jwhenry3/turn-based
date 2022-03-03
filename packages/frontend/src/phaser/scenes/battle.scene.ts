@@ -3,6 +3,7 @@ import { Battle } from '../../networking/schemas/Battle'
 import { BattleNpc } from '../../networking/schemas/BattleNpc'
 import { BattlePlayer } from '../../networking/schemas/BattlePlayer'
 import { Character } from '../../networking/schemas/Character'
+import { app } from '../../ui/app'
 import { BattleSceneEnemy } from '../entities/battle/battle-enemy'
 import { BattleScenePet } from '../entities/battle/battle-pet'
 import { BattleScenePlayer } from '../entities/battle/battle-player'
@@ -168,6 +169,7 @@ export class BattleScene extends Phaser.Scene {
   update() {
     if (window.innerWidth !== this.lastWidth) {
       this.zoom()
+      app.updates.next('battle:size')
     }
   }
   zoom() {

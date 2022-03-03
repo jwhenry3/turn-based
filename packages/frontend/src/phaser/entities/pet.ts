@@ -5,13 +5,21 @@ import { lerp } from '../behaviors/lerp'
 import { useSceneState } from '../use-scene-state'
 import { MovableEntity } from './movable'
 import { PlayerEntity } from './player'
+import { NamePlugin } from './plugins/name'
 
 export class PetEntity extends MovableEntity<PetNpc> {
   rectangle: Phaser.GameObjects.Rectangle
+  namePlugin: NamePlugin = new NamePlugin(this.scene)
 
   owner: PlayerEntity
 
   create() {
+    this.namePlugin.create(
+      this.owner.model.name + "'s Pet",
+      this.position.x,
+      this.position.y,
+      'rgba(200, 200, 120)'
+    )
     this.rectangle = new Phaser.GameObjects.Rectangle(
       this.scene,
       this.position.x,
@@ -28,14 +36,14 @@ export class PetEntity extends MovableEntity<PetNpc> {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       e.downElement.focus()
-      if (app.selected === this) {
+      if (app.target === this) {
         const scene = useSceneState.getState().scene
         app.rooms[scene].send('character:move:destination', {
           x: this.position.x,
           y: this.position.y,
         })
       }
-      app.selected = this
+      app.target = this
     })
     this.rectangle.setDepth(Math.round(this.rectangle.y))
     this.rectangle.setOrigin(0.5, 0.75)
@@ -56,7 +64,7 @@ export class PetEntity extends MovableEntity<PetNpc> {
       }
       this.rectangle.setDepth(Math.round(this.rectangle.y))
     }
-    if (app.selected === this) {
+    if (app.target === this) {
       this.rectangle.setStrokeStyle(
         4,
         Phaser.Display.Color.HexStringToColor('#aaf').color,
@@ -65,9 +73,11 @@ export class PetEntity extends MovableEntity<PetNpc> {
     } else {
       this.rectangle.setStrokeStyle(0)
     }
+    this.namePlugin.update(this.rectangle.x, this.rectangle.y)
   }
   destroy() {
     super.destroy()
     this.rectangle?.destroy()
+    this.namePlugin.destroy()
   }
 }

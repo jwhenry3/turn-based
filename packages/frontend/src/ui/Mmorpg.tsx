@@ -37,7 +37,7 @@ export default function Mmorpg() {
         input: {
           gamepad: true,
         },
-        antialias: false,
+        antialias: true,
         scene: [BackgroundScene],
       })
       app.scenes.lobby = app.game.scene.add('lobby', LobbyScene) as any

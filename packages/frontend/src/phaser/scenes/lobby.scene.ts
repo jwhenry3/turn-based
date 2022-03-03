@@ -1,1 +1,6 @@
-export class LobbyScene extends Phaser.Scene {}
+export class LobbyScene extends Phaser.Scene {
+
+  preload() {
+
+  }
+}

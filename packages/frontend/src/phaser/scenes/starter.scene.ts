@@ -30,7 +30,7 @@ export class StarterScene extends NetworkedScene {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       const input = app.movement
-      app.selected = undefined
+      app.target = undefined
       if (input.mouseTick === 0) {
         input.mouseTick = input.mouseCooldown
         e.updateWorldPoint(this.input.scene.cameras.main)

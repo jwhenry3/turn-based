@@ -1,26 +1,24 @@
 import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
+import { filter, pipe } from 'rxjs'
 import { app } from '../../../app'
-import { WindowPanel } from '../WindowPanel'
-import { Health } from './Health'
-import { Mana } from './Mana'
-import { Name } from './Name'
+import { WindowPanel } from '../../../world/hud/WindowPanel'
+import { Health } from '../bars/Health'
+import { Mana } from '../bars/Mana'
+import { Name } from '../details/Name'
 export const CharacterContainer = styled.div`
   position: fixed;
-  top: 8px;
-  left: 8px;
+  bottom: top;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-width: 240px;
   /* background-color: rgba(0, 0, 0, 0.75); */
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  min-width: 240px;
   border-radius: 8px;
-  width: 25vw;
-  @media (max-width: 420px) {
-    min-width: 50vw;
-    padding-right: 16px;
-  }
 `
 export const ValuesWrapper = styled.div`
   padding: 8px;
@@ -29,24 +27,26 @@ export const ValuesContainer = styled.div`
   overflow: hidden;
   z-index: 2;
 `
-export function CharacterPanel() {
-  const [character, setCharacter] = useState(app.character || undefined)
+export function TargetPanel() {
+  const [target, setTarget] = useState(app.target || undefined)
   useEffect(() => {
-    setCharacter(app.character)
-    const sub = app.updateCharacter.subscribe(() => {
-      setCharacter(app.character)
-    })
+    setTarget(app.target)
+    const sub = app.updates
+      .pipe(filter((value) => value === 'target:stats'))
+      .subscribe(() => {
+        setTarget(app.target)
+      })
     return () => sub.unsubscribe()
   }, [])
-  if (!character) return <></>
+  if (!target?.stats) return <></>
   return (
     <CharacterContainer>
-      <Name />
+      <Name name={target.name} />
       <WindowPanel style={{ marginTop: '-12px' }}>
         <ValuesWrapper>
           <ValuesContainer>
-            <Health />
-            <Mana />
+            <Health stats={target.stats} />
+            <Mana stats={target.stats} />
           </ValuesContainer>
         </ValuesWrapper>
       </WindowPanel>

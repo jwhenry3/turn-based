@@ -5,9 +5,11 @@ import { lerp } from '../behaviors/lerp'
 import { useSceneState } from '../use-scene-state'
 import { MovableEntity } from './movable'
 import { PetEntity } from './pet'
+import { NamePlugin } from './plugins/name'
 
 export class PlayerEntity extends MovableEntity<Character> {
   rectangle: Phaser.GameObjects.Rectangle
+  namePlugin: NamePlugin = new NamePlugin(this.scene)
 
   battleId?: string
   pet?: PetEntity
@@ -17,6 +19,7 @@ export class PlayerEntity extends MovableEntity<Character> {
   }
 
   create() {
+    this.namePlugin.create(this.model.name, this.position.x, this.position.y)
     // console.log('player create')
     // Using a circle for collision
     this.rectangle = new Phaser.GameObjects.Rectangle(
@@ -34,7 +37,7 @@ export class PlayerEntity extends MovableEntity<Character> {
     this.rectangle.on('pointerdown', (e) => {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
-      if (app.selected === this) {
+      if (app.target === this) {
         if (this.model.battleId) {
           this.scene.connector.room.send('character:battle:join', {
             battleId: this.model.battleId,
@@ -47,7 +50,7 @@ export class PlayerEntity extends MovableEntity<Character> {
           y: this.position.y,
         })
       }
-      app.selected = this
+      app.target = this
     })
     this.rectangle.setDepth(Math.round(this.rectangle.y))
     this.rectangle.setOrigin(0.5, 0.75)
@@ -55,7 +58,7 @@ export class PlayerEntity extends MovableEntity<Character> {
     if (this.isLocalPlayer) {
       app.character = this.model
       // console.log(this.model.stats.maxMp.toJSON())
-      app.updateCharacter.next()
+      app.updates.next('character:stats')
       this.scene.cameras.main.startFollow(this.rectangle, false, 0.05, 0.05)
       this.scene.cameras.main.setDeadzone(128, 128)
       this.scene.cameras.main.setZoom(1)
@@ -70,12 +73,14 @@ export class PlayerEntity extends MovableEntity<Character> {
     if (this.model.pet) {
       // console.log('added pet 1')
       this.pet = new PetEntity(this.model.pet, this.scene)
+      this.pet.owner = this
       this.scene.add.existing(this.pet)
     }
     this.model.listen('pet', (pet, previous) => {
       if (pet && !previous) {
         // console.log('added pet 2')
         this.pet = new PetEntity(pet, this.scene)
+        this.pet.owner = this
         this.scene.add.existing(this.pet)
       } else if (!pet && previous) {
         this.pet.destroy()
@@ -115,7 +120,7 @@ export class PlayerEntity extends MovableEntity<Character> {
       this.rectangle.setPosition(newX, newY)
     }
     this.rectangle.setDepth(Math.round(this.rectangle.y))
-    if (app.selected === this) {
+    if (app.target === this) {
       this.rectangle.setStrokeStyle(
         4,
         Phaser.Display.Color.HexStringToColor('#aaf').color,
@@ -139,9 +144,11 @@ export class PlayerEntity extends MovableEntity<Character> {
         Phaser.Display.Color.HexStringToColor('#55f').color
       )
     }
+    this.namePlugin.update(this.rectangle.x, this.rectangle.y)
   }
   destroy() {
     super.destroy()
     this.rectangle?.destroy()
+    this.namePlugin.destroy()
   }
 }

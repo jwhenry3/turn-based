@@ -13,10 +13,10 @@ export const app = {
     token: '',
     characterId: '',
   },
-  updateCharacter: new Subject<void>(),
   character: undefined as Character | undefined,
   game: undefined as Phaser.Game | undefined,
-  selected: undefined,
+  target: undefined,
+  updates: new Subject<string>(),
   movement: new MovementInput(),
   messages: {
     lobby: new Subject<{ type: string; message: any }>(),

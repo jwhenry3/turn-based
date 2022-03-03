@@ -1,9 +1,69 @@
 import { ArraySchema, MapSchema, Schema, type } from '@colyseus/schema'
 import { Subject, takeUntil } from 'rxjs'
-import { Character, PetNpc } from './schemas'
+import { Character } from './schemas'
 import { DropData } from '../rooms/fixture.models'
 import { v4 } from 'uuid'
 
+export class Attribute extends Schema {
+  @type('number')
+  baseAmount: number = 0
+  @type('number')
+  fromPoints: number = 0
+  @type('number')
+  fromEquipment: number = 0
+  @type('number')
+  fromBuffs: number = 0
+  @type('number')
+  total: number = 0
+
+  constructor(options?: Partial<Attribute>) {
+    super()
+    Object.assign(this, options)
+    this.total = this.baseAmount + this.fromPoints + this.fromBuffs
+  }
+}
+export class Statistics extends Schema {
+  @type('number')
+  level: number = 1
+
+  // not visible on client
+  grantExpOnDeath: number = 0
+
+  @type('number')
+  currentExp: number = 0
+  @type('number')
+  maxExpForCurrentLevel: number = 100
+  @type('number')
+  availableStatPoints: number = 5
+
+  @type(Attribute)
+  maxHp: Attribute = new Attribute({ baseAmount: 100 })
+  @type(Attribute)
+  hp: Attribute = new Attribute({ baseAmount: 100 })
+  @type(Attribute)
+  maxMp: Attribute = new Attribute({ baseAmount: 100 })
+  @type(Attribute)
+  mp: Attribute = new Attribute({ baseAmount: 100 })
+  @type(Attribute)
+  strength: Attribute = new Attribute({ baseAmount: 5 })
+  @type(Attribute)
+  dexterity: Attribute = new Attribute({ baseAmount: 5 })
+  @type(Attribute)
+  vitality: Attribute = new Attribute({ baseAmount: 5 })
+  @type(Attribute)
+  agility: Attribute = new Attribute({ baseAmount: 5 })
+  @type(Attribute)
+  intelligence: Attribute = new Attribute({ baseAmount: 5 })
+  @type(Attribute)
+  mind: Attribute = new Attribute({ baseAmount: 5 })
+  @type(Attribute)
+  charisma: Attribute = new Attribute({ baseAmount: 5 })
+
+  constructor(options?: Partial<Statistics>) {
+    super()
+    Object.assign(this, options)
+  }
+}
 export class BattlePet extends Schema {
   @type('string')
   characterId: string
@@ -13,6 +73,9 @@ export class BattlePet extends Schema {
   mana = 100
   @type('number')
   cooldown = 0
+
+  @type(Statistics)
+  stats = new Statistics()
 
   owner: Character
 
@@ -43,6 +106,9 @@ export class BattlePlayer extends Schema {
   pet: BattlePet
 
   character: Character
+
+  @type(Statistics)
+  stats = new Statistics()
 
   destroy$ = new Subject<void>()
   @type({ array: 'string' })
@@ -108,13 +174,14 @@ export class BattleNpc extends BattleNpcType {
     | 'neutral' = 'neutral'
 
   @type('number')
-  health: number = 30
-  @type('number')
   level: number = 1
   @type('number')
   expYield: number = 10
   @type('number')
   cooldown = 0
+
+  @type(Statistics)
+  stats = new Statistics()
 
   destroy$ = new Subject<void>()
 

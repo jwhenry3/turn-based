@@ -4,9 +4,9 @@ import {
   Character,
   Movement,
   PositionData,
-  Statistics,
 } from '../schemas'
 import { CharacterModel } from '../../data/character'
+import { Statistics } from '../battles'
 
 export function createCharacter(model: CharacterModel, clientId: string) {
   const char = new Character()

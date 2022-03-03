@@ -9,7 +9,7 @@ import {
 } from '@colyseus/schema'
 import { SpatialNode } from '../rooms/spacial/node'
 import SpatialHash from 'spatial-hash'
-import { Battle } from './battles'
+import { Attribute, Battle, Statistics } from './battles'
 
 export class Movement extends Schema {
   @type('string')
@@ -70,69 +70,6 @@ export class Appearance extends Schema {
   gender: string
 }
 
-export class Attribute extends Schema {
-  @type('number')
-  baseAmount: number = 0
-  @type('number')
-  fromPoints: number = 0
-  @type('number')
-  fromEquipment: number = 0
-  @type('number')
-  fromBuffs: number = 0
-  @type('number')
-  total: number = 0
-
-  constructor(options?: Partial<Attribute>) {
-    super()
-    Object.assign(this, options)
-    this.total = this.baseAmount + this.fromPoints + this.fromBuffs
-  }
-}
-
-export class Statistics extends Schema {
-  @type('number')
-  level: number = 1
-
-  // not visible on client
-  @filter(() => false)
-  @type('number')
-  grantExpOnDeath: number = 0
-
-  @type('number')
-  currentExp: number = 0
-  @type('number')
-  maxExpForCurrentLevel: number = 100
-  @type('number')
-  availableStatPoints: number = 5
-
-  @type(Attribute)
-  maxHp: Attribute = new Attribute({ baseAmount: 100 })
-  @type(Attribute)
-  hp: Attribute = new Attribute({ baseAmount: 100 })
-  @type(Attribute)
-  maxMp: Attribute = new Attribute({ baseAmount: 100 })
-  @type(Attribute)
-  mp: Attribute = new Attribute({ baseAmount: 100 })
-  @type(Attribute)
-  strength: Attribute = new Attribute({ baseAmount: 5 })
-  @type(Attribute)
-  dexterity: Attribute = new Attribute({ baseAmount: 5 })
-  @type(Attribute)
-  vitality: Attribute = new Attribute({ baseAmount: 5 })
-  @type(Attribute)
-  agility: Attribute = new Attribute({ baseAmount: 5 })
-  @type(Attribute)
-  intelligence: Attribute = new Attribute({ baseAmount: 5 })
-  @type(Attribute)
-  mind: Attribute = new Attribute({ baseAmount: 5 })
-  @type(Attribute)
-  charisma: Attribute = new Attribute({ baseAmount: 5 })
-
-  constructor(options?: Partial<Statistics>) {
-    super()
-    Object.assign(this, options)
-  }
-}
 export class Effect extends Schema {
   @type('string')
   effectId: string
