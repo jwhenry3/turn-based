@@ -11,7 +11,6 @@ export class NpcEntity extends MovableEntity<Npc> {
 
   create() {
     this.namePlugin.create(this.model.name, this.position.x, this.position.y, 'rgba(255, 120, 0)')
-    console.log(this.model.name)
     this.rectangle = new Phaser.GameObjects.Rectangle(
       this.scene,
       this.position.x,
@@ -49,10 +48,12 @@ export class NpcEntity extends MovableEntity<Npc> {
     if (this.rectangle.active && this.model.despawned) {
       this.rectangle.setActive(false)
       this.rectangle.setVisible(false)
+      this.namePlugin.setVisible(false)
     }
     if (!this.rectangle.active && !this.model.despawned) {
       this.rectangle.setActive(true)
       this.rectangle.setVisible(true)
+      this.namePlugin.setVisible(true)
     }
     if (this.rectangle.active) {
       if (

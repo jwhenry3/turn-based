@@ -144,7 +144,7 @@ export class NetworkedScene extends Phaser.Scene {
     const zoom2 = window.innerHeight / 600
     const zoom = zoom1 < zoom2 ? zoom1 : zoom2
     // adjust zoom to properly scope the area around the player to make it consistent across devices
-    this.cameras.main.setZoom(zoom < 0.5 ? 0.5 : zoom > 1 ? 1 : zoom)
+    this.cameras.main.setZoom(zoom < 0.5 ? 0.5 : zoom)
     app.updates.next('map:update')
   }
 

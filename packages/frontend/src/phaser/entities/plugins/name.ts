@@ -3,6 +3,10 @@ import { NetworkedScene } from '../../scenes/networked.scene'
 export class NamePlugin {
   text: Phaser.GameObjects.Text
   constructor(public scene: NetworkedScene) {}
+
+  setVisible(value:boolean) {
+    this.text.setVisible(value)
+  }
   create(
     name: string,
     x: number,
@@ -23,6 +27,10 @@ export class NamePlugin {
   }
 
   update(x: number, y: number) {
+    const zoom1 = window.innerWidth / 700
+    const zoom2 = window.innerHeight / 700
+    const zoom = zoom1 < zoom2 ? zoom1 : zoom2
+    this.text.setScale(1 / zoom < 1 ? 1 : 1 / zoom)
     if (this.text.x !== x || this.text.y !== y - 64) {
       this.text.setPosition(x, y - 64)
     }
