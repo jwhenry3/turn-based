@@ -43,13 +43,13 @@ export class NetworkedScene extends Phaser.Scene {
     this.scene.start(this.name)
   }
 
-  async stop() {
+  stop() {
     if (app.rooms.active === this.connector.room) {
       app.rooms.active = undefined
     }
+    this.scene.stop('battle')
     this.disconnect()
     this.scene.stop(this.name)
-    this.scene.stop('battle')
     this.playerObjects = {}
     this.npcObjects = {}
   }

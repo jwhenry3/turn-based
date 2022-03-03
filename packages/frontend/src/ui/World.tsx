@@ -16,7 +16,7 @@ export function World() {
       if (oldMap.current !== scene) {
         const oldScene = app.game.scene.getScene(oldMap.current)
         if (oldScene instanceof NetworkedScene) {
-          await oldScene.stop()
+          oldScene.stop()
           oldScene.connector.onDisconnect = () => null
         } else if (oldScene) {
           app.game.scene.stop(oldMap.current)
@@ -25,7 +25,11 @@ export function World() {
         if (newScene instanceof NetworkedScene) {
           await newScene.start()
           // logout or go to lobby when the map disconnects so we properly update state
-          newScene.connector.onDisconnect = () => update('lobby')
+          newScene.connector.onDisconnect = () => {
+            update('lobby')
+            newScene.stop()
+            newScene.connector.onDisconnect = () => null
+          }
         } else if (newScene) {
           app.game.scene.start(scene)
         }
