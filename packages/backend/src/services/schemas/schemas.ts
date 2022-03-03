@@ -49,12 +49,9 @@ export class PositionData extends Schema {
 
   getNextPosition(deltaTime: number) {
     const angle = Math.atan2(this.movement.vertical, this.movement.horizontal)
-    this.nextX = Math.round(
-      this.x + ((Math.cos(angle) * deltaTime) / 16) * this.speed
-    )
-    this.nextY = Math.round(
-      this.y + ((Math.sin(angle) * deltaTime) / 16) * this.speed
-    )
+    const delta = Math.round(Math.round(deltaTime) / 12)
+    this.nextX = Math.round(this.x + Math.cos(angle) * this.speed * delta)
+    this.nextY = Math.round(this.y + Math.sin(angle) * this.speed * delta)
   }
 }
 

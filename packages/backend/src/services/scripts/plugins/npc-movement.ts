@@ -13,8 +13,14 @@ export class NpcMovement extends NpcPlugin {
     // give padding room so the npc doesn't layer over the player initially
     if (Math.abs(diffX) > offset || Math.abs(diffY) > offset) {
       // todo: soften angle for more fluid turning
-      const horizontal = diffX > 1 ? 1 : diffX < -1 ? -1 : 0
-      const vertical = diffY > 1 ? 1 : diffY < -1 ? -1 : 0
+      const horizontal = diffX > 8 ? 1 : diffX < -8 ? -1 : 0
+      const vertical = diffY > 8 ? 1 : diffY < -8 ? -1 : 0
+      if (Math.abs(diffX) < 8) {
+        position.x += diffX
+      }
+      if (Math.abs(diffY) < 8) {
+        position.y += diffY
+      }
       this.npc.position.movement.horizontal = horizontal as any
       this.npc.position.movement.vertical = vertical as any
       if (!this.movementUpdates.includes(this.npc.position)) {
