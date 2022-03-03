@@ -1,5 +1,8 @@
 import styled from '@emotion/styled'
+import { Button } from '@mui/material'
 import { BattleScene } from '../../../phaser/scenes/battle.scene'
+import { useSceneState } from '../../../phaser/use-scene-state'
+import { app } from '../../app'
 
 const HudContainer = styled.div`
   position: fixed;
@@ -14,5 +17,16 @@ const HudContainer = styled.div`
   }
 `
 export function BattleHud({ battle }: { battle: BattleScene }) {
-  return <HudContainer>Battle!</HudContainer>
+  const { scene } = useSceneState()
+
+  const onLeave = (e) => {
+    if (scene !== 'lobby') {
+      app.rooms[scene]?.send('character:battle:leave')
+    }
+  }
+  return (
+    <HudContainer>
+      <Button onClick={onLeave}>Leave Battle</Button>
+    </HudContainer>
+  )
 }

@@ -32,6 +32,11 @@ export class PositionData extends Schema {
   @type(Movement)
   movement: Movement = new Movement()
 
+  @type('number')
+  destinationX?: number
+  @type('number')
+  destinationY?: number
+
   nextX = 100
 
   nextY = 100
@@ -42,10 +47,14 @@ export class PositionData extends Schema {
 
   owner: Character | Npc
 
-  getNextPosition() {
+  getNextPosition(deltaTime: number) {
     const angle = Math.atan2(this.movement.vertical, this.movement.horizontal)
-    this.nextX = Math.round(this.x + Math.cos(angle) * this.speed)
-    this.nextY = Math.round(this.y + Math.sin(angle) * this.speed)
+    this.nextX = Math.round(
+      this.x + ((Math.cos(angle) * deltaTime) / 16) * this.speed
+    )
+    this.nextY = Math.round(
+      this.y + ((Math.sin(angle) * deltaTime) / 16) * this.speed
+    )
   }
 }
 

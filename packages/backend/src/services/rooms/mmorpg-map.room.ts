@@ -19,7 +19,7 @@ import { Battle, BattlePlayer } from '../schemas/battles'
 import { npcTypes } from './fixtures/npcs/npc-types'
 import { MapConfig } from './fixtures/map.config'
 import { createNpc } from '../schemas/factories/npc'
-import {v4} from 'uuid'
+import { v4 } from 'uuid'
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -62,7 +62,7 @@ export class MmorpgMapRoom extends Room {
   spawnNpcs(config: Partial<NpcData>[]) {
     from(config).subscribe(({ npcId, x, y }) => {
       const { npc, data } = createNpc(npcId, x, y)
-      const input = new NpcInput(npc, data, this.movementUpdates)
+      const input = new NpcInput(npc, data, this.movementUpdates, this.clock)
       npc.hash = this.hash
       this.hash.insert(npc.node)
       input.onPlayerCollide = (player: Character) => {
@@ -77,16 +77,54 @@ export class MmorpgMapRoom extends Room {
     })
   }
 
+  moveTowards(position: PositionData) {
+    const { x: currentX, y: currentY } = position
+    const x = position.destinationX
+    const y = position.destinationY
+    const diffX = Math.round(x - currentX)
+    const diffY = Math.round(y - currentY)
+    // give padding room so the npc doesn't layer over the player initially
+    // todo: soften angle for more fluid turning
+    const horizontal = diffX > 8 ? 1 : diffX < -8 ? -1 : 0
+    const vertical = diffY > 8 ? 1 : diffY < -8 ? -1 : 0
+    if (Math.abs(diffX) < 8) {
+      position.x += diffX
+    }
+    if (Math.abs(diffY) < 8) {
+      position.y += diffY
+    }
+    if (horizontal !== 0 || vertical !== 0) {
+      return [horizontal, vertical]
+    }
+    position.destinationX = undefined
+    position.destinationY = undefined
+    return [0, 0]
+  }
   moveEntity(position: PositionData) {
+    if (!isNaN(position.destinationX) && !isNaN(position.destinationY)) {
+      // alter axes based on if a destination is supplied
+      const [horizontal, vertical] = this.moveTowards(position)
+      position.movement.horizontal = horizontal as any
+      position.movement.vertical = vertical as any
+    }
+    if (
+      position.movement.horizontal === 0 &&
+      position.movement.vertical === 0
+    ) {
+      position.destinationX = undefined
+      position.destinationY = undefined
+      if (this.movementUpdates.includes(position)) {
+        this.movementUpdates.splice(this.movementUpdates.indexOf(position), 1)
+      }
+      return
+    }
     if (position?.owner?.node) {
       this.hash.update(position.owner.node)
     }
-    if (position.isPlayerPosition) {
-      position.getNextPosition()
-    }
+    position.getNextPosition(this.clock.deltaTime)
     if (position.nextX > 16 && position.nextY > 16) {
-      position.x = Math.round(position.nextX)
-      position.y = Math.round(position.nextY)
+      position.x = position.nextX
+      position.y = position.nextY
     }
   }
 
@@ -95,6 +133,8 @@ export class MmorpgMapRoom extends Room {
     { horizontal, vertical }: { horizontal: 1 | -1 | 0; vertical: 1 | -1 | 0 }
   ) {
     if (!character.isInBattle && (horizontal !== 0 || vertical !== 0)) {
+      character.position.destinationX = undefined
+      character.position.destinationY = undefined
       character.position.movement.horizontal = horizontal
       character.position.movement.vertical = vertical
       if (!this.movementUpdates.includes(character.position)) {
@@ -105,27 +145,33 @@ export class MmorpgMapRoom extends Room {
     if (this.movementUpdates.includes(character.position)) {
       character.position.movement.horizontal = 0
       character.position.movement.vertical = 0
-      this.movementUpdates.splice(
-        this.movementUpdates.indexOf(character.position),
-        1
-      )
     }
   }
 
   onCreate({ map }: { map: MapConfig }): void | Promise<any> {
     this.setState(new MmorpgMapState())
     this.spawnNpcs(map.npcs)
-    this.interval = setInterval(() => {
+    this.clock.setInterval(() => {
       this.update$.next()
       // iterate async to avoid blocking the server
       from(this.movementUpdates).subscribe((position: PositionData) => {
         this.moveEntity(position)
       })
-    }, 1000 / 30)
+    }, 1000 / 8)
     this.onMessage('character:move', (client, { horizontal, vertical }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {
         this.setPlayerMovement(character, { horizontal, vertical })
+      }
+    })
+    this.onMessage('character:move:destination', (client, { x, y }) => {
+      const character = this.state.playersByClient.get(client.sessionId)
+      if (character) {
+        character.position.destinationX = x
+        character.position.destinationY = y
+        if (!this.movementUpdates.includes(character.position)) {
+          this.movementUpdates.push(character.position)
+        }
       }
     })
     this.onMessage('chat:map', (client, { message }) => {
@@ -176,7 +222,6 @@ export class MmorpgMapRoom extends Room {
   }
 
   onDispose() {
-    clearInterval(this.interval)
     this.stopUpdates$.next()
   }
 
@@ -241,7 +286,7 @@ export class MmorpgMapRoom extends Room {
     pet.characterId = character.characterId
     character.pet = pet
 
-    const input = new NpcInput(pet, data, this.movementUpdates)
+    const input = new NpcInput(pet, data, this.movementUpdates, this.clock)
     input.follow.startFollowing(character)
     this.update$
       .pipe(

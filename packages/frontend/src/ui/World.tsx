@@ -11,13 +11,6 @@ export function World() {
   const oldMap = useRef<string>('')
   const { battle } = useBattle()
   const { scene, update } = useSceneState()
-  const onLogout = (e) => {
-    app.rooms.lobby.send('account:logout')
-    update('lobby')
-  }
-  const onLeave = (e) => {
-    app.rooms.starter.send('character:battle:leave')
-  }
   useEffect(() => {
     ;(async () => {
       if (oldMap.current !== scene) {
@@ -45,8 +38,6 @@ export function World() {
     <>
       {!battle && <WorldHud />}
       {battle && <BattleHud battle={battle} />}
-      <Button onClick={onLogout}>Logout</Button>{' '}
-      <Button onClick={onLeave}>Leave Battle</Button>
     </>
   )
 }

@@ -1,4 +1,7 @@
 import styled from '@emotion/styled'
+import { Button } from '@mui/material'
+import { useSceneState } from '../../../phaser/use-scene-state'
+import { app } from '../../app'
 import { CharacterPanel } from './character/CharacterPanel'
 import { ChatWindow } from './chat/ChatWindow'
 import { MiniMap } from './map/MiniMap'
@@ -15,6 +18,10 @@ import { MainMenu } from './menu/MainMenu'
     pointer-events: all;
   }
 `
+const onLogout = (e) => {
+  app.rooms.lobby.send('account:logout')
+  useSceneState.getState().update('lobby')
+}
 export function WorldHud() {
   return (
     <HudContainer>
@@ -22,6 +29,7 @@ export function WorldHud() {
       <ChatWindow />
       <MiniMap />
       <MainMenu />
+      <Button onClick={onLogout}>Logout</Button>
     </HudContainer>
   )
 }

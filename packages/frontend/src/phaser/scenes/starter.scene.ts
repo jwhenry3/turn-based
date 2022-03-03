@@ -34,10 +34,10 @@ export class StarterScene extends NetworkedScene {
       if (input.mouseTick === 0) {
         input.mouseTick = input.mouseCooldown
         e.updateWorldPoint(this.input.scene.cameras.main)
-        input.mouseDestination = {
+        this.connector.room.send('character:move:destination', {
           x: e.worldX,
           y: e.worldY,
-        }
+        })
       }
     })
   }

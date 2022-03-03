@@ -2,6 +2,7 @@ import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
 import { blurAll } from '../behaviors/blurAll'
 import { lerp } from '../behaviors/lerp'
+import { useSceneState } from '../use-scene-state'
 import { MovableEntity } from './movable'
 import { PetEntity } from './pet'
 
@@ -40,10 +41,11 @@ export class PlayerEntity extends MovableEntity<Character> {
           })
           return
         }
-        app.movement.mouseDestination = {
+        const scene = useSceneState.getState().scene
+        app.rooms[scene].send('character:move:destination', {
           x: this.position.x,
           y: this.position.y,
-        }
+        })
       }
       app.selected = this
     })
@@ -91,13 +93,26 @@ export class PlayerEntity extends MovableEntity<Character> {
     }
     if (this.isLocalPlayer && this.rectangle) {
       app.movement.update(this.scene.input, this.rectangle)
+
+      if (
+        this.model.position.destinationX &&
+        this.model.position.destinationY
+      ) {
+        this.scene.destinationPointer.setPosition(
+          this.model.position.destinationX,
+          this.model.position.destinationY
+        )
+        this.scene.destinationPointer.setVisible(true)
+      } else {
+        this.scene.destinationPointer.setVisible(false)
+      }
     }
     if (
       this.rectangle.x !== this.position.x ||
       this.rectangle.y !== this.position.y
     ) {
-      const newX = lerp(this.rectangle.x, this.position.x, 0.2)
-      const newY = lerp(this.rectangle.y, this.position.y, 0.2)
+      const newX = lerp(this.rectangle.x, this.position.x, 0.075)
+      const newY = lerp(this.rectangle.y, this.position.y, 0.075)
       this.rectangle.setPosition(newX, newY)
     }
     this.rectangle.setDepth(Math.round(this.rectangle.y))

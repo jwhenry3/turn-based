@@ -1,3 +1,4 @@
+import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
 import {
   ChatMessage,
@@ -51,6 +52,7 @@ export class NetworkedScene extends Phaser.Scene {
     this.playerObjects = {}
     this.npcObjects = {}
   }
+
 
   handleEntities() {
     this.connector.room.onMessage('chat:map', (message: ChatMessage) => {
@@ -111,7 +113,6 @@ export class NetworkedScene extends Phaser.Scene {
             battleScene.addPlayer(p)
             battleScene.connector = this.connector
             battleScene.battle = b
-            app.movement.mouseDestination = undefined
             this.game.scene.start('battle')
             b.players.onRemove = (p) => {
               if (p.characterId === app.auth.characterId) {
@@ -139,15 +140,6 @@ export class NetworkedScene extends Phaser.Scene {
   }
 
   update() {
-    if (app.movement.mouseDestination) {
-      this.destinationPointer.setPosition(
-        app.movement.mouseDestination.x,
-        app.movement.mouseDestination.y
-      )
-      this.destinationPointer.setVisible(true)
-    } else {
-      this.destinationPointer.setVisible(false)
-    }
     const zoom1 = window.innerWidth / 600
     const zoom2 = window.innerHeight / 600
     const zoom = zoom1 < zoom2 ? zoom1 : zoom2

@@ -34,7 +34,6 @@ export class NpcFollow extends NpcMovement {
   execute() {
     if (this.shouldFollow && this.followTarget) {
       this.moveTowards(this.followTarget.position, 48)
-      this.npc.position.getNextPosition()
     }
   }
 }

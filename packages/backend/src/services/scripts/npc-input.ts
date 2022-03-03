@@ -1,3 +1,4 @@
+import { Clock } from 'colyseus'
 import { NpcData } from '../rooms/fixture.models'
 import { Npc, Character, PositionData } from '../schemas/schemas'
 import { NpcChase } from './plugins/npc-chase'
@@ -22,7 +23,8 @@ export class NpcInput {
   constructor(
     public npc: Npc,
     public data: NpcData,
-    public movementUpdates: PositionData[]
+    public movementUpdates: PositionData[],
+    public clock: Clock
   ) {
     this.wander = new NpcWander(this)
     this.chase = new NpcChase(this)

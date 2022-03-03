@@ -79,9 +79,6 @@ export class NpcChase extends NpcMovement {
       }
       if (this.waitTick === 0) {
         this.getMovementVector()
-        if (this.chaseTarget) {
-          this.npc.position.getNextPosition()
-        }
       }
     }
   }

@@ -2,6 +2,7 @@ import { PetNpc } from '../../networking/schemas/PetNpc'
 import { app } from '../../ui/app'
 import { blurAll } from '../behaviors/blurAll'
 import { lerp } from '../behaviors/lerp'
+import { useSceneState } from '../use-scene-state'
 import { MovableEntity } from './movable'
 import { PlayerEntity } from './player'
 
@@ -28,10 +29,11 @@ export class PetEntity extends MovableEntity<PetNpc> {
       blurAll()
       e.downElement.focus()
       if (app.selected === this) {
-        app.movement.mouseDestination = {
+        const scene = useSceneState.getState().scene
+        app.rooms[scene].send('character:move:destination', {
           x: this.position.x,
           y: this.position.y,
-        }
+        })
       }
       app.selected = this
     })
@@ -49,8 +51,8 @@ export class PetEntity extends MovableEntity<PetNpc> {
         this.rectangle.x !== this.position.x ||
         this.rectangle.y !== this.position.y
       ) {
-        const newX = lerp(this.rectangle.x, this.position.x, 0.2)
-        const newY = lerp(this.rectangle.y, this.position.y, 0.2)
+        const newX = lerp(this.rectangle.x, this.position.x, 0.05)
+        const newY = lerp(this.rectangle.y, this.position.y, 0.05)
         this.rectangle.setPosition(newX, newY)
       }
       this.rectangle.setDepth(Math.round(this.rectangle.y))

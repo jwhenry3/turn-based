@@ -16,13 +16,6 @@ export class NpcWander extends NpcMovement {
     this.wanderDuration = Math.random() * 20
   }
 
-  async calculateMovement() {
-    if (!this.goingHome && this.wandering && !this.isWithinBounds()) {
-      // change direction until the next position is not out of bounds
-      this.headTowardsOrigin()
-    }
-  }
-
   goHome() {
     this.wandering = false
     const diffX = this.data.x - this.npc.position.x
@@ -51,8 +44,6 @@ export class NpcWander extends NpcMovement {
     this.npc.position.movement.vertical = vertical as any
     if (horizontal !== 0 || vertical !== 0) {
       this.wandering = true
-      this.npc.position.getNextPosition()
-      await this.calculateMovement()
       if (!this.movementUpdates.includes(this.npc.position)) {
         this.movementUpdates.push(this.npc.position)
       }
@@ -81,6 +72,10 @@ export class NpcWander extends NpcMovement {
       this.stopWander()
       this.randomizeWander()
     }
+    if (!this.goingHome && this.wandering && !this.isWithinBounds()) {
+      // change direction until the next position is not out of bounds
+      this.headTowardsOrigin()
+    }
   }
 
   execute() {
@@ -90,6 +85,5 @@ export class NpcWander extends NpcMovement {
     } else {
       this.goHome()
     }
-    this.npc.position.getNextPosition()
   }
 }

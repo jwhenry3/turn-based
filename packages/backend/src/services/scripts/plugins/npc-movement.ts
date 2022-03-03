@@ -50,11 +50,5 @@ export class NpcMovement extends NpcPlugin {
     this.npc.position.nextY = this.npc.position.y
     this.npc.position.movement.horizontal = 0
     this.npc.position.movement.vertical = 0
-    if (this.movementUpdates.includes(this.npc.position)) {
-      this.movementUpdates.splice(
-        this.movementUpdates.indexOf(this.npc.position),
-        1
-      )
-    }
   }
 }
