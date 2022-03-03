@@ -143,6 +143,9 @@ export class Battle extends Schema {
   npcs: MapSchema<BattleNpc> = new MapSchema<BattleNpc>() // configured list of BattleNpcs to load
 
   battleTick = 0
+  addedPlayers: Record<number, boolean> = {}
+  addedEnemies: Record<number, boolean> = {}
+  positionOrder = [2, 1, 3, 4, 0, 6, 5, 7]
 
   update$ = new Subject<number>()
   completed$ = new Subject<void>()
@@ -151,6 +154,15 @@ export class Battle extends Schema {
   constructor(...args: any[]) {
     super(...args)
     this.battleId = v4()
+  }
+
+  shuffleArray(array) {
+    const clone = [...array]
+    for (let i = clone.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[clone[i], clone[j]] = [clone[j], clone[i]]
+    }
+    return clone
   }
   addEnemies(
     enemyOptions: BattleNpc[],
@@ -177,8 +189,11 @@ export class Battle extends Schema {
   }
 
   addEnemy(option: BattleNpc) {
+    const randomized = this.shuffleArray(this.positionOrder)
+    const firstAvailable = randomized.find((i) => !this.addedEnemies[i])
     const enemy = new BattleNpc(option)
-    enemy.battleLocation = this.npcs.size
+    enemy.battleLocation = firstAvailable
+    this.addedEnemies[firstAvailable] = true
     this.watchUpdate(enemy)
     this.npcs.set(option.battleNpcId, enemy)
   }
@@ -191,7 +206,10 @@ export class Battle extends Schema {
       const pet = new BattlePet(character)
       player.pet = pet
     }
-    player.battleLocation = this.players.size
+    player.battleLocation = this.positionOrder.find(
+      (i) => !this.addedPlayers[i]
+    )
+    this.addedPlayers[player.battleLocation] = true
     this.watchUpdate(player)
     this.players.set(character.currentClientId, player)
   }
@@ -199,6 +217,8 @@ export class Battle extends Schema {
     this.players[character.currentClientId]?.destroy$.next()
     character.isInBattle = false
     character.battleId = undefined
+    this.addedPlayers[this.players[character.currentClientId].battleLocation] =
+      false
     this.players.delete(character.currentClientId)
     if (this.players.size === 0) {
       this.complete()

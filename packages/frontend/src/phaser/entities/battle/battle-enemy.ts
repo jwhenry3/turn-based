@@ -5,6 +5,8 @@ import { SceneConnector } from '../../scenes/scene.connector'
 export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
   rectangle: Phaser.GameObjects.Rectangle
 
+  battleLocation = 0
+
   constructor(
     public model: BattleNpc,
     public scene: BattleScene,
@@ -12,12 +14,9 @@ export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
   ) {
     super(scene, 'sprite')
   }
-
   create() {
     const location =
-      this.scene.battleLocations.enemies[
-        this.scene.positionOrder[this.model.battleLocation]
-      ]
+      this.scene.battleLocations.enemies[this.model.battleLocation]
     this.rectangle = this.scene.add.rectangle(
       location[0],
       location[1],

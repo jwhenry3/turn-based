@@ -28,20 +28,32 @@ export class BattleScene extends Phaser.Scene {
     enemies: [],
   }
 
-  positionOrder = [1, 2, 3, 0, 4, 5, 6, 7]
+  rows = [
+    [-2, -1, 0, 1, 2],
+    [-1.5, 0, 1.5],
+  ]
+  leftMin = 0
+  gridSize = 64
+  spaceBetween = 64
+  center = this.height / 2
 
   createPositions() {
     const playerPositions = []
     const npcPositions = []
-    for (let i = 0; i < 8; i++) {
-      let baseX = 108 + (i - 5) * 64
-      let baseY = 360 + (i - 5) * 64
-      if (i < 5) {
-        baseX = 108 + 64 + i * 64
-        baseY = 236 + i * 64
+    for (let i = 0; i < this.rows.length; i++) {
+      const row = this.rows[i]
+      for (let j = 0; j < row.length; j++) {
+        const value = row[j]
+        const x =
+          this.leftMin +
+          ((i + j) % 2 === 0 ? 16 : -16) +
+          (this.gridSize + this.spaceBetween) * (this.rows.length - i)
+        const y =
+          this.center -
+          (this.gridSize + this.spaceBetween * ((1 - i) * 0.75)) * value
+        playerPositions.push([x + j * -8, y])
+        npcPositions.push([this.width - x - j * 8, y])
       }
-      playerPositions.push([baseX, baseY])
-      npcPositions.push([this.width - baseX + 64, this.height - baseY])
     }
     this.battleLocations.players = playerPositions
     this.battleLocations.enemies = npcPositions
@@ -74,39 +86,40 @@ export class BattleScene extends Phaser.Scene {
       this.addEnemy(npc)
     })
     // placeholders for debug
-    for (const [x, y] of this.battleLocations.players) {
-      const rect1 = this.add.rectangle(
-        x,
-        y,
-        32,
-        64,
-        Phaser.Display.Color.HexStringToColor('#00f').color,
-        0.5
-      )
-      const rect2 = this.add.rectangle(
-        x - 64,
-        y,
-        32,
-        64,
-        Phaser.Display.Color.HexStringToColor('#3af').color,
-        0.5
-      )
-      rect1.setOrigin(0.5, 0.75)
-      rect2.setOrigin(0.5, 0.75)
-    }
-    for (const [x, y] of this.battleLocations.enemies) {
-      const rect1 = this.add.rectangle(
-        x,
-        y,
-        32,
-        64,
-        Phaser.Display.Color.HexStringToColor('#f00').color
-      )
-      rect1.setOrigin(0.5, 0.75)
-    }
+    // for (const [x, y] of this.battleLocations.players) {
+    //   const rect1 = this.add.rectangle(
+    //     x,
+    //     y,
+    //     32,
+    //     64,
+    //     Phaser.Display.Color.HexStringToColor('#00f').color,
+    //     0.5
+    //   )
+    //   const rect2 = this.add.rectangle(
+    //     x - 64,
+    //     y + 16,
+    //     32,
+    //     64,
+    //     Phaser.Display.Color.HexStringToColor('#3af').color,
+    //     0.5
+    //   )
+    //   rect1.setOrigin(0.5, 0.75)
+    //   rect2.setOrigin(0.5, 0.75)
+    // }
+    // for (const [x, y] of this.battleLocations.enemies) {
+    //   const rect1 = this.add.rectangle(
+    //     x,
+    //     y,
+    //     32,
+    //     64,
+    //     Phaser.Display.Color.HexStringToColor('#f00').color
+    //   )
+    //   rect1.setOrigin(0.5, 0.75)
+    // }
   }
 
   addPlayer(player: BattlePlayer) {
+    if (this.players[player.characterId]) return
     this.players[player.characterId] = new BattleScenePlayer(
       player,
       this,
@@ -127,6 +140,7 @@ export class BattleScene extends Phaser.Scene {
     }
   }
   addEnemy(enemy: BattleNpc) {
+    if (this.enemies[enemy.battleNpcId]) return
     this.enemies[enemy.battleNpcId] = new BattleSceneEnemy(
       enemy,
       this,
@@ -135,6 +149,8 @@ export class BattleScene extends Phaser.Scene {
     this.add.existing(this.enemies[enemy.battleNpcId])
   }
   removePlayer(player) {
+    if (!this.players[player.characterId]) return
+    console.log('destroy', player.name)
     this.players[player.characterId].destroy()
     delete this.players[player.characterId]
   }
@@ -149,5 +165,22 @@ export class BattleScene extends Phaser.Scene {
     this.cameras.main.setZoom(
       zoom > zoom1 ? (zoom1 > 1 ? 1 : zoom1) : zoom > 1 ? 1 : zoom
     )
+  }
+
+  stop() {
+    this.battleLocations = {
+      players: [],
+
+      enemies: [],
+    }
+    for (const id in this.players) {
+      this.players[id].destroy()
+    }
+    for (const id in this.enemies) {
+      this.enemies[id].destroy()
+    }
+    this.players = {}
+    this.enemies = {}
+    this.playerEntities = {}
   }
 }

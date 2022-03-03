@@ -10,6 +10,8 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
 
   pet: BattleScenePet
 
+  battleLocation: number = 0
+
   constructor(
     public model: BattlePlayer,
     public scene: BattleScene,
@@ -24,7 +26,7 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
 
   create() {
     const location =
-      this.scene.battleLocations.players[this.scene.positionOrder[this.model.battleLocation]]
+      this.scene.battleLocations.players[this.model.battleLocation]
     this.rectangle = this.scene.add.rectangle(
       location[0],
       location[1],

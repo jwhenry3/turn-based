@@ -84,6 +84,7 @@ export class NpcWander extends NpcMovement {
   }
 
   execute() {
+    if (this.input.follow.shouldFollow && this.input.follow.followTarget) return
     if (!this.goingHome) {
       this.wander()
     } else {

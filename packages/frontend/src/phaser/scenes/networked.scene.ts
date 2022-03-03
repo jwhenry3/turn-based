@@ -119,6 +119,7 @@ export class NetworkedScene extends Phaser.Scene {
       this.connector.battles.onRemove = (e) => {
         let battleScene = this.game.scene.getScene('battle') as BattleScene
         if (battleScene?.battle.battleId !== e.battleId) return
+        battleScene.stop()
         this.game.scene.stop('battle')
       }
     }
