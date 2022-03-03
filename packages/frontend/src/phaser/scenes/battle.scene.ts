@@ -19,7 +19,7 @@ export class BattleScene extends Phaser.Scene {
   enemies: Record<string, BattleSceneEnemy> = {}
   playerEntities: Record<string, PlayerEntity> = {}
 
-  width = 800
+  width = 1100
   lastWidth = this.width
   height = 600
   battleLocations = {
@@ -34,8 +34,11 @@ export class BattleScene extends Phaser.Scene {
   ]
   leftMin = 0
   gridSize = 64
-  spaceBetween = 64
+  spaceBetween = 32
   center = this.height / 2
+  verticalOffset = 64
+
+  image: Phaser.GameObjects.Image
 
   createPositions() {
     const playerPositions = []
@@ -47,20 +50,26 @@ export class BattleScene extends Phaser.Scene {
         const x =
           this.leftMin +
           ((i + j) % 2 === 0 ? 16 : -16) +
-          (this.gridSize + this.spaceBetween) * (this.rows.length - i)
+          (this.gridSize + this.spaceBetween * 2.5) * (this.rows.length - i)
         const y =
-          this.center -
+          this.center + this.verticalOffset -
           (this.gridSize + this.spaceBetween * ((1 - i) * 0.75)) * value
         playerPositions.push([x + j * -8, y])
         npcPositions.push([this.width - x - j * 8, y])
       }
     }
-    this.battleLocations.players = playerPositions
-    this.battleLocations.enemies = npcPositions
+    return {
+      players: playerPositions,
+      enemies: npcPositions,
+    }
+  }
+
+  preload() {
+    this.load.image('battle-overlay', '/battle.png')
+    this.battleLocations = this.createPositions()
   }
 
   create() {
-    this.createPositions()
     this.cameras.main.transparent = false
     this.cameras.main.setBackgroundColor('#000')
     this.rectangle = this.add.rectangle(
@@ -70,6 +79,12 @@ export class BattleScene extends Phaser.Scene {
       this.height,
       Phaser.Display.Color.HexStringToColor('#00aa22').color
     )
+    this.image = this.add.image(
+      this.width / 2,
+      this.height / 2,
+      'battle-overlay'
+    )
+
     const focus = this.add.rectangle(
       this.width / 2,
       this.height / 2,
@@ -86,36 +101,36 @@ export class BattleScene extends Phaser.Scene {
       this.addEnemy(npc)
     })
     // placeholders for debug
-    // for (const [x, y] of this.battleLocations.players) {
-    //   const rect1 = this.add.rectangle(
-    //     x,
-    //     y,
-    //     32,
-    //     64,
-    //     Phaser.Display.Color.HexStringToColor('#00f').color,
-    //     0.5
-    //   )
-    //   const rect2 = this.add.rectangle(
-    //     x - 64,
-    //     y + 16,
-    //     32,
-    //     64,
-    //     Phaser.Display.Color.HexStringToColor('#3af').color,
-    //     0.5
-    //   )
-    //   rect1.setOrigin(0.5, 0.75)
-    //   rect2.setOrigin(0.5, 0.75)
-    // }
-    // for (const [x, y] of this.battleLocations.enemies) {
-    //   const rect1 = this.add.rectangle(
-    //     x,
-    //     y,
-    //     32,
-    //     64,
-    //     Phaser.Display.Color.HexStringToColor('#f00').color
-    //   )
-    //   rect1.setOrigin(0.5, 0.75)
-    // }
+    for (const [x, y] of this.battleLocations.players) {
+      const rect1 = this.add.rectangle(
+        x,
+        y,
+        32,
+        64,
+        Phaser.Display.Color.HexStringToColor('#00f').color,
+        0.5
+      )
+      const rect2 = this.add.rectangle(
+        x - 64,
+        y + 16,
+        32,
+        64,
+        Phaser.Display.Color.HexStringToColor('#3af').color,
+        0.5
+      )
+      rect1.setOrigin(0.5, 0.75)
+      rect2.setOrigin(0.5, 0.75)
+    }
+    for (const [x, y] of this.battleLocations.enemies) {
+      const rect1 = this.add.rectangle(
+        x,
+        y,
+        32,
+        64,
+        Phaser.Display.Color.HexStringToColor('#f00').color
+      )
+      rect1.setOrigin(0.5, 0.75)
+    }
   }
 
   addPlayer(player: BattlePlayer) {
@@ -127,17 +142,8 @@ export class BattleScene extends Phaser.Scene {
     )
     this.players[player.characterId].character =
       this.playerEntities[player.characterId].model
+
     this.add.existing(this.players[player.characterId])
-    if (player.pet) {
-      this.players[player.characterId].pet = new BattleScenePet(
-        player.pet,
-        this,
-        this.connector
-      )
-      this.players[player.characterId].pet.owner =
-        this.players[player.characterId]
-      this.add.existing(this.players[player.characterId].pet)
-    }
   }
   addEnemy(enemy: BattleNpc) {
     if (this.enemies[enemy.battleNpcId]) return

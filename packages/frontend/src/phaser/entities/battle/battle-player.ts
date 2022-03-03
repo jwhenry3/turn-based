@@ -27,6 +27,7 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
   create() {
     const location =
       this.scene.battleLocations.players[this.model.battleLocation]
+    // console.log(this.model.battleLocation, location)
     this.rectangle = this.scene.add.rectangle(
       location[0],
       location[1],
@@ -38,6 +39,13 @@ export class BattleScenePlayer extends Phaser.GameObjects.GameObject {
       Math.round(this.rectangle.y - this.rectangle.height)
     )
     this.rectangle.setOrigin(0.5, 0.75)
+    const player = this.model
+    if (player.pet) {
+      const pet = new BattleScenePet(player.pet, this.scene, this.connector)
+      this.scene.players[player.characterId].pet = pet
+      pet.owner = this.scene.players[player.characterId]
+      this.scene.add.existing(pet)
+    }
   }
 
   preUpdate() {
