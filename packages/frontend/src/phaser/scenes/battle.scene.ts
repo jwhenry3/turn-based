@@ -108,7 +108,7 @@ export class BattleScene extends Phaser.Scene {
         32,
         64,
         Phaser.Display.Color.HexStringToColor('#00f').color,
-        0.5
+        0.2
       )
       const rect2 = this.add.rectangle(
         x - 64,
@@ -116,7 +116,7 @@ export class BattleScene extends Phaser.Scene {
         32,
         64,
         Phaser.Display.Color.HexStringToColor('#3af').color,
-        0.5
+        0.2
       )
       rect1.setOrigin(0.5, 0.75)
       rect2.setOrigin(0.5, 0.75)
@@ -127,7 +127,8 @@ export class BattleScene extends Phaser.Scene {
         y,
         32,
         64,
-        Phaser.Display.Color.HexStringToColor('#f00').color
+        Phaser.Display.Color.HexStringToColor('#f00').color,
+        0.2
       )
       rect1.setOrigin(0.5, 0.75)
     }
