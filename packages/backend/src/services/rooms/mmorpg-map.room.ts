@@ -18,8 +18,8 @@ import { SpatialNode } from './spacial/node'
 import { Battle, BattlePlayer } from '../schemas/battles'
 import { npcTypes } from './fixtures/npcs/npc-types'
 import { MapConfig } from './fixtures/map.config'
-import { allNpcs } from './fixtures/npcs/all.npcs'
 import { createNpc } from '../schemas/factories/npc'
+import {v4} from 'uuid'
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -126,6 +126,20 @@ export class MmorpgMapRoom extends Room {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {
         this.setPlayerMovement(character, { horizontal, vertical })
+      }
+    })
+    this.onMessage('chat:map', (client, { message }) => {
+      const character = this.state.playersByClient.get(client.sessionId)
+      if (character) {
+        this.broadcast('chat:map', {
+          messageId: v4(),
+          type: 'player',
+          character: {
+            name: character.name,
+            characterId: character.characterId,
+          },
+          message,
+        })
       }
     })
     this.onMessage('character:zone', (client, { map }) => {})

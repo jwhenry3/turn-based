@@ -28,15 +28,16 @@ export function ChatInput() {
   const { addMessage } = useChatHistoryState()
   const onKey = (e) => {
     if (e.key.toLowerCase() === 'enter') {
-      addMessage({
-        messageId: new Date().valueOf() + '',
-        type: 'player',
-        character: {
-          characterId: app.auth.characterId,
-          name: 'Test User',
-        },
-        message: text,
-      })
+      app.rooms.active?.send('chat:map', { message: text })
+      // addMessage({
+      //   messageId: new Date().valueOf() + '',
+      //   type: 'player',
+      //   character: {
+      //     characterId: app.auth.characterId,
+      //     name: 'Test User',
+      //   },
+      //   message: text,
+      // })
       setText('')
     }
   }

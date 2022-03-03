@@ -27,6 +27,7 @@ export const app = {
     starter: 'home',
   },
   rooms: {
+    active: undefined as Room | undefined,
     lobby: undefined as Room | undefined,
     starter: undefined as Room | undefined,
   },

@@ -1,4 +1,8 @@
 import { app } from '../../ui/app'
+import {
+  ChatMessage,
+  useChatHistoryState,
+} from '../../ui/world/hud/chat/use-chat-history'
 import { NpcEntity } from '../entities/Npc'
 import { PlayerEntity } from '../entities/player'
 import { BattleScene } from './battle.scene'
@@ -32,11 +36,15 @@ export class NetworkedScene extends Phaser.Scene {
 
   async start() {
     await this.connect()
+    app.rooms.active = this.connector.room
     this.handleEntities()
     this.scene.start(this.name)
   }
 
   async stop() {
+    if (app.rooms.active === this.connector.room) {
+      app.rooms.active = undefined
+    }
     this.disconnect()
     this.scene.stop(this.name)
     this.playerObjects = {}
@@ -44,6 +52,9 @@ export class NetworkedScene extends Phaser.Scene {
   }
 
   handleEntities() {
+    this.connector.room.onMessage('chat:map', (message: ChatMessage) => {
+      useChatHistoryState.getState().addMessage(message)
+    })
     if (this.connector.entities?.players) {
       for (const characterId of Object.keys(
         this.connector.entities.players.toJSON()
