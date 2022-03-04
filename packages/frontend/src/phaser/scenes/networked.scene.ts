@@ -17,12 +17,30 @@ export class NetworkedScene extends Phaser.Scene {
   npcObjects: Record<string, NpcEntity> = {}
 
   destinationPointer: Phaser.GameObjects.Arc
+  ground: Phaser.GameObjects.Rectangle
+
+  localPlayer: PlayerEntity
+
+  width = 2056
+  height = 2056
 
   async connect() {
     await this.connector.connect()
   }
 
   create() {
+    this.ground = this.add.rectangle(
+      this.width / 2,
+      this.height / 2,
+      this.width,
+      this.height,
+      Phaser.Display.Color.HexStringToColor('#00aa66').color
+    )
+    this.ground.setDepth(-100)
+    this.ground.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, this.width, this.height),
+      Phaser.Geom.Rectangle.Contains
+    )
     this.destinationPointer = this.add.arc(
       0,
       0,
@@ -64,6 +82,9 @@ export class NetworkedScene extends Phaser.Scene {
       )) {
         const e = this.connector.entities.players[characterId]
         this.playerObjects[e.characterId] = new PlayerEntity(e, this)
+        if (this.playerObjects[e.characterId].isLocalPlayer) {
+          this.localPlayer = this.playerObjects[e.characterId]
+        }
         this.add.existing(this.playerObjects[e.characterId])
       }
 
@@ -71,6 +92,9 @@ export class NetworkedScene extends Phaser.Scene {
         // console.log('added', e)
         this.playerObjects[e.characterId] = new PlayerEntity(e, this)
         this.add.existing(this.playerObjects[e.characterId])
+        if (this.playerObjects[e.characterId].isLocalPlayer) {
+          this.localPlayer = this.playerObjects[e.characterId]
+        }
       }
       this.connector.entities.players.onChange = (e) => {
         // console.log('changed', e)
@@ -79,6 +103,9 @@ export class NetworkedScene extends Phaser.Scene {
       this.connector.entities.players.onRemove = (e) => {
         // console.log('removed', e)
         this.playerObjects[e.characterId]?.destroy()
+        if (this.localPlayer === this.playerObjects[e.characterId]) {
+          this.localPlayer = undefined
+        }
         delete this.playerObjects[e.characterId]
       }
     }

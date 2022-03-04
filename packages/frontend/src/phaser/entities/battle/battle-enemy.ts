@@ -4,11 +4,10 @@ import { blurAll } from '../../behaviors/blurAll'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
 import { NamePlugin } from '../plugins/name'
+import { RectanglePlugin } from '../plugins/rectangle'
+import { BattleEntity } from './battle-entity'
 
-export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
-  rectangle: Phaser.GameObjects.Rectangle
-  namePlugin: NamePlugin = new NamePlugin(this.scene)
-
+export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
   battleLocation = 0
 
   constructor(
@@ -16,33 +15,22 @@ export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
     public scene: BattleScene,
     public connector: SceneConnector
   ) {
-    super(scene, 'sprite')
+    super(model, scene, connector)
   }
+
+  getBattleLocation(type: string) {
+    return this.scene.battleLocations[type][this.model.battleLocation]
+  }
+
   create() {
-    const location =
-      this.scene.battleLocations.enemies[this.model.battleLocation]
-    this.rectangle = this.scene.add.rectangle(
-      location[0],
-      location[1],
-      32,
-      64,
-      Phaser.Display.Color.HexStringToColor('#f50').color
-    )
-    this.namePlugin.create(
-      this.model.name,
-      location[0],
-      location[1],
-      'rgba(255, 120, 0)'
-    )
-    this.rectangle.setInteractive(
-      new Phaser.Geom.Rectangle(0, 0, 32, 64),
-      Phaser.Geom.Rectangle.Contains
-    )
-    this.rectangle.setDepth(
-      Math.round(this.rectangle.y - this.rectangle.height)
-    )
-    this.rectangle.setOrigin(0.5, 0.75)
-    this.rectangle.on('pointerdown', (e) => {
+    this.rectanglePlugin.color = '#f50'
+    this.setPosition(...this.getBattleLocation('enemies'))
+    this.rectanglePlugin.create()
+    this.namePlugin.create(this.model.name, 'rgba(255, 120, 0)')
+    this.add(this.namePlugin.text)
+    this.add(this.rectanglePlugin.rectangle)
+    this.setDepth(Math.round(this.y))
+    this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       console.log('Selected!', this.model.name)
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
@@ -54,24 +42,8 @@ export class BattleSceneEnemy extends Phaser.GameObjects.GameObject {
   }
 
   preUpdate() {
-    if (!this.rectangle) {
-      this.create()
-    }
-    if (app.target === this.model) {
-      this.rectangle.setStrokeStyle(
-        4,
-        Phaser.Display.Color.HexStringToColor('#aaf').color,
-        0.5
-      )
-    } else {
-      this.rectangle.setStrokeStyle(0)
-    }
-    this.namePlugin.update(this.rectangle.x, this.rectangle.y)
-  }
-
-  destroy() {
-    super.destroy()
-    this.rectangle.destroy()
-    this.namePlugin.destroy()
+    if (!this.rectanglePlugin.rectangle) this.create()
+    this.namePlugin.update()
+    this.rectanglePlugin.update()
   }
 }

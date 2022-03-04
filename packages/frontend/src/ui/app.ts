@@ -3,7 +3,6 @@ import { Client, Room } from 'colyseus.js'
 import { Subject } from 'rxjs'
 import { Character } from '../networking/schemas/Character'
 import { Npc } from '../networking/schemas/Npc'
-import { MovementInput } from '../phaser/behaviors/input'
 import { LobbyScene } from '../phaser/scenes/lobby.scene'
 import { StarterScene } from '../phaser/scenes/starter.scene'
 
@@ -17,7 +16,6 @@ export const app = {
   game: undefined as Phaser.Game | undefined,
   target: undefined,
   updates: new Subject<string>(),
-  movement: new MovementInput(),
   messages: {
     lobby: new Subject<{ type: string; message: any }>(),
     starter: new Subject<{ type: string; message: any }>(),

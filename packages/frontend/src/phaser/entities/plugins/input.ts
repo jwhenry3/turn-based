@@ -1,18 +1,19 @@
-import { app } from '../../ui/app'
+import { app } from '../../../ui/app'
 
-export class MovementInput {
+export class InputPlugin {
   movement = [0, 0]
 
   keys: Record<string, Phaser.Input.Keyboard.Key> = {}
 
-
   mouseCooldown = 20
   mouseTick = 0
 
+  constructor(public input: Phaser.Input.InputPlugin) {}
+
   onChange = (axis: [number, number]) => null
 
-  create(input: Phaser.Input.InputPlugin) {
-    this.keys = input.keyboard.addKeys({
+  create() {
+    this.keys = this.input.keyboard.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.W,
       down: Phaser.Input.Keyboard.KeyCodes.S,
       left: Phaser.Input.Keyboard.KeyCodes.A,
@@ -20,10 +21,10 @@ export class MovementInput {
     }) as Record<string, Phaser.Input.Keyboard.Key>
   }
 
-  update(input: Phaser.Input.InputPlugin, position: { x: number; y: number }) {
+  update() {
     const movement: [number, number] = [0, 0]
     if (app.gameHasFocus) {
-      input.keyboard.enabled = true
+      this.input.keyboard.enabled = true
       if (this.keys.left.isDown) {
         movement[0] = -1
       }
@@ -37,13 +38,13 @@ export class MovementInput {
         movement[1] = 1
       }
     } else {
-      input.keyboard.enabled = false
+      this.input.keyboard.enabled = false
     }
     if (this.mouseTick > 0) {
       this.mouseTick--
     }
 
-    const pads = input.gamepad.getAll()
+    const pads = this.input.gamepad.getAll()
     if (pads.length > 0) {
       for (const pad of pads) {
         const x = Math.round(pad.getAxisValue(0) * 1.5)
@@ -58,5 +59,8 @@ export class MovementInput {
       this.movement = movement
       this.onChange(movement)
     }
+  }
+  destroy() {
+    this.input.keyboard.removeAllKeys()
   }
 }
