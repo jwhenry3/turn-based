@@ -5,8 +5,10 @@ import { BattlePlayer } from '../../networking/schemas/BattlePlayer'
 import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
 import { BattleSceneEnemy } from '../entities/battle/battle-enemy'
+import { BattleEntity } from '../entities/battle/battle-entity'
 import { BattleScenePet } from '../entities/battle/battle-pet'
 import { BattleScenePlayer } from '../entities/battle/battle-player'
+import { BattlePosition } from '../entities/battle/battle-position'
 import { PlayerEntity } from '../entities/player'
 import { SceneConnector } from './scene.connector'
 
@@ -29,8 +31,8 @@ export class BattleScene extends Phaser.Scene {
     [-2, -1, 0, 1, 2],
   ]
 
-  leftPositions: Phaser.GameObjects.Container[] = []
-  rightPositions: Phaser.GameObjects.Container[] = []
+  leftPositions: BattlePosition[] = []
+  rightPositions: BattlePosition[] = []
   leftMin = 0
   gridSize = 64
   spaceBetween = 32
@@ -72,16 +74,43 @@ export class BattleScene extends Phaser.Scene {
         let container = this.leftPositions[index]
         let container2 = this.rightPositions[index]
         if (!this.leftPositions[index]) {
-          container = this.add.container(x + j * 4, y)
-          container2 = this.add.container(this.width + 32 - x - j * 4, y)
+          container = new BattlePosition(this, x + j * 4, y)
+          container2 = new BattlePosition(this, this.width + 32 - x - j * 4, y)
+          this.add.existing(container)
+          this.add.existing(container2)
           this.leftPositions.push(container)
           this.rightPositions.push(container2)
         }
-        container.setPosition(x + j * 4, y)
-        container2.setPosition(this.width + 32 - x - j * 4, y)
-        container.setDepth(container.y)
-        container2.setDepth(container2.y)
+        container.originalX = x + j * 4
+        container.originalY = y
+        container2.originalX = this.width + 32 - x - j * 4
+        container2.originalY = y
+        if (!container.entity?.attacking) {
+          container.setPosition(x + j * 4, y)
+          container.setDepth(container.y)
+        }
+        if (!container.entity?.attacking) {
+          container2.setPosition(this.width + 32 - x - j * 4, y)
+          container2.setDepth(container2.y)
+        }
         index++
+      }
+    }
+    for (const id in this.players) {
+      if (this.players[id].pet) {
+        const position = this.players[id].petPosition
+        if (this.isMobilePortrait()) {
+          position.originalX = this.players[id].parentContainer.originalX - 40
+          if (!this.players[id].pet.attacking) {
+            position.setPosition(position.originalX, position.originalY)
+          }
+        } else {
+          this.players[id].petPosition.originalX =
+            this.players[id].parentContainer.originalX - 64
+          if (!this.players[id].pet.attacking) {
+            position.setPosition(position.originalX, position.originalY)
+          }
+        }
       }
     }
   }
@@ -187,10 +216,43 @@ export class BattleScene extends Phaser.Scene {
     this.players[player.characterId].destroy()
     delete this.players[player.characterId]
   }
+  isAttacking = 0
   update() {
     if (window.innerWidth !== this.lastWidth) {
       this.zoom()
       app.updates.next('battle:size')
+    }
+    if (this.input.mousePointer.isDown && !this.isAttacking) {
+      console.log('simulate attack!')
+      this.isAttacking++
+      const shouldBePlayer = !Math.round(Math.random() * 4)
+      const shouldBePet = !!Math.round(Math.random() * 2)
+      const enemyIndex =
+        Math.round(Math.random() * Object.keys(this.enemies).length) - 1
+      const player = this.players[Object.keys(this.players)[0]]
+      const enemy =
+        this.enemies[Object.keys(this.enemies)[enemyIndex < 0 ? 0 : enemyIndex]]
+      if (shouldBePlayer) {
+        if (!player.attacking && !enemy.attacking) {
+          player.attacking = enemy
+          player.retreat = false
+          player.onFinishAttack = () => this.isAttacking--
+        }
+      } else {
+        if (shouldBePet) {
+          if (!player.pet.attacking && !enemy.attacking) {
+            player.pet.attacking = enemy
+            player.pet.retreat = false
+            player.pet.onFinishAttack = () => this.isAttacking--
+          }
+        } else {
+          if (!player.attacking && !enemy.attacking) {
+            enemy.attacking = player
+            enemy.retreat = false
+            enemy.onFinishAttack = () => this.isAttacking--
+          }
+        }
+      }
     }
   }
   zoom() {
@@ -203,6 +265,10 @@ export class BattleScene extends Phaser.Scene {
       this.lastIsMobilePortrait = currentMobilePortrait
       this.createOrUpdatePositions()
     }
+  }
+
+  simulateAttack(entity: BattleEntity<any>, target: BattleEntity<any>) {
+    entity.attacking = target
   }
 
   stop() {

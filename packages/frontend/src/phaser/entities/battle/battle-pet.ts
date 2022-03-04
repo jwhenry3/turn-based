@@ -23,11 +23,6 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
   }
 
   create() {
-    if (this.scene.isMobilePortrait()) {
-      this.setPosition(-40, 16)
-    } else {
-      this.setPosition(-64, 16)
-    }
     this.namePlugin.create(this.owner.character.name + "'s Pet")
     this.rectanglePlugin.create()
     this.add(this.namePlugin.text)
@@ -46,5 +41,6 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.namePlugin.update()
     this.rectanglePlugin.update()
+    this.handleAttacks()
   }
 }

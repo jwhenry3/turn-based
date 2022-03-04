@@ -8,9 +8,11 @@ import { NamePlugin } from '../plugins/name'
 import { RectanglePlugin } from '../plugins/rectangle'
 import { BattleEntity } from './battle-entity'
 import { BattleScenePet } from './battle-pet'
+import { BattlePosition } from './battle-position'
 
 export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
   pet: BattleScenePet
+  petPosition: BattlePosition
 
   constructor(
     public character: Character,
@@ -28,12 +30,6 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     return this.scene.leftPositions[this.model.battleLocation]
   }
   create() {
-    console.log(
-      'created battle player',
-      this.model.battleLocation,
-      this.x,
-      this.y
-    )
     this.setPosition(0, 0)
     this.namePlugin.create(this.character.name)
     this.rectanglePlugin.create()
@@ -48,9 +44,23 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
         this.scene,
         this.connector
       )
+      const container = new BattlePosition(
+        this.scene,
+        this.parentContainer.x,
+        this.parentContainer.y
+      )
+      container.originalY = this.parentContainer.y + 16
+      if (this.scene.isMobilePortrait()) {
+        container.originalX = this.parentContainer.x - 40
+      } else {
+        container.originalX = this.parentContainer.x - 64
+      }
+      container.setPosition(container.originalX, container.originalY)
+      container.setDepth(container.y)
+      this.scene.add.existing(this.pet)
+      container.add(this.pet)
+      this.scene.add.existing(container)
       this.pet.owner = this
-      this.pet.setDepth(this.pet.y)
-      this.getBattleLocation().add(this.pet)
     }
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       console.log('Selected!', this.character.name)
@@ -67,5 +77,6 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.rectanglePlugin.update()
     this.namePlugin.update()
+    this.handleAttacks()
   }
 }
