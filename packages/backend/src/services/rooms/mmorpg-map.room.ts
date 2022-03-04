@@ -20,6 +20,7 @@ import { npcTypes } from './fixtures/npcs/npc-types'
 import { MapConfig } from './fixtures/map.config'
 import { createNpc } from '../schemas/factories/npc'
 import { v4 } from 'uuid'
+import { BattleHandler } from './battles/battle.handler'
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -35,6 +36,8 @@ export class MmorpgMapRoom extends Room {
   stopUpdates$ = new Subject<void>()
   stopPet$ = new Subject<string>()
 
+  battleHandlers: Record<string, BattleHandler> = {}
+
   hash = new SpatialHash(
     {
       x: 0,
@@ -47,14 +50,18 @@ export class MmorpgMapRoom extends Room {
 
   startBattle(npcData: NpcData, player: Character) {
     const battle = new Battle()
-    battle.addEnemies(
+    const handler = new BattleHandler(this, battle)
+    this.battleHandlers[battle.battleId] = handler
+    handler.addEnemies(
       npcData.battleNpcs,
       npcData.randomizeBattleNpcs,
       npcData.maxEnemies
     )
-    battle.addPlayer(player)
-    battle.onComplete = () => {
+    handler.addPlayer(player)
+    handler.onComplete = () => {
+      this.battleHandlers[battle.battleId].complete()
       this.state.battles.delete(battle.battleId)
+      delete this.battleHandlers[battle.battleId]
     }
     this.state.battles.set(battle.battleId, battle)
   }
@@ -157,6 +164,9 @@ export class MmorpgMapRoom extends Room {
       from(this.movementUpdates).subscribe((position: PositionData) => {
         this.moveEntity(position)
       })
+      from(Object.values(this.battleHandlers)).subscribe((handler) => {
+        handler.update()
+      })
     }, 1000 / 8)
     this.onMessage('character:move', (client, { horizontal, vertical }) => {
       const character = this.state.playersByClient.get(client.sessionId)
@@ -192,32 +202,34 @@ export class MmorpgMapRoom extends Room {
     this.onMessage('character:battle:join', (client, { battleId }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {
-        this.state.battles.forEach((battle) => {
-          if (battle.battleId === battleId) {
-            if (battle.players.size >= 8) {
-              client.send('character:battle:full')
-              return
-            }
-            let hasMoved = false
-            battle.players.forEach((player: BattlePlayer) => {
-              if (!hasMoved) {
-                character.position.x = player.character.position.x
-                character.position.y = player.character.position.y
-                hasMoved = true
-              }
-            })
-            battle.addPlayer(character)
+        const battle = this.state.battles[battleId]
+        if (battle) {
+          if (battle.players.size >= 8) {
+            client.send('character:battle:full')
+            return
           }
-        })
+          let hasMoved = false
+          battle.players.forEach((player: BattlePlayer) => {
+            if (!hasMoved) {
+              character.position.x = player.character.position.x
+              character.position.y = player.character.position.y
+              hasMoved = true
+            }
+          })
+          this.battleHandlers[battle.battleId].addPlayer(character)
+        }
       }
     })
     this.onMessage('character:battle:leave', (client) => {
       const character = this.state.playersByClient.get(client.sessionId)
-      this.state.battles.forEach((battle) => {
-        if (battle.players.has(character.currentClientId)) {
-          battle.removePlayer(character)
-        }
-      })
+      this.state.battles[character.battleId]?.removePlayer(character)
+    })
+    this.onMessage('character:battle:action', (client, action) => {
+      const character = this.state.playersByClient.get(client.sessionId)
+      const battle = this.state.battles[character.battleId]
+      if (battle && battle.players[character.currentClientId]?.canAct) {
+        console.log('Player wants to perform battle action', action)
+      }
     })
   }
 

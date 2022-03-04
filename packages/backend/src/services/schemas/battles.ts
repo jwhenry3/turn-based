@@ -1,5 +1,5 @@
 import { ArraySchema, MapSchema, Schema, type } from '@colyseus/schema'
-import { Subject, takeUntil } from 'rxjs'
+import { Subject } from 'rxjs'
 import { Character } from './schemas'
 import { DropData } from '../rooms/fixture.models'
 import { v4 } from 'uuid'
@@ -73,6 +73,10 @@ export class BattlePet extends Schema {
   mana = 100
   @type('number')
   cooldown = 0
+  speed = 4
+
+  @type('boolean')
+  canAct = false
 
   @type(Statistics)
   stats = new Statistics()
@@ -83,12 +87,6 @@ export class BattlePet extends Schema {
     super(args)
     this.owner = character
     this.characterId = character.characterId
-  }
-
-  update(tick: number) {
-    if (this.cooldown > 0) {
-      this.cooldown--
-    }
   }
 }
 export class BattlePlayer extends Schema {
@@ -104,6 +102,10 @@ export class BattlePlayer extends Schema {
 
   @type(BattlePet)
   pet: BattlePet
+
+  speed = 4
+  @type('boolean')
+  canAct = false
 
   character: Character
 
@@ -121,12 +123,6 @@ export class BattlePlayer extends Schema {
     super(args)
     this.character = character
     this.characterId = character.characterId
-  }
-
-  update(tick: number) {
-    if (this.cooldown > 0) {
-      this.cooldown--
-    }
   }
 }
 
@@ -180,6 +176,8 @@ export class BattleNpc extends BattleNpcType {
   @type('number')
   cooldown = 0
 
+  speed = 4
+
   @type(Statistics)
   stats = new Statistics()
 
@@ -188,12 +186,6 @@ export class BattleNpc extends BattleNpcType {
   constructor(data: Partial<BattleNpc>) {
     super(data)
     this.battleNpcId = v4()
-  }
-
-  update(tick: number) {
-    if (this.cooldown > 0) {
-      this.cooldown--
-    }
   }
 }
 
@@ -209,109 +201,8 @@ export class Battle extends Schema {
   @type({ map: BattleNpc })
   npcs: MapSchema<BattleNpc> = new MapSchema<BattleNpc>() // configured list of BattleNpcs to load
 
-  battleTick = 0
-  addedPlayers: Record<number, boolean> = {}
-  addedEnemies: Record<number, boolean> = {}
-  positionOrder = [2, 1, 3, 4, 0, 6, 5, 7]
-
-  update$ = new Subject<number>()
-  completed$ = new Subject<void>()
-  onComplete = () => null
-
   constructor(...args: any[]) {
     super(...args)
     this.battleId = v4()
-  }
-
-  shuffleArray(array) {
-    const clone = [...array]
-    for (let i = clone.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[clone[i], clone[j]] = [clone[j], clone[i]]
-    }
-    return clone
-  }
-  addEnemies(
-    enemyOptions: BattleNpc[],
-    canRandomizeNpcOptions: boolean = false,
-    maxEnemies: number = 1
-  ) {
-    if (canRandomizeNpcOptions) {
-      let numberOfEnemies = Math.round(Math.random() * maxEnemies) + 1
-      if (numberOfEnemies > maxEnemies) {
-        numberOfEnemies = maxEnemies
-      }
-      for (let i = 0; i < numberOfEnemies; i++) {
-        const index = Math.abs(
-          Math.round(Math.random() * (enemyOptions.length - 1))
-        )
-        this.addEnemy(new BattleNpc(enemyOptions[index]))
-      }
-    } else {
-      for (let i = 0; i < enemyOptions.length; i++) {
-        this.addEnemy(enemyOptions[i])
-      }
-    }
-  }
-  watchUpdate(entity: BattlePlayer | BattleNpc) {
-    this.update$
-      .pipe(takeUntil(this.completed$), takeUntil(entity.destroy$))
-      .subscribe((tick) => entity.update(tick))
-  }
-
-  addEnemy(option: BattleNpc) {
-    const enemy = new BattleNpc(option)
-    if (!enemy.battleLocation || this.addedEnemies[enemy.battleLocation]) {
-      const randomized = this.shuffleArray(this.positionOrder)
-      const firstAvailable = randomized.find((i) => !this.addedEnemies[i])
-      enemy.battleLocation = firstAvailable
-      this.addedEnemies[firstAvailable] = true
-    } else {
-      this.addedEnemies[enemy.battleLocation] = true
-    }
-    enemy.battleNpcId = v4()
-    this.watchUpdate(enemy)
-    this.npcs.set(enemy.battleNpcId, enemy)
-  }
-
-  addPlayer(character: Character) {
-    const player = new BattlePlayer(character)
-    character.isInBattle = true
-    character.battleId = this.battleId
-    if (character.pet) {
-      const pet = new BattlePet(character)
-      player.pet = pet
-    }
-    player.battleLocation = this.positionOrder.find(
-      (i) => !this.addedPlayers[i]
-    )
-    this.addedPlayers[player.battleLocation] = true
-    this.watchUpdate(player)
-    this.players.set(character.currentClientId, player)
-  }
-  removePlayer(character: Character) {
-    this.players[character.currentClientId]?.destroy$.next()
-    character.isInBattle = false
-    character.battleId = undefined
-    this.addedPlayers[this.players[character.currentClientId].battleLocation] =
-      false
-    this.players.delete(character.currentClientId)
-    if (this.players.size === 0) {
-      this.complete()
-    }
-  }
-  update() {
-    this.battleTick++
-    this.update$.next(this.battleTick)
-  }
-
-  complete() {
-    if (this.players.size > 0) {
-      this.players.forEach((player) => {
-        this.removePlayer(player.character)
-      })
-    }
-    this.completed$.next()
-    this.onComplete()
   }
 }
