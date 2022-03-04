@@ -38,7 +38,7 @@ export class PlayerEntity extends MovableEntity<Character> {
         y: this.y,
       })
     })
-    this.setDepth(Math.round(this.y))
+    this.setDepth(Math.round(this.y + 32))
     if (this.isLocalPlayer) {
       app.character = this.model
       // console.log(this.model.stats.maxMp.toJSON())
@@ -96,8 +96,7 @@ export class PlayerEntity extends MovableEntity<Character> {
       const { newX, newY } = this.lerpTo(this.model.position.x, this.model.position.y)
       this.setPosition(newX, newY)
     }
-    // console.log(this.x, this.model.position.x, this.y, this.model.position.y)
-    this.setDepth(Math.round(this.y))
+    this.setDepth(Math.round(this.y + 32))
 
     if (this.model.isInBattle) {
       if (this.pet?.visible === true) {

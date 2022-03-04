@@ -42,5 +42,6 @@ export class NpcEntity extends MovableEntity<Npc> {
     }
     this.rectanglePlugin.update()
     this.namePlugin.update()
+    this.setDepth(Math.round(this.y + 32))
   }
 }

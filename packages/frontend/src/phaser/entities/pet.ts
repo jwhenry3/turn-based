@@ -42,5 +42,6 @@ export class PetEntity extends MovableEntity<PetNpc> {
     }
     this.rectanglePlugin.update()
     this.namePlugin.update()
+    this.setDepth(Math.round(this.y + 32))
   }
 }
