@@ -9,6 +9,7 @@ import { BattleEntity } from '../entities/battle/battle-entity'
 import { BattleScenePet } from '../entities/battle/battle-pet'
 import { BattleScenePlayer } from '../entities/battle/battle-player'
 import { BattlePosition } from '../entities/battle/battle-position'
+import { BattleQueuedAttack } from '../entities/battle/battle-queued-attack'
 import { PlayerEntity } from '../entities/player'
 import { SceneConnector } from './scene.connector'
 
@@ -217,42 +218,54 @@ export class BattleScene extends Phaser.Scene {
     delete this.players[player.characterId]
   }
   isAttacking = 0
+  fightIndex = 0
+
+  queuedAttacks: BattleQueuedAttack[] = []
+
   update() {
     if (window.innerWidth !== this.lastWidth) {
       this.zoom()
       app.updates.next('battle:size')
     }
-    if (this.input.mousePointer.isDown && !this.isAttacking) {
-      console.log('simulate attack!')
-      this.isAttacking++
-      const shouldBePlayer = !Math.round(Math.random() * 4)
-      const shouldBePet = !!Math.round(Math.random() * 2)
+    if (this.input.mousePointer.isDown && this.queuedAttacks.length < 2) {
       const enemyIndex =
         Math.round(Math.random() * Object.keys(this.enemies).length) - 1
       const player = this.players[Object.keys(this.players)[0]]
+      const order = [player, player.pet, ...Object.values(this.enemies)]
+
       const enemy =
         this.enemies[Object.keys(this.enemies)[enemyIndex < 0 ? 0 : enemyIndex]]
-      if (shouldBePlayer) {
-        if (!player.attacking && !enemy.attacking) {
-          player.attacking = enemy
-          player.retreat = false
-          player.onFinishAttack = () => this.isAttacking--
+      const attacker = order[this.fightIndex]
+      if (attacker instanceof BattleSceneEnemy) {
+        this.isAttacking++
+        const attack = new BattleQueuedAttack(
+          this,
+          attacker,
+          player,
+          60,
+          'test'
+        )
+        attack.onComplete = () => {
+          this.isAttacking--
+          this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
         }
+        this.queuedAttacks.push(attack)
       } else {
-        if (shouldBePet) {
-          if (!player.pet.attacking && !enemy.attacking) {
-            player.pet.attacking = enemy
-            player.pet.retreat = false
-            player.pet.onFinishAttack = () => this.isAttacking--
-          }
-        } else {
-          if (!player.attacking && !enemy.attacking) {
-            enemy.attacking = player
-            enemy.retreat = false
-            enemy.onFinishAttack = () => this.isAttacking--
-          }
+        this.isAttacking++
+        const attack = new BattleQueuedAttack(this, attacker, enemy, 60, 'test')
+        attack.onComplete = () => {
+          this.isAttacking--
+          this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
         }
+        this.queuedAttacks.push(attack)
       }
+      this.fightIndex++
+      if (this.fightIndex >= order.length) {
+        this.fightIndex = 0
+      }
+    }
+    if (this.queuedAttacks.length > 0) {
+      this.queuedAttacks[0].update()
     }
   }
   zoom() {

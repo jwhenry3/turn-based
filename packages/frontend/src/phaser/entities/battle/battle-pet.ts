@@ -41,6 +41,5 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.namePlugin.update()
     this.rectanglePlugin.update()
-    this.handleAttacks()
   }
 }

@@ -77,6 +77,5 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.rectanglePlugin.update()
     this.namePlugin.update()
-    this.handleAttacks()
   }
 }
