@@ -3,7 +3,9 @@ import { Button } from '@mui/material'
 import { BattleScene } from '../../../phaser/scenes/battle.scene'
 import { useSceneState } from '../../../phaser/use-scene-state'
 import { app } from '../../app'
+import { BattleActions } from './actions/BattleActions'
 import { CharacterPanel } from './character/CharacterPanel'
+import { PetPanel } from './character/PetPanel'
 import { TargetPanel } from './target/TargetPanel'
 
 const HudContainer = styled.div`
@@ -19,18 +21,11 @@ const HudContainer = styled.div`
   }
 `
 export function BattleHud({ battle }: { battle: BattleScene }) {
-  const { scene } = useSceneState()
-
-  const onLeave = (e) => {
-    if (scene !== 'lobby') {
-      app.rooms[scene]?.send('character:battle:leave')
-    }
-  }
   return (
     <HudContainer>
-      <Button onClick={onLeave}>Leave Battle</Button>
-      <TargetPanel />
+      <BattleActions />
       <CharacterPanel />
+      <PetPanel />
     </HudContainer>
   )
 }

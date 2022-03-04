@@ -6,12 +6,12 @@ import { WindowPanel } from '../../../world/hud/WindowPanel'
 import { Health } from '../bars/Health'
 import { Mana } from '../bars/Mana'
 import { Name } from '../details/Name'
-export const CharacterContainer = styled.div`
+export const PetContainer = styled.div`
   position: fixed;
   top: 0;
-  left: 8px;
+  right: 8px;
   width: 50vw;
-  padding-right: 16px;
+  padding-left: 16px;
   /* background-color: rgba(0, 0, 0, 0.75); */
   color: #fff;
   display: flex;
@@ -26,20 +26,20 @@ export const ValuesContainer = styled.div`
   overflow: hidden;
   z-index: 2;
 `
-export function CharacterPanel() {
-  const [character, setCharacter] = useState(app.character || undefined)
+export function PetPanel() {
+  const [character, setCharacter] = useState(app.character?.pet || undefined)
   useEffect(() => {
-    setCharacter(app.character)
+    setCharacter(app.character?.pet)
     const sub = app.updates
       .pipe(filter((value) => value === 'character:stats'))
       .subscribe(() => {
-        setCharacter(app.character)
+        setCharacter(app.character?.pet)
       })
     return () => sub.unsubscribe()
   }, [])
   if (!character) return <></>
   return (
-    <CharacterContainer>
+    <PetContainer>
       <Name name={character.name} />
       <WindowPanel style={{ marginTop: '-12px' }}>
         <ValuesWrapper>
@@ -49,6 +49,6 @@ export function CharacterPanel() {
           </ValuesContainer>
         </ValuesWrapper>
       </WindowPanel>
-    </CharacterContainer>
+    </PetContainer>
   )
 }
