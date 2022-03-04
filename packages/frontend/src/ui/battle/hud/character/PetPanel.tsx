@@ -7,11 +7,6 @@ import { Health } from '../bars/Health'
 import { Mana } from '../bars/Mana'
 import { Name } from '../details/Name'
 export const PetContainer = styled.div`
-  position: fixed;
-  top: 0;
-  right: 8px;
-  width: 50vw;
-  padding-left: 16px;
   /* background-color: rgba(0, 0, 0, 0.75); */
   color: #fff;
   display: flex;

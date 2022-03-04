@@ -18,18 +18,17 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
     super(model, scene, connector)
   }
 
-  getBattleLocation(type: string) {
-    return this.scene.battleLocations[type][this.model.battleLocation]
+  getBattleLocation() {
+    return this.scene.rightPositions[this.model.battleLocation]
   }
-
   create() {
     this.rectanglePlugin.color = '#f50'
-    this.setPosition(...this.getBattleLocation('enemies'))
+    this.setPosition(0, 0)
     this.rectanglePlugin.create()
     this.namePlugin.create(this.model.name, 'rgba(255, 120, 0)')
     this.add(this.namePlugin.text)
     this.add(this.rectanglePlugin.rectangle)
-    this.setDepth(Math.round(this.y))
+    this.setDepth(this.y)
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       console.log('Selected!', this.model.name)
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return

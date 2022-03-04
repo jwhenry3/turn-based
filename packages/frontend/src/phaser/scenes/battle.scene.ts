@@ -23,16 +23,14 @@ export class BattleScene extends Phaser.Scene {
   width = 1100
   lastWidth = this.width
   height = 600
-  battleLocations = {
-    players: [],
-
-    enemies: [],
-  }
 
   rows = [
     [-2, -1, 0, 1, 2],
     [-2, -1, 0, 1, 2],
   ]
+
+  leftPositions: Phaser.GameObjects.Container[] = []
+  rightPositions: Phaser.GameObjects.Container[] = []
   leftMin = 0
   gridSize = 64
   spaceBetween = 32
@@ -40,10 +38,22 @@ export class BattleScene extends Phaser.Scene {
   verticalOffset = 64
 
   image: Phaser.GameObjects.Image
+  lastIsMobilePortrait = false
+  isMobilePortrait() {
+    return window.innerWidth < 550
+  }
 
-  createPositions() {
-    const playerPositions = []
-    const npcPositions = []
+  createOrUpdatePositions() {
+    let offsetIncrement = 4
+    let horizontalSpaceBetween = this.spaceBetween * 2.5
+    this.leftMin = 0
+    if (this.isMobilePortrait()) {
+      this.leftMin = this.width / 4.2
+      offsetIncrement = 4
+      horizontalSpaceBetween = this.spaceBetween
+    }
+
+    let index = 0
     for (let i = 0; i < this.rows.length; i++) {
       const row = this.rows[i]
       let offset = 0
@@ -53,25 +63,32 @@ export class BattleScene extends Phaser.Scene {
           this.leftMin +
           offset +
           // ((i + j) % 2 === 0 ? 16 : -16) +
-          (this.gridSize + this.spaceBetween * 2.5) * (this.rows.length - i)
+          (this.gridSize + horizontalSpaceBetween) * (this.rows.length - i)
         const y =
           this.center +
           this.verticalOffset -
           (this.gridSize + (this.spaceBetween / 8) * ((1 - i) * 0.75)) * value
-        offset += 16
-        playerPositions.push([x + j * -8, y])
-        npcPositions.push([this.width - x - j * 8, y])
+        offset += offsetIncrement
+        let container = this.leftPositions[index]
+        let container2 = this.rightPositions[index]
+        if (!this.leftPositions[index]) {
+          container = this.add.container(x + j * 4, y)
+          container2 = this.add.container(this.width + 32 - x - j * 4, y)
+          this.leftPositions.push(container)
+          this.rightPositions.push(container2)
+        }
+        container.setPosition(x + j * 4, y)
+        container2.setPosition(this.width + 32 - x - j * 4, y)
+        container.setDepth(container.y)
+        container2.setDepth(container2.y)
+        index++
       }
-    }
-    return {
-      players: playerPositions,
-      enemies: npcPositions,
     }
   }
 
   preload() {
     this.load.image('battle-overlay', '/battle.png')
-    this.battleLocations = this.createPositions()
+    this.createOrUpdatePositions()
   }
 
   create() {
@@ -99,25 +116,21 @@ export class BattleScene extends Phaser.Scene {
     )
     this.cameras.main.startFollow(focus)
     this.zoom()
-    this.battle.players.forEach((player) => {
-      this.addPlayer(player)
-    })
-    this.battle.npcs.forEach((npc) => {
-      this.addEnemy(npc)
-    })
     // placeholders for debug
-    for (const [x, y] of this.battleLocations.players) {
-      const rect1 = this.add.rectangle(
-        x,
-        y,
+    for (const container of this.leftPositions) {
+      const rect1 = new Phaser.GameObjects.Rectangle(
+        this,
+        0,
+        0,
         24,
         24,
         Phaser.Display.Color.HexStringToColor('#00f').color,
         0.2
       )
-      const rect2 = this.add.rectangle(
-        x - 64,
-        y + 16,
+      const rect2 = new Phaser.GameObjects.Rectangle(
+        this,
+        this.isMobilePortrait() ? -48 : -64,
+        16,
         24,
         24,
         Phaser.Display.Color.HexStringToColor('#3af').color,
@@ -125,17 +138,21 @@ export class BattleScene extends Phaser.Scene {
       )
       rect1.setOrigin(0.5, 0.75)
       rect2.setOrigin(0.5, 0.75)
+      container.add(rect1)
+      container.add(rect2)
     }
-    for (const [x, y] of this.battleLocations.enemies) {
-      const rect1 = this.add.rectangle(
-        x,
-        y,
+    for (const container of this.rightPositions) {
+      const rect1 = new Phaser.GameObjects.Rectangle(
+        this,
+        0,
+        0,
         24,
         24,
         Phaser.Display.Color.HexStringToColor('#f00').color,
         0.2
       )
       rect1.setOrigin(0.5, 0.75)
+      container.add(rect1)
     }
   }
 
@@ -147,8 +164,10 @@ export class BattleScene extends Phaser.Scene {
       this,
       this.connector
     )
-
     this.add.existing(this.players[player.characterId])
+    this.players[player.characterId]
+      .getBattleLocation()
+      .add(this.players[player.characterId])
   }
   addEnemy(enemy: BattleNpc) {
     if (this.enemies[enemy.battleNpcId]) return
@@ -158,6 +177,9 @@ export class BattleScene extends Phaser.Scene {
       this.connector
     )
     this.add.existing(this.enemies[enemy.battleNpcId])
+    this.enemies[enemy.battleNpcId]
+      .getBattleLocation()
+      .add(this.enemies[enemy.battleNpcId])
   }
   removePlayer(player) {
     if (!this.players[player.characterId]) return
@@ -174,7 +196,13 @@ export class BattleScene extends Phaser.Scene {
   zoom() {
     const zoom = window.innerWidth / this.width
     const zoom1 = window.innerHeight / this.height
-    this.cameras.main.setZoom(zoom > zoom1 ? zoom1 : zoom)
+    const modifier = this.isMobilePortrait() ? 2 : 1
+    this.cameras.main.setZoom((zoom > zoom1 ? zoom1 : zoom) * modifier)
+    const currentMobilePortrait = this.isMobilePortrait()
+    if (this.lastIsMobilePortrait !== currentMobilePortrait) {
+      this.lastIsMobilePortrait = currentMobilePortrait
+      this.createOrUpdatePositions()
+    }
   }
 
   stop() {

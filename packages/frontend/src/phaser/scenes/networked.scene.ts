@@ -135,12 +135,20 @@ export class NetworkedScene extends Phaser.Scene {
                 BattleScene
               ) as BattleScene
             }
+            this.game.scene.start('battle')
             useBattle.getState().update(battleScene)
             battleScene.playerEntities = this.playerObjects
             battleScene.addPlayer(p)
             battleScene.connector = this.connector
             battleScene.battle = b
-            this.game.scene.start('battle')
+            battleScene.battle.players.forEach((player) => {
+              console.log('adding player')
+              battleScene.addPlayer(player)
+            })
+            battleScene.battle.npcs.forEach((npc) => {
+              console.log('adding enemy')
+              battleScene.addEnemy(npc)
+            })
             b.players.onRemove = (p) => {
               if (p.characterId === app.auth.characterId) {
                 this.game.scene.stop('battle')

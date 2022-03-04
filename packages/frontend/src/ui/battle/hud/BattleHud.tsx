@@ -20,12 +20,32 @@ const HudContainer = styled.div`
     pointer-events: all;
   }
 `
+const Panels = styled.div`
+  display: flex;
+  top: 0;
+  left: 0;
+  right: 0;
+  flex-wrap: wrap;
+  padding: 8px;
+  > * {
+    flex: 1;
+    max-width: 240px;
+    min-width: 200px;
+  }
+  @media (max-width: 1000px) {
+    > * {
+      max-width: 100%;
+    }
+  }
+`
 export function BattleHud({ battle }: { battle: BattleScene }) {
   return (
     <HudContainer>
       <BattleActions />
-      <CharacterPanel />
-      <PetPanel />
+      <Panels>
+        <CharacterPanel />
+        <PetPanel />
+      </Panels>
     </HudContainer>
   )
 }

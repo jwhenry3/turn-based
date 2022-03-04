@@ -18,20 +18,20 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
     super(model, scene, connector)
   }
 
-  getBattleLocation(type: string) {
-    const location =
-      this.scene.battleLocations[type][this.owner.model.battleLocation]
-
-    return [location[0] - 64, location[1] + 16]
+  getBattleLocation() {
+    return this.scene.leftPositions[this.owner.model.battleLocation]
   }
 
   create() {
-    this.setPosition(...this.getBattleLocation('players'))
+    if (this.scene.isMobilePortrait()) {
+      this.setPosition(-40, 16)
+    } else {
+      this.setPosition(-64, 16)
+    }
     this.namePlugin.create(this.owner.character.name + "'s Pet")
     this.rectanglePlugin.create()
     this.add(this.namePlugin.text)
     this.add(this.rectanglePlugin.rectangle)
-    this.setDepth(Math.round(this.y))
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       console.log('Selected!', 'pet')
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return

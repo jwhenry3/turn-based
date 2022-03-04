@@ -24,16 +24,22 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
   get isLocalPlayer() {
     return this.character.currentClientId === this.connector.room.sessionId
   }
-  getBattleLocation(type: string) {
-    return this.scene.battleLocations[type][this.model.battleLocation]
+  getBattleLocation() {
+    return this.scene.leftPositions[this.model.battleLocation]
   }
   create() {
-    this.setPosition(...this.getBattleLocation('players'))
+    console.log(
+      'created battle player',
+      this.model.battleLocation,
+      this.x,
+      this.y
+    )
+    this.setPosition(0, 0)
     this.namePlugin.create(this.character.name)
     this.rectanglePlugin.create()
     this.add(this.namePlugin.text)
     this.add(this.rectanglePlugin.rectangle)
-    this.setDepth(Math.round(this.y))
+    this.setDepth(this.y)
     const player = this.model
     if (player.pet) {
       this.pet = new BattleScenePet(
@@ -43,7 +49,8 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
         this.connector
       )
       this.pet.owner = this
-      this.scene.add.existing(this.pet)
+      this.pet.setDepth(this.pet.y)
+      this.getBattleLocation().add(this.pet)
     }
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       console.log('Selected!', this.character.name)
