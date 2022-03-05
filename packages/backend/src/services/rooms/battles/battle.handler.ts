@@ -9,6 +9,8 @@ import {
 import { Character } from '../../schemas/schemas'
 import { v4 } from 'uuid'
 import { NpcLogic } from './npc.logic'
+import { PlayerLogic } from './player.logic'
+import { PetLogic } from './pet.logic'
 
 export class BattleHandler {
   battleTick = 0
@@ -21,7 +23,9 @@ export class BattleHandler {
 
   queuedActions = []
 
-  battleQueue: (BattleNpc | BattlePet | BattlePlayer)[] = []
+  lastPlayerAction: Record<string, any> = {}
+
+  npcBattleQueue: string[] = []
 
   constructor(public room: Room, public battle: Battle) {}
 
@@ -64,14 +68,10 @@ export class BattleHandler {
       enemy.battleLocation = firstAvailable
       enemy.cooldown = enemy.speed * 16
       this.addedEnemies[firstAvailable] = true
-      this.battleQueue.push(enemy)
-      this.battleQueue.sort((a, b) => {
-        return b.cooldown - a.cooldown
-      })
     } else {
       this.addedEnemies[enemy.battleLocation] = true
     }
-    enemy.battleNpcId = v4()
+    this.npcBattleQueue.push(enemy.battleNpcId)
     this.battle.npcs.set(enemy.battleNpcId, enemy)
   }
 
@@ -83,7 +83,7 @@ export class BattleHandler {
       const pet = new BattlePet(character)
       pet.cooldown = pet.speed * 16
       player.pet = pet
-      this.battleQueue.push(pet)
+      this.delayActionsFor(player.pet, () => (player.pet.canAct = true))
     }
     player.cooldown = player.speed * 16
     player.battleLocation = this.positionOrder.find(
@@ -91,10 +91,7 @@ export class BattleHandler {
     )
     this.addedPlayers[player.battleLocation] = true
     this.battle.players.set(character.currentClientId, player)
-    this.battleQueue.push(player)
-    this.battleQueue.sort((a, b) => {
-      return b.cooldown - a.cooldown
-    })
+    this.delayActionsFor(player, () => (player.canAct = true))
   }
   removePlayer(character: Character) {
     this.battle.players[character.currentClientId]?.destroy$.next()
@@ -108,19 +105,63 @@ export class BattleHandler {
       this.complete()
     }
   }
+
+  delayActionsFor(
+    entity: BattlePlayer | BattlePet | BattleNpc,
+    onNext = () => null
+  ) {
+    this.room.clock.setTimeout(
+      onNext,
+      1000 * entity.speed + Math.round(Math.random() * 400)
+    )
+  }
+
+  onPlayerAction(character: Character, action: any) {
+    const entity = this.battle.players[
+      character.currentClientId
+    ] as BattlePlayer
+    if (entity && entity.stats.hp.total > 0) {
+      entity.canAct = false
+      const logic = new PlayerLogic(this, entity)
+      logic.performAction(action)
+      this.delayActionsFor(entity, () => {
+        entity.canAct = true
+      })
+    }
+  }
+
+  onPetAction(character: Character, action: any) {
+    const entity = this.battle.players[
+      character.currentClientId
+    ] as BattlePlayer
+    if (entity?.pet && entity?.pet.stats.hp.total > 0) {
+      entity.pet.canAct = false
+      const logic = new PetLogic(this, entity.pet)
+      logic.performAction(action)
+      this.delayActionsFor(entity, () => {
+        entity.pet.canAct = true
+      })
+    }
+  }
+
+  onNpcAction(id: string) {
+    const entity = this.battle.npcs[id] as BattleNpc
+    if (entity && entity.stats.hp.total > 0) {
+      const logic = new NpcLogic(this, entity)
+      logic.performAction()
+      this.delayActionsFor(entity, () => {
+        this.npcBattleQueue.push(id)
+      })
+    }
+  }
+
   update() {
     this.battleTick++
-    if (this.battleTick % 30 === 0) {
-      const entity = this.battleQueue.shift()
-      if (entity instanceof BattleNpc) {
-        const logic = new NpcLogic(this, entity)
-        logic.performAction()
-        this.battleQueue.push(entity)
-      } else {
-        entity.canAct = true
-      }
+
+    if (this.battleTick % 10 === 0) {
+      const next = this.npcBattleQueue.shift()
+      this.onNpcAction(next)
     }
-    this.update$.next(this.battleTick)
   }
 
   complete() {

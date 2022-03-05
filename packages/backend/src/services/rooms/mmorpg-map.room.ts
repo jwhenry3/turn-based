@@ -164,10 +164,12 @@ export class MmorpgMapRoom extends Room {
       from(this.movementUpdates).subscribe((position: PositionData) => {
         this.moveEntity(position)
       })
+    }, 1000 / 8)
+    this.clock.setInterval(() => {
       from(Object.values(this.battleHandlers)).subscribe((handler) => {
         handler.update()
       })
-    }, 1000 / 8)
+    }, 1000)
     this.onMessage('character:move', (client, { horizontal, vertical }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {

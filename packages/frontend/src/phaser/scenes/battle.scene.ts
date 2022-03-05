@@ -23,6 +23,8 @@ export class BattleScene extends Phaser.Scene {
   enemies: Record<string, BattleSceneEnemy> = {}
   playerEntities: Record<string, PlayerEntity> = {}
 
+  localPlayer: BattleScenePlayer
+
   width = 1100
   lastWidth = this.width
   height = 600
@@ -86,14 +88,10 @@ export class BattleScene extends Phaser.Scene {
         container.originalY = y
         container2.originalX = this.width + 32 - x - j * 4
         container2.originalY = y
-        if (!container.entity?.attacking) {
-          container.setPosition(x + j * 4, y)
-          container.setDepth(container.y)
-        }
-        if (!container.entity?.attacking) {
-          container2.setPosition(this.width + 32 - x - j * 4, y)
-          container2.setDepth(container2.y)
-        }
+        container.setPosition(x + j * 4, y)
+        container.setDepth(container.y)
+        container2.setPosition(this.width + 32 - x - j * 4, y)
+        container2.setDepth(container2.y)
         index++
       }
     }
@@ -102,15 +100,11 @@ export class BattleScene extends Phaser.Scene {
         const position = this.players[id].petPosition
         if (this.isMobilePortrait()) {
           position.originalX = this.players[id].parentContainer.originalX - 40
-          if (!this.players[id].pet.attacking) {
-            position.setPosition(position.originalX, position.originalY)
-          }
+          position.setPosition(position.originalX, position.originalY)
         } else {
           this.players[id].petPosition.originalX =
             this.players[id].parentContainer.originalX - 64
-          if (!this.players[id].pet.attacking) {
-            position.setPosition(position.originalX, position.originalY)
-          }
+          position.setPosition(position.originalX, position.originalY)
         }
       }
     }
@@ -198,6 +192,9 @@ export class BattleScene extends Phaser.Scene {
     this.players[player.characterId]
       .getBattleLocation()
       .add(this.players[player.characterId])
+    if (player.characterId === app.character.characterId) {
+      this.localPlayer = this.players[player.characterId]
+    }
   }
   addEnemy(enemy: BattleNpc) {
     if (this.enemies[enemy.battleNpcId]) return
@@ -228,41 +225,40 @@ export class BattleScene extends Phaser.Scene {
       app.updates.next('battle:size')
     }
     if (this.input.mousePointer.isDown && this.queuedAttacks.length < 2) {
-      const enemyIndex =
-        Math.round(Math.random() * Object.keys(this.enemies).length) - 1
-      const player = this.players[Object.keys(this.players)[0]]
-      const order = [player, player.pet, ...Object.values(this.enemies)]
-
-      const enemy =
-        this.enemies[Object.keys(this.enemies)[enemyIndex < 0 ? 0 : enemyIndex]]
-      const attacker = order[this.fightIndex]
-      if (attacker instanceof BattleSceneEnemy) {
-        this.isAttacking++
-        const attack = new BattleQueuedAttack(
-          this,
-          attacker,
-          player,
-          60,
-          'test'
-        )
-        attack.onComplete = () => {
-          this.isAttacking--
-          this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
-        }
-        this.queuedAttacks.push(attack)
-      } else {
-        this.isAttacking++
-        const attack = new BattleQueuedAttack(this, attacker, enemy, 60, 'test')
-        attack.onComplete = () => {
-          this.isAttacking--
-          this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
-        }
-        this.queuedAttacks.push(attack)
-      }
-      this.fightIndex++
-      if (this.fightIndex >= order.length) {
-        this.fightIndex = 0
-      }
+      // const enemyIndex =
+      //   Math.round(Math.random() * Object.keys(this.enemies).length) - 1
+      // const player = this.players[Object.keys(this.players)[0]]
+      // const order = [player, player.pet, ...Object.values(this.enemies)]
+      // const enemy =
+      //   this.enemies[Object.keys(this.enemies)[enemyIndex < 0 ? 0 : enemyIndex]]
+      // const attacker = order[this.fightIndex]
+      // if (attacker instanceof BattleSceneEnemy) {
+      //   this.isAttacking++
+      //   const attack = new BattleQueuedAttack(
+      //     this,
+      //     attacker,
+      //     player,
+      //     60,
+      //     'test'
+      //   )
+      //   attack.onComplete = () => {
+      //     this.isAttacking--
+      //     this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
+      //   }
+      //   this.queuedAttacks.push(attack)
+      // } else {
+      //   this.isAttacking++
+      //   const attack = new BattleQueuedAttack(this, attacker, enemy, 60, 'test')
+      //   attack.onComplete = () => {
+      //     this.isAttacking--
+      //     this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
+      //   }
+      //   this.queuedAttacks.push(attack)
+      // }
+      // this.fightIndex++
+      // if (this.fightIndex >= order.length) {
+      //   this.fightIndex = 0
+      // }
     }
     if (this.queuedAttacks.length > 0) {
       this.queuedAttacks[0].update()

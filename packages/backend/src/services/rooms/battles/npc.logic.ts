@@ -13,6 +13,5 @@ export class NpcLogic {
       duration: 60,
       abilityId: 'test',
     })
-    this.npc.cooldown = this.npc.speed * 16
   }
 }

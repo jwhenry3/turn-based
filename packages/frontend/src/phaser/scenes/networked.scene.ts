@@ -4,6 +4,7 @@ import {
   ChatMessage,
   useChatHistoryState,
 } from '../../ui/world/hud/chat/use-chat-history'
+import { BattleQueuedAttack } from '../entities/battle/battle-queued-attack'
 import { NpcEntity } from '../entities/Npc'
 import { PlayerEntity } from '../entities/player'
 import { useBattle } from '../use-battle'
@@ -52,6 +53,25 @@ export class NetworkedScene extends Phaser.Scene {
       0.2
     )
     this.destinationPointer.setVisible(false)
+    this.connector.room.onMessage('battle:action', (action) => {
+      const battle = useBattle.getState().battle
+      if (battle?.battle.battleId === action.battleId) {
+        console.log('Received action', action)
+        const attacker = battle?.enemies[action.entity]
+        const enemy =
+          battle?.players[action.target] || Object.values(battle.players)[0]
+        const attack = new BattleQueuedAttack(
+          battle,
+          attacker,
+          enemy,
+          action.duration,
+          action.abilityId
+        )
+        attack.onComplete = () =>
+          battle.queuedAttacks.splice(battle.queuedAttacks.indexOf(attack), 1)
+        battle.queuedAttacks.push(attack)
+      }
+    })
   }
 
   async start() {

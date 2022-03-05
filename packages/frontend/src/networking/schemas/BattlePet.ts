@@ -13,5 +13,6 @@ export class BattlePet extends Schema {
     @type("number") public health!: number;
     @type("number") public mana!: number;
     @type("number") public cooldown!: number;
+    @type("boolean") public canAct!: boolean;
     @type(Statistics) public stats: Statistics = new Statistics();
 }
