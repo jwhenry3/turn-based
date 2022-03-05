@@ -21,6 +21,7 @@ import { MapConfig } from './fixtures/map.config'
 import { createNpc } from '../schemas/factories/npc'
 import { v4 } from 'uuid'
 import { BattleHandler } from './battles/battle.handler'
+import { MapSchema } from '@colyseus/schema'
 
 export class MmorpgMapRoom extends Room {
   connectedClients: Record<string, Client> = {}
@@ -226,13 +227,31 @@ export class MmorpgMapRoom extends Room {
       const character = this.state.playersByClient.get(client.sessionId)
       this.state.battles[character.battleId]?.removePlayer(character)
     })
-    this.onMessage('character:battle:action', (client, action) => {
-      const character = this.state.playersByClient.get(client.sessionId)
-      const battle = this.state.battles[character.battleId]
-      if (battle && battle.players[character.currentClientId]?.canAct) {
-        console.log('Player wants to perform battle action', action)
+    this.onMessage(
+      'character:battle:action',
+      (client, { abilityId, entityType, targetId, targetType }) => {
+        const character = this.state.playersByClient.get(client.sessionId)
+        const battle = this.state.battles[character.battleId] as Battle
+        const handler = this.battleHandlers[battle.battleId] as BattleHandler
+        if (character && battle && handler) {
+          const player = battle.players[character.currentClientId]
+          const otherCharacter = this.state.players.get(targetId)
+          const clientId = otherCharacter?.currentClientId
+          const target =
+            targetType === 'npc'
+              ? battle.npcs[targetId]
+              : targetType === 'pet'
+              ? battle.players[clientId].pet
+              : battle.players[clientId]
+          if (entityType === 'player' && player && target) {
+            handler.onPlayerAction(character, { abilityId, target })
+          }
+          if (entityType === 'pet' && player?.pet && target) {
+            handler.onPetAction(character, { abilityId, target })
+          }
+        }
       }
-    })
+    )
   }
 
   onDispose() {
@@ -261,7 +280,7 @@ export class MmorpgMapRoom extends Room {
       client.send('character not found with id')
       return
     }
-    const oldCharacter = this.state.players.get(characterModel.name)
+    const oldCharacter = this.state.players.get(characterModel.characterId)
     this.connectedClients[client.sessionId] = client
     if (oldCharacter) {
       if (this.state.playersByClient) {
@@ -278,7 +297,7 @@ export class MmorpgMapRoom extends Room {
       this.hash.insert(node)
       character.position.isPlayerPosition = true
       this.addPet(character)
-      this.state.players.set(character.name, character)
+      this.state.players.set(character.characterId, character)
       this.state.playersByClient.set(client.sessionId, character)
     }
     return characterModel

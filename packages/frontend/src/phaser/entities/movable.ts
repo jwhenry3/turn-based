@@ -26,10 +26,10 @@ export class MovableEntity<
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
-      if (app.target === this) {
+      if (app.selected === this) {
         afterSelected()
       }
-      app.target = this
+      app.selected = this
     })
   }
 

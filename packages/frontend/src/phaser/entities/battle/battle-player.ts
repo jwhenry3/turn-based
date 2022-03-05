@@ -67,7 +67,7 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       e.downElement.focus()
-      app.target = this.character
+      app.target = this.model
       app.updates.next('target:stats')
     })
     console.log('created!')

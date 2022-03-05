@@ -17,7 +17,7 @@ export class StarterScene extends NetworkedScene {
       blurAll()
       const input = this.localPlayer?.inputPlugin
       console.log(input)
-      app.target = undefined
+      app.selected = undefined
       if (input?.mouseTick === 0) {
         input.mouseTick = input.mouseCooldown
         e.updateWorldPoint(this.input.scene.cameras.main)

@@ -28,7 +28,10 @@ export class RectanglePlugin {
 
   update() {
     if (!this.owner) return
-    if (app.target === this.owner) {
+    if (
+      app.selected === this.owner ||
+      (app.target as any) === this.owner.model
+    ) {
       this.rectangle.setStrokeStyle(
         4,
         Phaser.Display.Color.HexStringToColor('#fff').color,
@@ -46,7 +49,10 @@ export class RectanglePlugin {
         Phaser.Display.Color.HexStringToColor(this.color).color
       )
     }
-    if (app.target === this.owner) {
+    if (
+      app.selected === this.owner ||
+      (app.target as any) === this.owner.model
+    ) {
       this.rectangle.setStrokeStyle(
         4,
         Phaser.Display.Color.HexStringToColor('#fff').color,

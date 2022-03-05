@@ -67,6 +67,10 @@ export class Statistics extends Schema {
 export class BattlePet extends Schema {
   @type('string')
   characterId: string
+  @type('string')
+  petId: string
+  @type('string')
+  npcTypeId: string
   @type('number')
   health = 100
   @type('number')
@@ -87,6 +91,8 @@ export class BattlePet extends Schema {
     super(args)
     this.owner = character
     this.characterId = character.characterId
+    this.petId = character.pet.npcId
+    this.npcTypeId = character.pet.npcTypeId
   }
 }
 export class BattlePlayer extends Schema {

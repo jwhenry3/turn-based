@@ -1,8 +1,13 @@
 import { MapSchema } from '@colyseus/schema'
 import { Client, Room } from 'colyseus.js'
 import { Subject } from 'rxjs'
+import { BattleNpc } from '../networking/schemas/BattleNpc'
+import { BattlePet } from '../networking/schemas/BattlePet'
+import { BattlePlayer } from '../networking/schemas/BattlePlayer'
 import { Character } from '../networking/schemas/Character'
 import { Npc } from '../networking/schemas/Npc'
+import { BattleEntity } from '../phaser/entities/battle/battle-entity'
+import { MovableEntity } from '../phaser/entities/movable'
 import { LobbyScene } from '../phaser/scenes/lobby.scene'
 import { StarterScene } from '../phaser/scenes/starter.scene'
 
@@ -14,7 +19,8 @@ export const app = {
   },
   character: undefined as Character | undefined,
   game: undefined as Phaser.Game | undefined,
-  target: undefined,
+  selected: undefined as MovableEntity<any> | undefined,
+  target: undefined as BattlePet | BattlePlayer | BattleNpc | undefined,
   updates: new Subject<string>(),
   messages: {
     lobby: new Subject<{ type: string; message: any }>(),

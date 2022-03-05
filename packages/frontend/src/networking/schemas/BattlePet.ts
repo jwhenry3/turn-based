@@ -10,6 +10,8 @@ import { Statistics } from './Statistics'
 
 export class BattlePet extends Schema {
     @type("string") public characterId!: string;
+    @type("string") public petId!: string;
+    @type("string") public npcTypeId!: string;
     @type("number") public health!: number;
     @type("number") public mana!: number;
     @type("number") public cooldown!: number;

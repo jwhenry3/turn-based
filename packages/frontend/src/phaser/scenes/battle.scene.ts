@@ -224,42 +224,7 @@ export class BattleScene extends Phaser.Scene {
       this.zoom()
       app.updates.next('battle:size')
     }
-    if (this.input.mousePointer.isDown && this.queuedAttacks.length < 2) {
-      // const enemyIndex =
-      //   Math.round(Math.random() * Object.keys(this.enemies).length) - 1
-      // const player = this.players[Object.keys(this.players)[0]]
-      // const order = [player, player.pet, ...Object.values(this.enemies)]
-      // const enemy =
-      //   this.enemies[Object.keys(this.enemies)[enemyIndex < 0 ? 0 : enemyIndex]]
-      // const attacker = order[this.fightIndex]
-      // if (attacker instanceof BattleSceneEnemy) {
-      //   this.isAttacking++
-      //   const attack = new BattleQueuedAttack(
-      //     this,
-      //     attacker,
-      //     player,
-      //     60,
-      //     'test'
-      //   )
-      //   attack.onComplete = () => {
-      //     this.isAttacking--
-      //     this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
-      //   }
-      //   this.queuedAttacks.push(attack)
-      // } else {
-      //   this.isAttacking++
-      //   const attack = new BattleQueuedAttack(this, attacker, enemy, 60, 'test')
-      //   attack.onComplete = () => {
-      //     this.isAttacking--
-      //     this.queuedAttacks.splice(this.queuedAttacks.indexOf(attack), 1)
-      //   }
-      //   this.queuedAttacks.push(attack)
-      // }
-      // this.fightIndex++
-      // if (this.fightIndex >= order.length) {
-      //   this.fightIndex = 0
-      // }
-    }
+
     if (this.queuedAttacks.length > 0) {
       this.queuedAttacks[0].update()
     }
