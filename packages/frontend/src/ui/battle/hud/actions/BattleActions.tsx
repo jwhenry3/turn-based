@@ -36,16 +36,16 @@ export function BattleActions() {
     const interval = setInterval(() => {
       const battleScene = app.game.scene.getScene('battle') as BattleScene
       if (battleScene) {
-        if (battleScene.localPlayer?.pet?.canAct && !petCanAct) {
+        if (battleScene.localPlayer?.pet?.model.canAct && !petCanAct) {
           setPetCanAct(true)
         }
-        if (!battleScene.localPlayer?.pet?.canAct && petCanAct) {
+        if (!battleScene.localPlayer?.pet?.model.canAct && petCanAct) {
           setPetCanAct(false)
         }
-        if (battleScene.localPlayer?.canAct && !playerCanAct) {
+        if (battleScene.localPlayer?.model.canAct && !playerCanAct) {
           setPlayerCanAct(true)
         }
-        if (!battleScene.localPlayer?.canAct && playerCanAct) {
+        if (!battleScene.localPlayer?.model.canAct && playerCanAct) {
           setPlayerCanAct(false)
         }
       }
