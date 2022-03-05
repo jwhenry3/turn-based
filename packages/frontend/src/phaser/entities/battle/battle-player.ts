@@ -63,14 +63,14 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
       this.pet.owner = this
     }
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
-      console.log('Selected!', this.character.name)
+      // console.log('Selected!', this.character.name)
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       e.downElement.focus()
       app.target = this.model
       app.updates.next('target:stats')
     })
-    console.log('created!')
+    // console.log('created!')
   }
 
   preUpdate() {

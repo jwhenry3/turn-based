@@ -56,20 +56,38 @@ export class NetworkedScene extends Phaser.Scene {
     this.connector.room.onMessage('battle:action', (action) => {
       const battle = useBattle.getState().battle
       if (battle?.battle.battleId === action.battleId) {
-        console.log('Received action', action)
-        const attacker = battle?.enemies[action.entity]
-        const enemy =
-          battle?.players[action.target] || Object.values(battle.players)[0]
-        const attack = new BattleQueuedAttack(
-          battle,
-          attacker,
-          enemy,
-          action.duration,
-          action.abilityId
-        )
-        attack.onComplete = () =>
-          battle.queuedAttacks.splice(battle.queuedAttacks.indexOf(attack), 1)
-        battle.queuedAttacks.push(attack)
+        // console.log('Received action', action)
+        let attacker: any = null
+        let target: any = null
+        if (action.entity.battleNpcId) {
+          attacker = battle?.enemies[action.entity.battleNpcId]
+        } else if (action.entity.petId) {
+          attacker = battle?.players[action.entity.characterId].pet
+        } else {
+          attacker = battle?.players[action.entity.characterId]
+        }
+        if (action.target.battleNpcId) {
+          target = battle?.enemies[action.target.battleNpcId]
+        } else if (action.target.petId) {
+          target = battle?.players[action.target.characterId].pet
+        } else {
+          target = battle?.players[action.target.characterId]
+        }
+
+        if (attacker && target) {
+          const attack = new BattleQueuedAttack(
+            battle,
+            attacker,
+            target,
+            action.duration,
+            action.abilityId
+          )
+          attack.onComplete = () =>
+            battle.queuedAttacks.splice(battle.queuedAttacks.indexOf(attack), 1)
+          battle.queuedAttacks.push(attack)
+        } else {
+          console.warn('enemy not found for action', action)
+        }
       }
     })
   }
@@ -162,11 +180,11 @@ export class NetworkedScene extends Phaser.Scene {
             battleScene.connector = this.connector
             battleScene.battle = b
             battleScene.battle.players.forEach((player) => {
-              console.log('adding player')
+              // console.log('adding player')
               battleScene.addPlayer(player)
             })
             battleScene.battle.npcs.forEach((npc) => {
-              console.log('adding enemy')
+              // console.log('adding enemy')
               battleScene.addEnemy(npc)
             })
             b.players.onRemove = (p) => {

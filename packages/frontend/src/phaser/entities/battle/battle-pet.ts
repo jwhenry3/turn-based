@@ -28,7 +28,7 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
     this.add(this.namePlugin.text)
     this.add(this.rectanglePlugin.rectangle)
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
-      console.log('Selected!', 'pet')
+      // console.log('Selected!', 'pet')
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       e.downElement.focus()

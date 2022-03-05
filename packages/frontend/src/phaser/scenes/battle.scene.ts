@@ -226,7 +226,9 @@ export class BattleScene extends Phaser.Scene {
     }
 
     if (this.queuedAttacks.length > 0) {
-      this.queuedAttacks[0].update()
+      for (const attack of this.queuedAttacks) {
+        attack.update()
+      }
     }
   }
   zoom() {
@@ -239,10 +241,6 @@ export class BattleScene extends Phaser.Scene {
       this.lastIsMobilePortrait = currentMobilePortrait
       this.createOrUpdatePositions()
     }
-  }
-
-  simulateAttack(entity: BattleEntity<any>, target: BattleEntity<any>) {
-    entity.attacking = target
   }
 
   stop() {

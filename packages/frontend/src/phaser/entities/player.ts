@@ -43,7 +43,7 @@ export class PlayerEntity extends MovableEntity<Character> {
       app.character = this.model
       // console.log(this.model.stats.maxMp.toJSON())
       app.updates.next('character:stats')
-      console.log(this.x, this.y)
+      // console.log(this.x, this.y)
       this.scene.cameras.main.startFollow(this, false, 0.05, 0.05)
       this.scene.cameras.main.setDeadzone(128, 128)
       this.scene.cameras.main.setZoom(1)

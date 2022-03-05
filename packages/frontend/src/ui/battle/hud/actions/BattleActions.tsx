@@ -35,6 +35,10 @@ export const ActionMenuContainer = styled.div`
   left: 16px;
   bottom: 16px;
 `
+
+let __playerCanAct = false
+let __petCanAct = false
+let __hasTarget = false
 export function BattleActions() {
   const [hasTarget, setHasTarget] = useState(false)
   const [playerCanAct, setPlayerCanAct] = useState(false)
@@ -43,22 +47,19 @@ export function BattleActions() {
     const interval = setInterval(() => {
       const battleScene = app.game.scene.getScene('battle') as BattleScene
       if (battleScene) {
-        if (battleScene.localPlayer?.pet?.model.canAct && !petCanAct) {
-          setPetCanAct(true)
+        const _petCanAct = !!battleScene.localPlayer?.pet?.model.canAct
+        const _playerCanAct = !!battleScene.localPlayer?.model.canAct
+        if (_petCanAct !== __petCanAct) {
+          __petCanAct = _petCanAct
+          setPetCanAct(_petCanAct)
         }
-        if (!battleScene.localPlayer?.pet?.model.canAct && petCanAct) {
-          setPetCanAct(false)
+        if (_playerCanAct !== __playerCanAct) {
+          __playerCanAct = _playerCanAct
+          setPlayerCanAct(_playerCanAct)
         }
-        if (battleScene.localPlayer?.model.canAct && !playerCanAct) {
-          setPlayerCanAct(true)
-        }
-        if (!battleScene.localPlayer?.model.canAct && playerCanAct) {
-          setPlayerCanAct(false)
-        }
-        if (app.target && !hasTarget) {
-          setHasTarget(true)
-        } else if (!app.target && hasTarget) {
-          setHasTarget(false)
+        if (!!app.target !== __hasTarget) {
+          setHasTarget(!!app.target)
+          __hasTarget = !!app.target
         }
       }
     }, 500)
@@ -71,36 +72,44 @@ export function BattleActions() {
       !!(app.target as BattlePlayer).characterId &&
       !(app.target as BattlePet).petId
     const isPet = !!(app.target as BattlePet).petId
-    console.log(app.target)
-    return {
-      targetType: isNpc ? 'npc' : isPet ? 'pet' : isPlayer ? 'player' : '',
-      targetId: (app.target as BattleNpc).battleNpcId
-        ? (app.target as BattleNpc).battleNpcId
-        : (app.target as BattlePlayer | BattlePet).characterId,
+    // console.log(app.target)
+    const target = app.target as any
+    if (isNpc) {
+      return { battleNpcId: target.battleNpcId }
     }
+    if (isPlayer) {
+      return { characterId: target.characterId }
+    }
+    if (isPet) {
+      return { characterId: target.characterId, petId: target.petId }
+    }
+    return undefined
   }
   const onPlayerAction = () => {
     const battleScene = app.game.scene.getScene('battle') as BattleScene
     if (battleScene && app.rooms.active && hasTarget) {
-      console.log('send player action')
-      console.log(getTargetData())
       app.rooms.active.send('character:battle:action', {
         battleId: battleScene.battle.battleId,
-        entityType: 'player',
+        entity: {
+          characterId: battleScene.localPlayer.character.characterId,
+        },
         abilityId: 'test',
-        ...getTargetData(),
+        target: getTargetData(),
       })
     }
   }
   const onPetAction = () => {
     const battleScene = app.game.scene.getScene('battle') as BattleScene
     if (battleScene && app.rooms.active && hasTarget) {
-      console.log('send pet action')
+      // console.log('send pet action')
       app.rooms.active.send('character:battle:action', {
         battleId: battleScene.battle.battleId,
-        entityType: 'pet',
+        entity: {
+          characterId: battleScene.localPlayer.character.characterId,
+          petId: battleScene.localPlayer.character.pet.npcId,
+        },
         abilityId: 'test',
-        ...getTargetData(),
+        target: getTargetData(),
       })
     }
   }
@@ -139,22 +148,22 @@ export function BattleActions() {
           {petCanAct && (
             <div>
               <Fab
-                color="primary"
+                color="secondary"
                 onClick={onPetAction}
                 disabled={!hasTarget}
               />
               <Fab
-                color="primary"
+                color="secondary"
                 onClick={onPetAction}
                 disabled={!hasTarget}
               />
               <Fab
-                color="primary"
+                color="secondary"
                 onClick={onPetAction}
                 disabled={!hasTarget}
               />
               <Fab
-                color="primary"
+                color="secondary"
                 onClick={onPetAction}
                 disabled={!hasTarget}
               />

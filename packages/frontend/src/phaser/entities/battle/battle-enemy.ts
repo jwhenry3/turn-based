@@ -30,11 +30,10 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
     this.add(this.rectanglePlugin.rectangle)
     this.setDepth(this.y)
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
-      console.log('Selected!', this.model.name)
+      // console.log('Selected!', this.model.name)
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       e.downElement.focus()
-      console.log('Selected!', this.model.name)
       app.target = this.model
       app.updates.next('target:stats')
     })

@@ -16,7 +16,7 @@ export class StarterScene extends NetworkedScene {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
       const input = this.localPlayer?.inputPlugin
-      console.log(input)
+      // console.log(input)
       app.selected = undefined
       if (input?.mouseTick === 0) {
         input.mouseTick = input.mouseCooldown

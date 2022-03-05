@@ -1,15 +1,40 @@
-import { Battle, BattleNpc } from '../../schemas/battles'
+import { from, lastValueFrom, tap } from 'rxjs'
+import {
+  Battle,
+  BattleNpc,
+  BattlePet,
+  BattlePlayer,
+} from '../../schemas/battles'
 import { BattleHandler } from './battle.handler'
 
 export class NpcLogic {
   constructor(public handler: BattleHandler, public npc: BattleNpc) {}
 
-  performAction() {
-    console.log('NPC should perform an action')
+  async performAction() {
+    // console.log('NPC should perform an action')
+    const players = this.handler.battle.players
+    const options: (BattlePet | BattlePlayer)[] = []
+    await lastValueFrom(
+      from(players.values()).pipe(
+        tap((player) => {
+          options.push(player)
+          if (player.pet) {
+            options.push(player.pet)
+          }
+        })
+      )
+    )
+    const attackOption = Math.round(Math.random() * (options.length - 1))
+    const target = options[attackOption]
     this.handler.room.broadcast('battle:action', {
       battleId: this.handler.battle.battleId,
-      entity: this.npc.battleNpcId,
-      target: this.handler.battle.players.values()[0],
+      entity: {
+        battleNpcId: this.npc.battleNpcId,
+      },
+      target: {
+        characterId: target.characterId,
+        petId: target instanceof BattlePet ? target.petId : undefined,
+      },
       duration: 60,
       abilityId: 'test',
     })

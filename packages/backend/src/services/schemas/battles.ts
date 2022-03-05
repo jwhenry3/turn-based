@@ -66,6 +66,8 @@ export class Statistics extends Schema {
 }
 export class BattlePet extends Schema {
   @type('string')
+  name: string
+  @type('string')
   characterId: string
   @type('string')
   petId: string
@@ -75,7 +77,8 @@ export class BattlePet extends Schema {
   health = 100
   @type('number')
   mana = 100
-  @type('number')
+
+  interval = 0
   cooldown = 0
   speed = 4
 
@@ -92,18 +95,22 @@ export class BattlePet extends Schema {
     this.owner = character
     this.characterId = character.characterId
     this.petId = character.pet.npcId
+    this.name = character.pet.name
     this.npcTypeId = character.pet.npcTypeId
   }
 }
 export class BattlePlayer extends Schema {
   @type('string')
   characterId: string
+  @type('string')
+  name: string
   @type('number')
   health = 100
   @type('number')
   mana = 100
 
-  @type('number')
+  interval = 0
+
   cooldown = 0
 
   @type(BattlePet)
@@ -129,6 +136,7 @@ export class BattlePlayer extends Schema {
     super(args)
     this.character = character
     this.characterId = character.characterId
+    this.name = character.name
   }
 }
 
@@ -179,7 +187,8 @@ export class BattleNpc extends BattleNpcType {
   level: number = 1
   @type('number')
   expYield: number = 10
-  @type('number')
+
+  interval = 0
   cooldown = 0
 
   speed = 4

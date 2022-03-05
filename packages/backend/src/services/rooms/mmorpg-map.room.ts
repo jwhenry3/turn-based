@@ -225,28 +225,24 @@ export class MmorpgMapRoom extends Room {
     })
     this.onMessage('character:battle:leave', (client) => {
       const character = this.state.playersByClient.get(client.sessionId)
-      this.state.battles[character.battleId]?.removePlayer(character)
+      const battle = this.battleHandlers[character.battleId]
+      battle?.removePlayer(character)
     })
     this.onMessage(
       'character:battle:action',
-      (client, { abilityId, entityType, targetId, targetType }) => {
+      (client, { abilityId, entity, target }) => {
         const character = this.state.playersByClient.get(client.sessionId)
         const battle = this.state.battles[character.battleId] as Battle
         const handler = this.battleHandlers[battle.battleId] as BattleHandler
         if (character && battle && handler) {
-          const player = battle.players[character.currentClientId]
-          const otherCharacter = this.state.players.get(targetId)
-          const clientId = otherCharacter?.currentClientId
-          const target =
-            targetType === 'npc'
-              ? battle.npcs[targetId]
-              : targetType === 'pet'
-              ? battle.players[clientId].pet
-              : battle.players[clientId]
-          if (entityType === 'player' && player && target) {
-            handler.onPlayerAction(character, { abilityId, target })
+          const player = battle.players[character.characterId]
+          if (entity.characterId && !entity.petId && player && target) {
+            handler.onPlayerAction(character, {
+              abilityId,
+              target,
+            })
           }
-          if (entityType === 'pet' && player?.pet && target) {
+          if (entity.characterId && entity.petId && player?.pet && target) {
             handler.onPetAction(character, { abilityId, target })
           }
         }
