@@ -245,8 +245,8 @@ export class BattleHandler {
       this.battle.players.forEach((player) => {
         this.removePlayer(player.character)
       })
+    } else {
+      this.onComplete()
     }
-    this.completed$.next()
-    this.onComplete()
   }
 }

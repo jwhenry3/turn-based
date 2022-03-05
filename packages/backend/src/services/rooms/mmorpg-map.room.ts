@@ -60,7 +60,6 @@ export class MmorpgMapRoom extends Room {
     )
     handler.addPlayer(player)
     handler.onComplete = () => {
-      this.battleHandlers[battle.battleId].complete()
       this.state.battles.delete(battle.battleId)
       delete this.battleHandlers[battle.battleId]
     }
