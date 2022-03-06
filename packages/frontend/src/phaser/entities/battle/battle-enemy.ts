@@ -43,5 +43,6 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.namePlugin.update()
     this.rectanglePlugin.update()
+    this.handleJump()
   }
 }

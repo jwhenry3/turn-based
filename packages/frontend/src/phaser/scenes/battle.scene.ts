@@ -99,12 +99,23 @@ export class BattleScene extends Phaser.Scene {
       if (this.players[id].pet) {
         const position = this.players[id].petPosition
         if (this.isMobilePortrait()) {
-          position.originalX = this.players[id].parentContainer.originalX - 40
-          position.setPosition(position.originalX, position.originalY)
+          if (
+            position &&
+            this.players[id]?.parentContainer?.originalX &&
+            this.players[id].parentContainer
+          ) {
+            position.originalX = this.players[id].parentContainer.originalX - 40
+            position.setPosition(position.originalX, position.originalY)
+          }
         } else {
-          this.players[id].petPosition.originalX =
-            this.players[id].parentContainer.originalX - 64
-          position.setPosition(position.originalX, position.originalY)
+          if (
+            position &&
+            this.players[id]?.parentContainer?.originalX &&
+            this.players[id].parentContainer
+          ) {
+            position.originalX = this.players[id].parentContainer.originalX - 64
+            position.setPosition(position.originalX, position.originalY)
+          }
         }
       }
     }

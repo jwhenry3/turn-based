@@ -6,7 +6,7 @@ import { PetEntity } from './pet'
 import { InputPlugin } from './plugins/input'
 
 export class PlayerEntity extends MovableEntity<Character> {
-  inputPlugin = new InputPlugin(this.scene.input)
+  inputPlugin: InputPlugin
 
   battleId?: string
   pet?: PetEntity
@@ -18,6 +18,10 @@ export class PlayerEntity extends MovableEntity<Character> {
   }
 
   create() {
+    if (this.isLocalPlayer) {
+      this.inputPlugin = new InputPlugin(this.scene.input, this)
+      this.inputPlugin.create()
+    }
     this.setPosition(this.model.position.x, this.model.position.y)
     this.namePlugin.create(this.model.name)
     this.rectanglePlugin.create()
@@ -75,7 +79,6 @@ export class PlayerEntity extends MovableEntity<Character> {
   }
   lastWidth = 1600
 
-
   preUpdate() {
     if (!this.rectanglePlugin.rectangle) this.create()
     if (this.isLocalPlayer) {
@@ -93,7 +96,10 @@ export class PlayerEntity extends MovableEntity<Character> {
       }
     }
     if (this.x !== this.model.position.x || this.y !== this.model.position.y) {
-      const { newX, newY } = this.lerpTo(this.model.position.x, this.model.position.y)
+      const { newX, newY } = this.lerpTo(
+        this.model.position.x,
+        this.model.position.y
+      )
       this.setPosition(newX, newY)
     }
     this.setDepth(Math.round(this.y + 32))
@@ -109,7 +115,8 @@ export class PlayerEntity extends MovableEntity<Character> {
     }
     this.rectanglePlugin.update()
     this.namePlugin.update()
-    this.inputPlugin.update()
+    this.inputPlugin?.update()
+    this.handleJump()
   }
   destroy() {
     super.destroy()

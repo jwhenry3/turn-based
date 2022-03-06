@@ -24,7 +24,7 @@ export const HealthAmount = styled.div`
   z-index: -1;
 `
 export function Health({ stats }) {
-  console.log('rerender', stats.hp.total)
+  // console.log('rerender', stats.hp.total)
   return (
     <HealthContainer>
       <HealthAmount

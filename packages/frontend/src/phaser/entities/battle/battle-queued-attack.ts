@@ -7,6 +7,7 @@ export class BattleQueuedAttack {
   willRetreat = false
   retreating = false
   retreatDelay = 0
+  hasStartedAction = false
   constructor(
     public scene: BattleScene,
     public entity: BattleEntity<any>,
@@ -41,11 +42,17 @@ export class BattleQueuedAttack {
     return { newX, newY }
   }
   update() {
+    this.entity.handleJump()
+    if (!this.hasStartedAction) {
+      this.entity.animateJump = true
+      this.hasStartedAction = true
+    }
     if (this.willRetreat) {
       if (this.retreatDelay > 0) {
         this.retreatDelay--
         return
       }
+      this.entity.animateJump = true
       this.retreating = true
       this.willRetreat = false
     }

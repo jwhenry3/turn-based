@@ -47,11 +47,13 @@ export class PositionData extends Schema {
 
   owner: Character | Npc
 
+  delta = 0
+
   getNextPosition(deltaTime: number) {
     const angle = Math.atan2(this.movement.vertical, this.movement.horizontal)
-    const delta = Math.round(Math.round(deltaTime) / 12)
-    this.nextX = Math.round(this.x + Math.cos(angle) * this.speed * delta)
-    this.nextY = Math.round(this.y + Math.sin(angle) * this.speed * delta)
+    this.delta = Math.round(Math.round(deltaTime) / 12)
+    this.nextX = Math.round(this.x + Math.cos(angle) * this.speed * this.delta)
+    this.nextY = Math.round(this.y + Math.sin(angle) * this.speed * this.delta)
   }
 }
 

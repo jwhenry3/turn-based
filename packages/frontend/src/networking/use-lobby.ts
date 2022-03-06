@@ -10,7 +10,7 @@ export function useLobby() {
     let timeout
     ;(async () => {
       try {
-        const client = new Client('ws://localhost:9200')
+        const client = new Client(`ws://${window.location.hostname}:9200`)
         // console.log('Connecting to Lobby... attempt:', attempts + 1)
         let room = await client.joinOrCreate('lobby')
         app.rooms.lobby = room

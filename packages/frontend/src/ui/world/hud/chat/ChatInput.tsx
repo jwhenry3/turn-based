@@ -29,15 +29,6 @@ export function ChatInput() {
   const onKey = (e) => {
     if (e.key.toLowerCase() === 'enter') {
       app.rooms.active?.send('chat:map', { message: text })
-      // addMessage({
-      //   messageId: new Date().valueOf() + '',
-      //   type: 'player',
-      //   character: {
-      //     characterId: app.auth.characterId,
-      //     name: 'Test User',
-      //   },
-      //   message: text,
-      // })
       setText('')
     }
   }
@@ -45,6 +36,16 @@ export function ChatInput() {
     <ChatInputContainer>
       <ChatInputField
         type="text"
+        onFocus={(e) => {
+          if (!app.focusedUi.includes(e.target)) {
+            app.focusedUi.push(e.target)
+          }
+        }}
+        onBlur={(e) => {
+          if (app.focusedUi.includes(e.target)) {
+            app.focusedUi.splice(app.focusedUi.indexOf(e.target), 1)
+          }
+        }}
         onKeyUp={onKey}
         onChange={(e) => setText(e.target.value)}
         value={text}

@@ -13,6 +13,11 @@ export class MovableEntity<
   rectanglePlugin: RectanglePlugin = new RectanglePlugin(this.scene, this)
   namePlugin: NamePlugin = new NamePlugin(this.scene, this)
 
+  animateJump = false
+  falling = false
+  jumpMax = 64
+  jumpCurrent = 0
+
   constructor(public model: T, public scene: NetworkedScene) {
     super(scene)
   }
@@ -33,20 +38,45 @@ export class MovableEntity<
     })
   }
 
+  timer = 0
+  jumping = false
+
+  handleJump() {
+    if (this.animateJump || this.jumping) {
+      this.jumping = true
+      this.animateJump = false
+      const nextValue = Math.sin(Math.PI * this.timer * 10) * this.jumpMax
+      this.timer += 0.002
+      if (nextValue > 0) {
+        if (this.jumpCurrent < nextValue) {
+          this.falling = true
+        }
+        this.jumpCurrent = nextValue
+        this.rectanglePlugin.rectangle.setPosition(0, -this.jumpCurrent)
+      }
+      if (nextValue <= 0 && nextValue < this.jumpCurrent) {
+        this.jumping = false
+        this.falling = false
+        this.jumpCurrent = 0
+        this.timer = 0
+      }
+    }
+  }
+
   lerpTo(x: number, y: number) {
     const diffX = Math.abs(x - this.x)
     const diffY = Math.abs(y - this.y)
     let newX = this.x
     let newY = this.y
-    if (diffX < 1) {
+    if (diffX < 2) {
       newX = x
     } else {
-      newX = lerp(this.x, x, 0.05)
+      newX = lerp(this.x, x, Math.abs(x / this.x) * 0.08)
     }
-    if (diffY < 1) {
+    if (diffY < 2) {
       newY = y
     } else {
-      newY = lerp(this.y, y, 0.05)
+      newY = lerp(this.y, y, Math.abs(y / this.y) * 0.08)
     }
     return { newX, newY }
   }

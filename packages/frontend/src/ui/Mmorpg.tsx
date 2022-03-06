@@ -26,6 +26,7 @@ export default function Mmorpg() {
         parent: node,
         type: Phaser.WEBGL,
         backgroundColor: '#0af',
+        pixelArt: true,
         scale: {
           mode: Phaser.Scale.RESIZE,
           parent: node,
@@ -35,6 +36,9 @@ export default function Mmorpg() {
           autoRound: true,
         },
         input: {
+          keyboard: {
+            target: node
+          },
           gamepad: true,
         },
         antialias: true,
@@ -45,17 +49,14 @@ export default function Mmorpg() {
       update('lobby')
     }
   }
-  const onFocusChange = (value: boolean) => {
-    // console.log('focus change', value)
-  }
   return (
     <div>
       <GameContainer
+        tabIndex={0}
         ref={(node) => onRef(node)}
-        onMouseLeave={() => onFocusChange(false)}
-        onMouseEnter={() => onFocusChange(true)}
+        onClick={(e) => (e.target as any).focus()}
       />
-      <div onMouseEnter={() => onFocusChange(false)}>
+      <div>
         {scene === 'lobby' && lobby && lobby.state && <Lobby />}
         {scene && scene !== 'lobby' && <World />}
       </div>

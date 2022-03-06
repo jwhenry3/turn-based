@@ -2,6 +2,7 @@ import { BattlePlayer } from '../../../networking/schemas/BattlePlayer'
 import { Character } from '../../../networking/schemas/Character'
 import { app } from '../../../ui/app'
 import { blurAll } from '../../behaviors/blurAll'
+import { lerp } from '../../behaviors/lerp'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
 import { NamePlugin } from '../plugins/name'
@@ -72,10 +73,10 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     })
     // console.log('created!')
   }
-
   preUpdate() {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.rectanglePlugin.update()
     this.namePlugin.update()
+    this.handleJump()
   }
 }

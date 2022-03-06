@@ -41,7 +41,6 @@ export function PetPanel() {
         })
       )
       .subscribe(({ entity }) => {
-        console.log(entity, entity.stats.hp.total)
         if ((entity as any).petId) {
           setCharacter(entity)
           setTick(tick + 1)

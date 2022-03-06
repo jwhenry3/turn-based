@@ -34,7 +34,6 @@ export function CharacterPanel() {
     const sub = app.battleEvents
       .pipe(
         filter(({ event, entity }) => {
-          console.log(event, entity)
           return (
             event === 'battle:update' &&
             (entity as BattlePlayer).characterId === app.character.characterId
@@ -42,7 +41,6 @@ export function CharacterPanel() {
         })
       )
       .subscribe(({ entity }) => {
-        console.log(entity, entity.stats.hp.total)
         if (!(entity as any).petId) {
           setCharacter(entity)
           setTick(tick + 1)

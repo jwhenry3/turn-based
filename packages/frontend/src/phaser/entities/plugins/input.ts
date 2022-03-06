@@ -1,44 +1,67 @@
 import { app } from '../../../ui/app'
+import { PlayerEntity } from '../player'
 
 export class InputPlugin {
   movement = [0, 0]
-
-  keys: Record<string, Phaser.Input.Keyboard.Key> = {}
+  keyMap = {
+    w: 'up',
+    s: 'down',
+    a: 'left',
+    d: 'right',
+    ' ': 'jump',
+  }
+  keys: Record<string, boolean> = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+    jump: false,
+  }
 
   mouseCooldown = 20
   mouseTick = 0
 
-  constructor(public input: Phaser.Input.InputPlugin) {}
+  constructor(
+    public input: Phaser.Input.InputPlugin,
+    public entity: PlayerEntity
+  ) {}
 
   onChange = (axis: [number, number]) => null
 
+  onKeyDown = (e) => {
+    if (this.keyMap[e.key] && app.focusedUi.length === 0) {
+      this.keys[this.keyMap[e.key]] = true
+    }
+  }
+  onKeyUp = (e) => {
+    if (this.keyMap[e.key]) {
+      this.keys[this.keyMap[e.key]] = false
+    }
+  }
   create() {
-    this.keys = this.input.keyboard.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.W,
-      down: Phaser.Input.Keyboard.KeyCodes.S,
-      left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-    }) as Record<string, Phaser.Input.Keyboard.Key>
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
   }
 
   update() {
     const movement: [number, number] = [0, 0]
-    if (app.gameHasFocus) {
-      this.input.keyboard.enabled = true
-      if (this.keys.left.isDown) {
-        movement[0] = -1
+    if (this.keys.left) {
+      movement[0] = -1
+    }
+    if (this.keys.right) {
+      movement[0] = 1
+    }
+    if (this.keys.up) {
+      movement[1] = -1
+    }
+    if (this.keys.down) {
+      movement[1] = 1
+    }
+    if (this.keys.jump) {
+      if (this.entity.jumpCurrent === 0) {
+        // console.log('jump!')
+        this.entity.animateJump = true
       }
-      if (this.keys.right.isDown) {
-        movement[0] = 1
-      }
-      if (this.keys.up.isDown) {
-        movement[1] = -1
-      }
-      if (this.keys.down.isDown) {
-        movement[1] = 1
-      }
-    } else {
-      this.input.keyboard.enabled = false
     }
     if (this.mouseTick > 0) {
       this.mouseTick--
@@ -61,6 +84,7 @@ export class InputPlugin {
     }
   }
   destroy() {
-    this.input.keyboard.removeAllKeys()
+    window.removeEventListener('keydown', this.onKeyDown)
+    window.removeEventListener('keyup', this.onKeyUp)
   }
 }

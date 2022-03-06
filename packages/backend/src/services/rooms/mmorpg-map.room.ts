@@ -86,20 +86,23 @@ export class MmorpgMapRoom extends Room {
 
   moveTowards(position: PositionData) {
     const { x: currentX, y: currentY } = position
-    const x = position.destinationX
-    const y = position.destinationY
+    const x = Math.round(position.destinationX)
+    const y = Math.round(position.destinationY)
     const diffX = Math.round(x - currentX)
     const diffY = Math.round(y - currentY)
-    // give padding room so the npc doesn't layer over the player initially
-    // todo: soften angle for more fluid turning
-    const horizontal = diffX > 8 ? 1 : diffX < -8 ? -1 : 0
-    const vertical = diffY > 8 ? 1 : diffY < -8 ? -1 : 0
-    if (Math.abs(diffX) < 8) {
-      position.x += diffX
-    }
-    if (Math.abs(diffY) < 8) {
-      position.y += diffY
-    }
+
+    const horizontal =
+      diffX > position.speed * position.delta
+        ? 1
+        : diffX < -position.speed * position.delta
+        ? -1
+        : 0
+    const vertical =
+      diffY > position.speed * position.delta
+        ? 1
+        : diffY < -position.speed * position.delta
+        ? -1
+        : 0
     if (horizontal !== 0 || vertical !== 0) {
       return [horizontal, vertical]
     }
@@ -232,17 +235,19 @@ export class MmorpgMapRoom extends Room {
       (client, { abilityId, entity, target }) => {
         const character = this.state.playersByClient.get(client.sessionId)
         const battle = this.state.battles[character.battleId] as Battle
-        const handler = this.battleHandlers[battle.battleId] as BattleHandler
-        if (character && battle && handler) {
-          const player = battle.players[character.characterId]
-          if (entity.characterId && !entity.petId && player && target) {
-            handler.onPlayerAction(character, {
-              abilityId,
-              target,
-            })
-          }
-          if (entity.characterId && entity.petId && player?.pet && target) {
-            handler.onPetAction(character, { abilityId, target })
+        if (battle) {
+          const handler = this.battleHandlers[battle.battleId] as BattleHandler
+          if (character && battle && handler) {
+            const player = battle.players[character.characterId]
+            if (entity.characterId && !entity.petId && player && target) {
+              handler.onPlayerAction(character, {
+                abilityId,
+                target,
+              })
+            }
+            if (entity.characterId && entity.petId && player?.pet && target) {
+              handler.onPetAction(character, { abilityId, target })
+            }
           }
         }
       }
@@ -366,8 +371,10 @@ export class MmorpgMapRoom extends Room {
         character.isInBattle = false
         this.stopPet$.next(character.characterId)
         this.state.battles.forEach((battle) => {
-          if (battle.players[character.characterId]) {
-            this.state.battles.delete(battle)
+          if (battle.players.size === 1) {
+            if (battle.players[character.characterId]) {
+              this.battleHandlers[battle.battleId]?.complete()
+            }
           }
         })
         character.status = 'disconnected'

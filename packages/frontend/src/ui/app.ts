@@ -6,17 +6,19 @@ import { BattlePet } from '../networking/schemas/BattlePet'
 import { BattlePlayer } from '../networking/schemas/BattlePlayer'
 import { Character } from '../networking/schemas/Character'
 import { Npc } from '../networking/schemas/Npc'
-import { BattleEntity } from '../phaser/entities/battle/battle-entity'
 import { MovableEntity } from '../phaser/entities/movable'
 import { LobbyScene } from '../phaser/scenes/lobby.scene'
 import { StarterScene } from '../phaser/scenes/starter.scene'
 
 export const app = {
-  gameHasFocus: false,
+  get gameHasFocus() {
+    return app.focusedUi.length === 0
+  },
   auth: {
     token: '',
     characterId: '',
   },
+  focusedUi: [] as HTMLElement[],
   character: undefined as Character | undefined,
   game: undefined as Phaser.Game | undefined,
   selected: undefined as MovableEntity<any> | undefined,
@@ -31,7 +33,7 @@ export const app = {
     starter: new Subject<{ type: string; message: any }>(),
   },
   regions: {
-    home: new Client('ws://localhost:9201'),
+    home: new Client(`ws://${window.location.hostname}:9201`),
   },
   regionMaps: {
     starter: 'home',
