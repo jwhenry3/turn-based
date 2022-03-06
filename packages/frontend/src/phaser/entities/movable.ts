@@ -15,7 +15,7 @@ export class MovableEntity<
 
   animateJump = false
   falling = false
-  jumpMax = 64
+  jumpMax = 32
   jumpCurrent = 0
 
   constructor(public model: T, public scene: NetworkedScene) {
@@ -45,7 +45,7 @@ export class MovableEntity<
     if (this.animateJump || this.jumping) {
       this.jumping = true
       this.animateJump = false
-      const nextValue = Math.sin(Math.PI * this.timer * 10) * this.jumpMax
+      const nextValue = Math.sin(Math.PI * this.timer * 20) * this.jumpMax
       this.timer += 0.002
       if (nextValue > 0) {
         if (this.jumpCurrent < nextValue) {
