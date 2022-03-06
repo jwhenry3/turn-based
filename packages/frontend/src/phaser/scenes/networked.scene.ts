@@ -82,8 +82,13 @@ export class NetworkedScene extends Phaser.Scene {
             action.duration,
             action.abilityId
           )
-          attack.onComplete = () =>
+          attack.onComplete = () => {
             battle.queuedAttacks.splice(battle.queuedAttacks.indexOf(attack), 1)
+            app.battleEvents.next({
+              event: 'battle:update',
+              entity: target.model,
+            })
+          }
           battle.queuedAttacks.push(attack)
         } else {
           console.warn('enemy not found for action', action)

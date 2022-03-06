@@ -1,6 +1,8 @@
 import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
 import { filter } from 'rxjs'
+import { BattlePlayer } from '../../../../networking/schemas/BattlePlayer'
+import { BattleScene } from '../../../../phaser/scenes/battle.scene'
 import { app } from '../../../app'
 import { WindowPanel } from '../../../world/hud/WindowPanel'
 import { Health } from '../bars/Health'
@@ -22,14 +24,31 @@ export const ValuesContainer = styled.div`
   z-index: 2;
 `
 export function CharacterPanel() {
-  const [character, setCharacter] = useState(app.character || undefined)
+  const [character, setCharacter] = useState(undefined)
+  const [tick, setTick] = useState(0)
   useEffect(() => {
-    setCharacter(app.character)
-    const sub = app.updates
-      .pipe(filter((value) => value === 'character:stats'))
-      .subscribe(() => {
-        setCharacter(app.character)
+    const battleScene = app.game.scene.getScene('battle') as BattleScene
+    if (battleScene) {
+      setCharacter(battleScene.localPlayer.model)
+    }
+    const sub = app.battleEvents
+      .pipe(
+        filter(({ event, entity }) => {
+          console.log(event, entity)
+          return (
+            event === 'battle:update' &&
+            (entity as BattlePlayer).characterId === app.character.characterId
+          )
+        })
+      )
+      .subscribe(({ entity }) => {
+        console.log(entity, entity.stats.hp.total)
+        if (!(entity as any).petId) {
+          setCharacter(entity)
+          setTick(tick + 1)
+        }
       })
+
     return () => sub.unsubscribe()
   }, [])
   if (!character) return <></>

@@ -21,6 +21,10 @@ export const app = {
   game: undefined as Phaser.Game | undefined,
   selected: undefined as MovableEntity<any> | undefined,
   target: undefined as BattlePet | BattlePlayer | BattleNpc | undefined,
+  battleEvents: new Subject<{
+    event: string
+    entity: BattleNpc | BattlePlayer | BattlePet
+  }>(),
   updates: new Subject<string>(),
   messages: {
     lobby: new Subject<{ type: string; message: any }>(),

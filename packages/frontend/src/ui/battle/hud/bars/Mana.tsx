@@ -25,7 +25,9 @@ export const ManaAmount = styled.div`
 export function Mana({ stats }) {
   return (
     <ManaContainer>
-      <ManaAmount />
+      <ManaAmount
+        style={{ width: (stats.mp.total / stats.maxMp.total) * 100 + '%' }}
+      />
       <GameText>
         {stats.mp.total} / {stats.maxMp.total}
       </GameText>

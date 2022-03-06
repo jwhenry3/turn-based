@@ -24,9 +24,12 @@ export const HealthAmount = styled.div`
   z-index: -1;
 `
 export function Health({ stats }) {
+  console.log('rerender', stats.hp.total)
   return (
     <HealthContainer>
-      <HealthAmount />
+      <HealthAmount
+        style={{ width: (stats.hp.total / stats.maxHp.total) * 100 + '%' }}
+      />
       <GameText>
         {stats.hp.total} / {stats.maxHp.total}
       </GameText>

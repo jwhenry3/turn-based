@@ -93,7 +93,7 @@ export function BattleActions() {
         entity: {
           characterId: battleScene.localPlayer.character.characterId,
         },
-        abilityId: 'test',
+        abilityId: 'attack',
         target: getTargetData(),
       })
     }
@@ -108,7 +108,7 @@ export function BattleActions() {
           characterId: battleScene.localPlayer.character.characterId,
           petId: battleScene.localPlayer.character.pet.npcId,
         },
-        abilityId: 'test',
+        abilityId: 'attack',
         target: getTargetData(),
       })
     }

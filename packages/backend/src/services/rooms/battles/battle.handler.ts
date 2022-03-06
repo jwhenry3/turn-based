@@ -6,7 +6,7 @@ import {
   BattlePet,
   BattlePlayer,
 } from '../../schemas/battles'
-import { Character } from '../../schemas/schemas'
+import { Character, ItemDrop } from '../../schemas/schemas'
 import { v4 } from 'uuid'
 import { NpcLogic } from './npc.logic'
 import { PlayerLogic } from './player.logic'
@@ -19,6 +19,9 @@ export class BattleHandler {
   positionOrder = [2, 1, 3, 4, 0, 6, 5, 7]
   update$ = new Subject<number>()
   completed$ = new Subject<void>()
+
+  droppedItems: ItemDrop[] = []
+
   onComplete = () => null
 
   queuedActions = []
@@ -105,7 +108,6 @@ export class BattleHandler {
     this.battle.players.set(character.characterId, player)
   }
   removePlayer(character: Character) {
-    this.battle.players[character.characterId]?.destroy$.next()
     character.isInBattle = false
     character.battleId = undefined
     this.addedPlayers[
@@ -127,6 +129,68 @@ export class BattleHandler {
     )
   }
 
+  onVanquish(
+    origin: BattlePlayer | BattlePet | BattleNpc,
+    target: BattlePlayer | BattlePet | BattleNpc
+  ) {
+    if ((target as BattleNpc).battleNpcId) {
+      if ((origin as any).characterId) {
+        origin.stats.currentExp += (target as BattleNpc).expYield
+        if (origin.stats.currentExp >= origin.stats.maxExpForCurrentLevel) {
+          origin.stats.level += 1
+          origin.stats.currentExp =
+            origin.stats.currentExp - origin.stats.maxExpForCurrentLevel
+          origin.stats.maxExpForCurrentLevel *= 1.2
+          if (origin.stats.currentExp >= origin.stats.maxExpForCurrentLevel) {
+            origin.stats.currentExp = origin.stats.maxExpForCurrentLevel
+          }
+          this.room.broadcast('character:level:up', {
+            battleId: this.battle.battleId,
+            characterId: (origin as BattlePet | BattlePlayer).characterId,
+            petId: (origin as BattlePet).petId || undefined,
+            level: origin.stats.level,
+          })
+          // todo: apply base stat boosts based on level calculation
+        }
+      }
+    }
+    const player = target as BattlePlayer
+    const pet = target as BattlePet
+    if (
+      (this.battle.players[pet.characterId].pet?.stats.hp.total || 0) === 0 &&
+      this.battle.players[player.characterId].stats.hp.total === 0
+    ) {
+      // The player lost the battle, check if other players are alive
+      // if all players are dead, then show message and leave battle shortly after
+      if (this.battle.players.size > 1) {
+        // keep the battle going and let someone else rez this player/pet
+        let canRez = false
+        this.battle.players.forEach((player) => {
+          if (player.stats.hp.total > 0 || player.pet?.stats.hp.total > 0) {
+            canRez = true
+          }
+        })
+        if (!canRez) {
+          // end battle
+          this.room.broadcast('battle:lost', {
+            battleId: this.battle.battleId,
+          })
+          this.room.clock.setTimeout(() => {
+            this.complete()
+          }, 5000)
+        }
+      } else {
+        // end battle
+        this.room.broadcast('battle:lost', {
+          battleId: this.battle.battleId,
+        })
+        this.room.clock.setTimeout(() => {
+          this.complete()
+        }, 5000)
+      }
+    }
+  }
+
   async onPlayerAction(character: Character, action: any) {
     const entity = this.battle.players[character.characterId] as BattlePlayer
     if (
@@ -136,7 +200,10 @@ export class BattleHandler {
       entity.stats.hp.total > 0
     ) {
       const logic = new PlayerLogic(this, entity)
-      if (await logic.performAction(action)) {
+      const onVanquish = (target: BattlePlayer | BattlePet | BattleNpc) => {
+        this.onVanquish(entity, target)
+      }
+      if (await logic.performAction(action, onVanquish)) {
         entity.canAct = false
         entity.cooldown = entity.interval
         if (this.battleQueue.includes(entity)) {
@@ -156,7 +223,10 @@ export class BattleHandler {
       entity.pet.stats.hp.total > 0
     ) {
       const logic = new PetLogic(this, entity.pet)
-      if (await logic.performAction(action)) {
+      const onVanquish = (target: BattlePlayer | BattlePet | BattleNpc) => {
+        this.onVanquish(entity, target)
+      }
+      if (await logic.performAction(action, onVanquish)) {
         entity.pet.canAct = false
         entity.pet.cooldown = entity.interval
         if (this.battleQueue.includes(entity.pet)) {
@@ -171,7 +241,10 @@ export class BattleHandler {
     const entity = this.battle.npcs[id] as BattleNpc
     if (entity && entity.stats.hp.total > 0) {
       const logic = new NpcLogic(this, entity)
-      logic.performAction()
+      const onVanquish = (target: BattlePlayer | BattlePet | BattleNpc) => {
+        this.onVanquish(entity, target)
+      }
+      logic.performAction(onVanquish)
       entity.cooldown = entity.interval
     }
     if (this.battleQueue.includes(entity)) {

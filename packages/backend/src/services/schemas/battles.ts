@@ -1,5 +1,4 @@
 import { ArraySchema, MapSchema, Schema, type } from '@colyseus/schema'
-import { Subject } from 'rxjs'
 import { Character } from './schemas'
 import { DropData } from '../rooms/fixture.models'
 import { v4 } from 'uuid'
@@ -35,6 +34,26 @@ export class Statistics extends Schema {
   maxExpForCurrentLevel: number = 100
   @type('number')
   availableStatPoints: number = 5
+
+  @type('string')
+  damageType: 'piercing' | 'blunt' | 'slashing' | 'magic' = 'blunt'
+
+  @type('string')
+  weaponCategory: 'melee' | 'ranged' | 'magic' = 'melee'
+
+  @type('string')
+  damageElement:
+    | 'fire'
+    | 'wind'
+    | 'earth'
+    | 'water'
+    | 'ice'
+    | 'light'
+    | 'dark'
+    | 'neutral' = 'neutral'
+
+  @type('number')
+  baseDamage: number = 1
 
   @type(Attribute)
   maxHp: Attribute = new Attribute({ baseAmount: 100 })
@@ -125,7 +144,6 @@ export class BattlePlayer extends Schema {
   @type(Statistics)
   stats = new Statistics()
 
-  destroy$ = new Subject<void>()
   @type({ array: 'string' })
   status: ArraySchema<string> = new ArraySchema<string>()
 
@@ -195,8 +213,6 @@ export class BattleNpc extends BattleNpcType {
 
   @type(Statistics)
   stats = new Statistics()
-
-  destroy$ = new Subject<void>()
 
   constructor(data: Partial<BattleNpc>) {
     super(data)

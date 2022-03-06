@@ -171,8 +171,11 @@ export class Inventory extends Schema {
 }
 
 export class ItemDrop extends Schema {
+  // Odds from 0-1 of dropping the item (percentage chance of drop)
   @type('number')
-  rate: number
+  chance: number = 1
+  @type('number')
+  quantity: number = 1
   @type('string')
   itemId: string
 }
