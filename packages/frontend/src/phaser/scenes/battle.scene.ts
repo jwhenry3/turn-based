@@ -152,43 +152,43 @@ export class BattleScene extends Phaser.Scene {
     this.cameras.main.startFollow(focus)
     this.zoom()
     // placeholders for debug
-    for (const container of this.leftPositions) {
-      const rect1 = new Phaser.GameObjects.Rectangle(
-        this,
-        0,
-        0,
-        24,
-        24,
-        Phaser.Display.Color.HexStringToColor('#00f').color,
-        0.2
-      )
-      const rect2 = new Phaser.GameObjects.Rectangle(
-        this,
-        this.isMobilePortrait() ? -48 : -64,
-        16,
-        24,
-        24,
-        Phaser.Display.Color.HexStringToColor('#3af').color,
-        0.2
-      )
-      rect1.setOrigin(0.5, 0.75)
-      rect2.setOrigin(0.5, 0.75)
-      container.add(rect1)
-      container.add(rect2)
-    }
-    for (const container of this.rightPositions) {
-      const rect1 = new Phaser.GameObjects.Rectangle(
-        this,
-        0,
-        0,
-        24,
-        24,
-        Phaser.Display.Color.HexStringToColor('#f00').color,
-        0.2
-      )
-      rect1.setOrigin(0.5, 0.75)
-      container.add(rect1)
-    }
+    // for (const container of this.leftPositions) {
+    //   const rect1 = new Phaser.GameObjects.Rectangle(
+    //     this,
+    //     0,
+    //     0,
+    //     24,
+    //     24,
+    //     Phaser.Display.Color.HexStringToColor('#00f').color,
+    //     0.2
+    //   )
+    //   const rect2 = new Phaser.GameObjects.Rectangle(
+    //     this,
+    //     this.isMobilePortrait() ? -48 : -64,
+    //     16,
+    //     24,
+    //     24,
+    //     Phaser.Display.Color.HexStringToColor('#3af').color,
+    //     0.2
+    //   )
+    //   rect1.setOrigin(0.5, 0.75)
+    //   rect2.setOrigin(0.5, 0.75)
+    //   container.add(rect1)
+    //   container.add(rect2)
+    // }
+    // for (const container of this.rightPositions) {
+    //   const rect1 = new Phaser.GameObjects.Rectangle(
+    //     this,
+    //     0,
+    //     0,
+    //     24,
+    //     24,
+    //     Phaser.Display.Color.HexStringToColor('#f00').color,
+    //     0.2
+    //   )
+    //   rect1.setOrigin(0.5, 0.75)
+    //   container.add(rect1)
+    // }
   }
 
   addPlayer(player: BattlePlayer) {

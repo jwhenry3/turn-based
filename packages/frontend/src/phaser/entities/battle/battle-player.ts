@@ -33,9 +33,12 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
   create() {
     this.setPosition(0, 0)
     this.namePlugin.create(this.character.name)
+    this.shadowPlugin.create()
     this.rectanglePlugin.create()
-    this.add(this.namePlugin.text)
+
+    this.add(this.shadowPlugin.shadow)
     this.add(this.rectanglePlugin.rectangle)
+    this.add(this.namePlugin.text)
     this.setDepth(this.y)
     const player = this.model
     if (player.pet) {
@@ -50,7 +53,7 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
         this.parentContainer.x,
         this.parentContainer.y
       )
-      container.originalY = this.parentContainer.y + 16
+      container.originalY = this.parentContainer.y + 32
       if (this.scene.isMobilePortrait()) {
         container.originalX = this.parentContainer.x - 40
       } else {
@@ -77,6 +80,7 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.rectanglePlugin.update()
     this.namePlugin.update()
+    this.shadowPlugin.update()
     this.handleJump()
   }
 }

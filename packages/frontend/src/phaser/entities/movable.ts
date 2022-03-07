@@ -6,11 +6,13 @@ import { NetworkedScene } from '../scenes/networked.scene'
 import { useSceneState } from '../use-scene-state'
 import { NamePlugin } from './plugins/name'
 import { RectanglePlugin } from './plugins/rectangle'
+import { ShadowPlugin } from './plugins/shadow'
 
 export class MovableEntity<
   T extends { position: Position; battleId?: string }
 > extends Phaser.GameObjects.Container {
   rectanglePlugin: RectanglePlugin = new RectanglePlugin(this.scene, this)
+  shadowPlugin: ShadowPlugin = new ShadowPlugin(this.scene, this)
   namePlugin: NamePlugin = new NamePlugin(this.scene, this)
 
   animateJump = false

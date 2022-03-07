@@ -1,7 +1,6 @@
-import { BattleNpc } from '../../../schemas/battles';
-import { NpcData } from '../../fixture.models';
-import { npcTypes } from './npc-types';
-
+import { BattleNpc } from '../../../schemas/battles'
+import { NpcData } from '../../fixture.models'
+import { npcTypes } from './npc-types'
 
 export const allNpcs = {
   1: new NpcData({
@@ -32,16 +31,31 @@ export const allNpcs = {
     chaseRadius: 128,
     triggersBattle: true,
     randomizeBattleNpcs: true,
-    maxEnemies: 8,
+    maxEnemies: 4,
     battleNpcs: [
       new BattleNpc({
         name: 'Test Battle Npc',
-      })
+      }),
     ],
   }),
   6: new NpcData({
     npcId: '6',
     ...npcTypes.npc,
     name: 'Patricia',
+    triggersBattle: true,
+    battleNpcs: [
+      new BattleNpc({
+        name: 'Test Battle Npc',
+        battleLocation: 2,
+      }),
+      new BattleNpc({
+        name: 'Test Battle Npc',
+        battleLocation: 7,
+      }),
+      new BattleNpc({
+        name: 'Test Battle Npc',
+        battleLocation: 9,
+      }),
+    ],
   }),
 }

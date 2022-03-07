@@ -24,10 +24,12 @@ export class PlayerEntity extends MovableEntity<Character> {
     }
     this.setPosition(this.model.position.x, this.model.position.y)
     this.namePlugin.create(this.model.name)
+    this.shadowPlugin.create()
     this.rectanglePlugin.create()
 
-    this.add(this.namePlugin.text)
+    this.add(this.shadowPlugin.shadow)
     this.add(this.rectanglePlugin.rectangle)
+    this.add(this.namePlugin.text)
 
     this.handleClick(() => {
       if (this.model.battleId) {

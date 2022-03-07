@@ -47,6 +47,7 @@ export class NpcLogic {
               petId: (target as BattlePet).petId,
             },
             abilityId: 'attack',
+            duration: 60,
             results,
           })
           return true

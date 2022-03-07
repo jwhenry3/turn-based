@@ -9,6 +9,7 @@ export class NpcEntity extends MovableEntity<Npc> {
     this.rectanglePlugin.color = '#f80'
     this.setPosition(this.model.position.x, this.model.position.y)
     this.namePlugin.create(this.model.name, 'rgba(255, 120, 0)')
+    this.shadowPlugin.create()
     this.rectanglePlugin.create()
     this.setInteractive(
       new Phaser.Geom.Rectangle(0, 0, 32, 64),
@@ -21,8 +22,9 @@ export class NpcEntity extends MovableEntity<Npc> {
         y: this.y,
       })
     })
-    this.add(this.namePlugin.text)
+    this.add(this.shadowPlugin.shadow)
     this.add(this.rectanglePlugin.rectangle)
+    this.add(this.namePlugin.text)
   }
 
   preUpdate() {

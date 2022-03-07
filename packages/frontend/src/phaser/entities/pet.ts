@@ -15,6 +15,7 @@ export class PetEntity extends MovableEntity<PetNpc> {
       this.owner.model.name + "'s Pet",
       'rgba(120, 150, 50, 0.8)'
     )
+    this.shadowPlugin.create()
     this.rectanglePlugin.create()
     this.setInteractive(
       new Phaser.Geom.Rectangle(0, 0, 32, 64),
@@ -27,8 +28,9 @@ export class PetEntity extends MovableEntity<PetNpc> {
         y: this.y,
       })
     })
-    this.add(this.namePlugin.text)
+    this.add(this.shadowPlugin.shadow)
     this.add(this.rectanglePlugin.rectangle)
+    this.add(this.namePlugin.text)
   }
 
   preUpdate() {

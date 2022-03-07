@@ -57,12 +57,12 @@ export class InputPlugin {
     if (this.keys.down) {
       movement[1] = 1
     }
-    if (this.keys.jump) {
-      if (this.entity.jumpCurrent === 0) {
-        // console.log('jump!')
-        this.entity.animateJump = true
-      }
-    }
+    // if (this.keys.jump) {
+    //   if (this.entity.jumpCurrent === 0) {
+    //     // console.log('jump!')
+    //     this.entity.animateJump = true
+    //   }
+    // }
     if (this.mouseTick > 0) {
       this.mouseTick--
     }

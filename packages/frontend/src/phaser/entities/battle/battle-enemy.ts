@@ -24,10 +24,13 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
   create() {
     this.rectanglePlugin.color = '#f50'
     this.setPosition(0, 0)
-    this.rectanglePlugin.create()
     this.namePlugin.create(this.model.name, 'rgba(255, 120, 0)')
-    this.add(this.namePlugin.text)
+    this.shadowPlugin.create()
+    this.rectanglePlugin.create()
+
+    this.add(this.shadowPlugin.shadow)
     this.add(this.rectanglePlugin.rectangle)
+    this.add(this.namePlugin.text)
     this.setDepth(this.y)
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       // console.log('Selected!', this.model.name)
@@ -43,6 +46,7 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.namePlugin.update()
     this.rectanglePlugin.update()
+    this.shadowPlugin.update()
     this.handleJump()
   }
 }

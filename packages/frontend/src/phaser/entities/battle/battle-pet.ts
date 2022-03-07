@@ -3,8 +3,6 @@ import { app } from '../../../ui/app'
 import { blurAll } from '../../behaviors/blurAll'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
-import { NamePlugin } from '../plugins/name'
-import { RectanglePlugin } from '../plugins/rectangle'
 import { BattleEntity } from './battle-entity'
 import { BattleScenePlayer } from './battle-player'
 
@@ -24,9 +22,12 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
 
   create() {
     this.namePlugin.create(this.owner.character.name + "'s Pet")
+    this.shadowPlugin.create()
     this.rectanglePlugin.create()
-    this.add(this.namePlugin.text)
+
+    this.add(this.shadowPlugin.shadow)
     this.add(this.rectanglePlugin.rectangle)
+    this.add(this.namePlugin.text)
     this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
       // console.log('Selected!', 'pet')
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
@@ -41,6 +42,7 @@ export class BattleScenePet extends BattleEntity<BattlePet> {
     if (!this.rectanglePlugin.rectangle) this.create()
     this.namePlugin.update()
     this.rectanglePlugin.update()
+    this.shadowPlugin.update()
     this.handleJump()
   }
 }

@@ -8,6 +8,9 @@ export class BattleQueuedAttack {
   retreating = false
   retreatDelay = 0
   hasStartedAction = false
+
+  isRanged = false
+  isMagic = false
   constructor(
     public scene: BattleScene,
     public entity: BattleEntity<any>,
@@ -23,25 +26,34 @@ export class BattleQueuedAttack {
     this.onComplete()
   }
   onComplete = () => {}
-
+  hasRan = false
   lerpTo(x: number, y: number) {
-    const diffX = Math.abs(x - this.entity.parentContainer.x)
-    const diffY = Math.abs(y - this.entity.parentContainer.y)
-    let newX = this.entity.parentContainer.x
-    let newY = this.entity.parentContainer.y
-    if (diffX < 1) {
-      newX = x
-    } else {
-      newX = lerp(this.entity.parentContainer.x, x, 0.05)
-    }
-    if (diffY < 1) {
-      newY = y
-    } else {
-      newY = lerp(this.entity.parentContainer.y, y, 0.05)
-    }
+    let newX = lerp(this.entity.parentContainer.x, x, 0.08)
+    let newY = lerp(this.entity.parentContainer.y, y, 0.08)
     return { newX, newY }
   }
+
+  abilityDuration = 0
+
   update() {
+    if (this.isMagic && !this.isRanged) {
+      if (this.abilityDuration === 0) {
+        this.entity.shadowPlugin.isGlowing = true
+        this.target.shadowPlugin.isGlowing = true
+        this.target.shadowPlugin.isTarget = true
+        this.abilityDuration = this.durationAtTarget * 2
+      }
+      if (this.abilityDuration > 1) {
+        this.abilityDuration--
+      }
+      if (this.abilityDuration === 1) {
+        this.entity.shadowPlugin.isGlowing = false
+        this.target.shadowPlugin.isGlowing = false
+        this.target.shadowPlugin.isTarget = false
+        this.complete()
+      }
+      return
+    }
     this.entity.handleJump()
     if (!this.hasStartedAction) {
       this.entity.animateJump = true
@@ -56,20 +68,20 @@ export class BattleQueuedAttack {
       this.retreating = true
       this.willRetreat = false
     }
+
     if (!this.retreating) {
       const target = this.target.parentContainer
       let offset = 48
       if (target.x > this.scene.width / 2) {
         offset = -48
       }
-      const { newX, newY } = this.lerpTo(
-        target.originalX + offset,
-        target.originalY
-      )
+      const destinationX = this.isRanged
+        ? this.scene.width / 2
+        : target.originalX + offset
+      const { newX, newY } = this.lerpTo(destinationX, target.originalY)
       this.entity.parentContainer.setPosition(newX, newY)
       if (
-        Math.abs(this.entity.parentContainer.x - (target.originalX + offset)) <
-          4 &&
+        Math.abs(this.entity.parentContainer.x - destinationX) < 4 &&
         Math.abs(this.entity.parentContainer.y - target.originalY) < 4
       ) {
         this.willRetreat = true

@@ -79,7 +79,7 @@ export class NetworkedScene extends Phaser.Scene {
             battle,
             attacker,
             target,
-            action.duration,
+            action.duration || 60,
             action.abilityId
           )
           attack.onComplete = () => {

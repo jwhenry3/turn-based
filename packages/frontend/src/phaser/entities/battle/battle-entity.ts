@@ -3,11 +3,13 @@ import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
 import { NamePlugin } from '../plugins/name'
 import { RectanglePlugin } from '../plugins/rectangle'
+import { ShadowPlugin } from '../plugins/shadow'
 import { BattlePosition } from './battle-position'
 
 export class BattleEntity<T> extends Phaser.GameObjects.Container {
   rectanglePlugin: RectanglePlugin = new RectanglePlugin(this.scene, this)
   namePlugin: NamePlugin = new NamePlugin(this.scene, this)
+  shadowPlugin: ShadowPlugin = new ShadowPlugin(this.scene, this)
 
   animateJump = false
   falling = false
