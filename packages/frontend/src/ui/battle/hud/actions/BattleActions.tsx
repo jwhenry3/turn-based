@@ -44,6 +44,9 @@ export function BattleActions() {
   const [playerCanAct, setPlayerCanAct] = useState(false)
   const [petCanAct, setPetCanAct] = useState(false)
   useEffect(() => {
+    __playerCanAct = false
+    __petCanAct = false
+    __hasTarget = false
     const interval = setInterval(() => {
       const battleScene = app.game.scene.getScene('battle') as BattleScene
       if (battleScene) {

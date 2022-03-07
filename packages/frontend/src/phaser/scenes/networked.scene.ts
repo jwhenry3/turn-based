@@ -1,11 +1,10 @@
-import { Character } from '../../networking/schemas/Character'
 import { app } from '../../ui/app'
 import {
   ChatMessage,
   useChatHistoryState,
 } from '../../ui/world/hud/chat/use-chat-history'
 import { BattleQueuedAttack } from '../entities/battle/battle-queued-attack'
-import { NpcEntity } from '../entities/Npc'
+import { NpcEntity } from '../entities/npc'
 import { PlayerEntity } from '../entities/player'
 import { useBattle } from '../use-battle'
 import { BattleScene } from './battle.scene'
@@ -172,12 +171,15 @@ export class NetworkedScene extends Phaser.Scene {
         b.players.onAdd = (p) => {
           let battleScene = this.game.scene.getScene('battle') as BattleScene
           if (p.characterId === app.auth.characterId) {
-            if (!battleScene) {
-              battleScene = this.game.scene.add(
-                'battle',
-                BattleScene
-              ) as BattleScene
+            if (battleScene) {
+              battleScene.stop()
+              this.game.scene.stop('battle')
+              this.game.scene.remove('battle')
             }
+            battleScene = this.game.scene.add(
+              'battle',
+              BattleScene
+            ) as BattleScene
             this.game.scene.start('battle')
             useBattle.getState().update(battleScene)
             battleScene.playerEntities = this.playerObjects
@@ -213,6 +215,7 @@ export class NetworkedScene extends Phaser.Scene {
         useBattle.getState().update(undefined)
         battleScene.stop()
         this.game.scene.stop('battle')
+        this.game.scene.remove('battle')
       }
     }
   }

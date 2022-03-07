@@ -294,6 +294,7 @@ export class BattleHandler {
       if (this.battleQueue.length > 0) {
         // console.log(this.battleQueue[0].name)
         const entityToProcess = this.battleQueue[0]
+        console.log(entityToProcess.name + "'s turn")
         if (entityToProcess instanceof BattleNpc) {
           this.onNpcAction(entityToProcess.battleNpcId)
         } else {
