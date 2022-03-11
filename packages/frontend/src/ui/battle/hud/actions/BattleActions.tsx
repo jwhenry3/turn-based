@@ -9,6 +9,7 @@ import { BattleScenePet } from '../../../../phaser/entities/battle/battle-pet'
 import { BattleScenePlayer } from '../../../../phaser/entities/battle/battle-player'
 import { BattleScene } from '../../../../phaser/scenes/battle.scene'
 import { app } from '../../../app'
+import { GiBroadsword, GiBowArrow, GiFire, GiExitDoor } from 'react-icons/gi'
 
 export const BattleActionsContainer = styled.div`
   position: fixed;
@@ -132,18 +133,32 @@ export function BattleActions() {
         <BattleActionsContainer>
           {playerCanAct && (
             <div>
-              <Fab color="primary" onClick={() => onPlayerAction()} />
-              <Fab color="primary" onClick={() => onPlayerAction('ranged')} />
-              <Fab color="primary" onClick={() => onPlayerAction('magic')} />
+              <Fab color="primary" onClick={() => onPlayerAction()}>
+                <GiBroadsword size={32} />
+              </Fab>
+              <Fab color="primary" onClick={() => onPlayerAction('ranged')}>
+                <GiBowArrow size={32} />
+              </Fab>
+              <Fab color="primary" onClick={() => onPlayerAction('magic')}>
+                <GiFire size={32} />
+              </Fab>
               <Fab color="primary" onClick={() => onPlayerAction()} />
             </div>
           )}
           {petCanAct && (
             <div>
-              <Fab color="secondary" onClick={() => onPetAction()} />
-              <Fab color="secondary" onClick={() => onPetAction('ranged')} />
-              <Fab color="secondary" onClick={() => onPetAction('magic')} />
-              <Fab color="secondary" onClick={() => onPetAction()} />
+              <Fab color="secondary" onClick={() => onPetAction()}>
+                <GiBroadsword size={32} />
+              </Fab>
+              <Fab color="secondary" onClick={() => onPetAction('ranged')}>
+                <GiBowArrow size={32} />
+              </Fab>
+              <Fab color="secondary" onClick={() => onPetAction('magic')}>
+                <GiFire size={32} />
+              </Fab>
+              <Fab color="secondary" onClick={() => onPetAction()}>
+                <GiBroadsword size={32} />
+              </Fab>
             </div>
           )}
         </BattleActionsContainer>
@@ -152,7 +167,9 @@ export function BattleActions() {
         <Fab />
       </ActionMenuContainer>
       <LeaveBattleContainer>
-        <Fab onClick={onLeave} />
+        <Fab onClick={onLeave}>
+          <GiExitDoor size={32} />
+        </Fab>
       </LeaveBattleContainer>
     </>
   )
