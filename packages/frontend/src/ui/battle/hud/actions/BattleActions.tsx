@@ -88,28 +88,27 @@ export function BattleActions() {
     }
     return undefined
   }
-  const onPlayerAction = () => {
-    console.log(app.target)
-    if (!app.target) {
+  const onPlayerAction = (abilityId?: 'melee' | 'ranged' | 'magic') => {
+    const battleScene = app.game.scene.getScene('battle') as BattleScene
+    if (!app.target || app.target === battleScene?.localPlayer.model) {
       return
     }
-    const battleScene = app.game.scene.getScene('battle') as BattleScene
     if (battleScene && app.rooms.active) {
       app.rooms.active.send('character:battle:action', {
         battleId: battleScene.battle.battleId,
         entity: {
           characterId: battleScene.localPlayer.character.characterId,
         },
-        abilityId: 'attack',
+        abilityId: abilityId || 'attack',
         target: getTargetData(),
       })
     }
   }
-  const onPetAction = () => {
-    if (!app.target) {
+  const onPetAction = (abilityId?: 'melee' | 'ranged' | 'magic') => {
+    const battleScene = app.game.scene.getScene('battle') as BattleScene
+    if (!app.target || app.target === battleScene?.localPlayer.pet.model) {
       return
     }
-    const battleScene = app.game.scene.getScene('battle') as BattleScene
     if (battleScene && app.rooms.active) {
       // console.log('send pet action')
       app.rooms.active.send('character:battle:action', {
@@ -118,7 +117,7 @@ export function BattleActions() {
           characterId: battleScene.localPlayer.character.characterId,
           petId: battleScene.localPlayer.character.pet.npcId,
         },
-        abilityId: 'attack',
+        abilityId: abilityId || 'attack',
         target: getTargetData(),
       })
     }
@@ -133,18 +132,18 @@ export function BattleActions() {
         <BattleActionsContainer>
           {playerCanAct && (
             <div>
-              <Fab color="primary" onClick={onPlayerAction} />
-              <Fab color="primary" onClick={onPlayerAction} />
-              <Fab color="primary" onClick={onPlayerAction} />
-              <Fab color="primary" onClick={onPlayerAction} />
+              <Fab color="primary" onClick={() => onPlayerAction()} />
+              <Fab color="primary" onClick={() => onPlayerAction('ranged')} />
+              <Fab color="primary" onClick={() => onPlayerAction('magic')} />
+              <Fab color="primary" onClick={() => onPlayerAction()} />
             </div>
           )}
           {petCanAct && (
             <div>
-              <Fab color="secondary" onClick={onPetAction} />
-              <Fab color="secondary" onClick={onPetAction} />
-              <Fab color="secondary" onClick={onPetAction} />
-              <Fab color="secondary" onClick={onPetAction} />
+              <Fab color="secondary" onClick={() => onPetAction()} />
+              <Fab color="secondary" onClick={() => onPetAction('ranged')} />
+              <Fab color="secondary" onClick={() => onPetAction('magic')} />
+              <Fab color="secondary" onClick={() => onPetAction()} />
             </div>
           )}
         </BattleActionsContainer>

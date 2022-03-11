@@ -17,7 +17,10 @@ export class BattleQueuedAttack {
     public target: BattleEntity<any>,
     public durationAtTarget: number,
     public abilityId: string
-  ) {}
+  ) {
+    if (abilityId === 'ranged') this.isRanged = true
+    if (abilityId === 'magic') this.isMagic = true
+  }
 
   complete() {
     this.retreatDelay = 0
@@ -37,22 +40,13 @@ export class BattleQueuedAttack {
 
   update() {
     if (this.isMagic && !this.isRanged) {
-      if (this.abilityDuration === 0) {
-        this.entity.shadowPlugin.isGlowing = true
-        this.target.shadowPlugin.isGlowing = true
-        this.target.shadowPlugin.isTarget = true
-        this.abilityDuration = this.durationAtTarget * 2
-      }
       if (this.abilityDuration > 1) {
         this.abilityDuration--
       }
       if (this.abilityDuration === 1) {
-        this.entity.shadowPlugin.isGlowing = false
-        this.target.shadowPlugin.isGlowing = false
-        this.target.shadowPlugin.isTarget = false
-        this.complete()
+        this.entity.isCasting = false
+        this.target.isCastingTarget = false
       }
-      return
     }
     this.entity.handleJump()
     if (!this.hasStartedAction) {
@@ -64,6 +58,12 @@ export class BattleQueuedAttack {
         this.retreatDelay--
         return
       }
+      if (this.entity.parentContainer.originalX < this.scene.width / 2) {
+        this.entity.facing = 'right'
+      } else {
+        this.entity.facing = 'left'
+      }
+      this.entity.isShooting = false
       this.entity.animateJump = true
       this.retreating = true
       this.willRetreat = false
@@ -75,17 +75,38 @@ export class BattleQueuedAttack {
       if (target.x > this.scene.width / 2) {
         offset = -48
       }
-      const destinationX = this.isRanged
-        ? this.scene.width / 2
-        : target.originalX + offset
+      const destinationX =
+        this.isRanged || this.isMagic
+          ? this.scene.width / 2
+          : target.originalX + offset
       const { newX, newY } = this.lerpTo(destinationX, target.originalY)
       this.entity.parentContainer.setPosition(newX, newY)
+      if (destinationX > this.entity.parentContainer.x) {
+        this.entity.facing = 'right'
+      } else if (destinationX < this.entity.parentContainer.x) {
+        this.entity.facing = 'left'
+      }
       if (
         Math.abs(this.entity.parentContainer.x - destinationX) < 4 &&
         Math.abs(this.entity.parentContainer.y - target.originalY) < 4
       ) {
         this.willRetreat = true
-        this.retreatDelay = this.durationAtTarget
+        this.retreatDelay = this.isMagic
+          ? this.durationAtTarget * 2
+          : this.durationAtTarget
+        if (this.isMagic) {
+          this.entity.isCasting = true
+          this.target.isCastingTarget = true
+        }
+        this.abilityDuration = this.durationAtTarget * 2
+        if (this.isRanged) {
+          this.entity.isShooting = true
+        }
+        if (target.originalX > this.entity.parentContainer.x) {
+          this.entity.facing = 'right'
+        } else if (target.originalX < this.entity.parentContainer.x) {
+          this.entity.facing = 'left'
+        }
       }
     } else {
       const target = this.entity.parentContainer as BattlePosition
@@ -95,6 +116,11 @@ export class BattleQueuedAttack {
         Math.abs(this.entity.parentContainer.x - target.originalX) < 4 &&
         Math.abs(this.entity.parentContainer.y - target.originalY) < 4
       ) {
+        if (this.entity.parentContainer.originalX < this.scene.width / 2) {
+          this.entity.facing = 'right'
+        } else {
+          this.entity.facing = 'left'
+        }
         this.complete()
       }
     }

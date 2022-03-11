@@ -13,6 +13,18 @@ export class LobbyScene extends Phaser.Scene {
       repeat: 0,
     })
     this.anims.create({
+      key: 'cast',
+      frameRate: 1,
+      frames: this.anims.generateFrameNumbers('entity', { start: 8, end: 8 }),
+      repeat: 0,
+    })
+    this.anims.create({
+      key: 'shoot',
+      frameRate: 1,
+      frames: this.anims.generateFrameNumbers('entity', { start: 9, end: 9 }),
+      repeat: 0,
+    })
+    this.anims.create({
       key: 'jump',
       frameRate: 1,
       frames: this.anims.generateFrameNumbers('entity', { start: 7, end: 7 }),

@@ -10,8 +10,7 @@ export class PlayerLogic {
     action: any,
     onVanquish: (entity: BattleNpc | BattlePlayer | BattlePet) => void
   ) {
-    // console.log('Player performed an action')
-    // console.log(action)
+
     const ability = abilities[action.abilityId]
     if (ability) {
       const target = getTargetFromAction(this.handler, action)

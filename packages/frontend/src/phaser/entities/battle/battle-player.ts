@@ -5,6 +5,7 @@ import { blurAll } from '../../behaviors/blurAll'
 import { lerp } from '../../behaviors/lerp'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
+import { CastingCirclePlugin } from '../plugins/casting-circle'
 import { EntitySpritePlugin } from '../plugins/entity-sprite'
 import { NamePlugin } from '../plugins/name'
 import { createPluginPipeline, PluginPipeline } from '../plugins/pipeline'
@@ -49,6 +50,7 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
   }
   create() {
     this.pluginPipeline = createPluginPipeline([
+      new CastingCirclePlugin(this.scene, this),
       new RectanglePlugin(this.scene, this, undefined, () => this.onClick()),
       new ShadowPlugin(this.scene, this),
       new NamePlugin(this.scene, this, this.character.name),

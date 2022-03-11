@@ -29,7 +29,9 @@ export class NpcLogic {
     )
     const attackOption = Math.round(Math.random() * (options.length - 1))
     const target = options[attackOption]
-    const ability = abilities.attack
+    const chosenAttackMethod = Math.round(Math.random() * 3)
+    const methods = ['melee', 'ranged', 'magic']
+    const ability = abilities[methods[chosenAttackMethod]]
     if (ability) {
       if (target) {
         const results = ability(this.entity.stats, target.stats, () =>
@@ -46,7 +48,7 @@ export class NpcLogic {
               characterId: target.characterId,
               petId: (target as BattlePet).petId,
             },
-            abilityId: 'attack',
+            abilityId: methods[chosenAttackMethod],
             duration: 60,
             results,
           })

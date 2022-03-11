@@ -11,6 +11,10 @@ export class BattleEntity<T> extends Phaser.GameObjects.Container {
   parentContainer: BattlePosition
   moving = false
   facing: 'left' | 'right' = 'right'
+
+  isCasting = false
+  isShooting = false
+  isCastingTarget = false
   constructor(
     public model: T,
     public scene: BattleScene,

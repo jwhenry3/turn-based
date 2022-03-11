@@ -48,68 +48,76 @@ export function calculateRangedDamage(origin: Statistics, target: Statistics) {
 }
 
 export const abilities = {
-  attack: (
+  melee: (
     origin: Statistics,
     target: Statistics,
     onHealthDepleted: () => void
   ) => {
-    if (origin.weaponCategory === 'ranged') {
-      if (wasHit(calculateRangedAccuracy(origin, target))) {
-        const damage = calculateRangedDamage(origin, target)
-        target.hp.total -= damage
-        if (target.hp.total <= 0) {
-          target.hp.total = 0
-          onHealthDepleted()
-        }
-        return {
-          type: 'hit',
-          damage,
-        }
-      } else {
-        return {
-          type: 'miss',
-        }
+    if (wasHit(calculateMeleeAccuracy(origin, target))) {
+      const damage = calculateMeleeDamage(origin, target)
+      target.hp.total -= damage
+      if (target.hp.total <= 0) {
+        target.hp.total = 0
+        onHealthDepleted()
+      }
+      return {
+        type: 'hit',
+        damage,
+      }
+    } else {
+      return {
+        type: 'miss',
       }
     }
-    if (origin.weaponCategory === 'melee') {
-      if (wasHit(calculateMeleeAccuracy(origin, target))) {
-        const damage = calculateMeleeDamage(origin, target)
-        target.hp.total -= damage
-        if (target.hp.total <= 0) {
-          target.hp.total = 0
-          onHealthDepleted()
-        }
-        return {
-          type: 'hit',
-          damage,
-        }
-      } else {
-        return {
-          type: 'miss',
-        }
+  },
+  attack: (
+    origin: Statistics,
+    target: Statistics,
+    onHealthDepleted: () => void
+  ) => abilities.melee(origin, target, onHealthDepleted),
+  ranged: (
+    origin: Statistics,
+    target: Statistics,
+    onHealthDepleted: () => void
+  ) => {
+    if (wasHit(calculateRangedAccuracy(origin, target))) {
+      const damage = calculateRangedDamage(origin, target)
+      target.hp.total -= damage
+      if (target.hp.total <= 0) {
+        target.hp.total = 0
+        onHealthDepleted()
+      }
+      return {
+        type: 'hit',
+        damage,
+      }
+    } else {
+      return {
+        type: 'miss',
       }
     }
-
-    if (origin.weaponCategory === 'magic') {
-      if (wasHit(calculateMagicAccuracy(origin, target))) {
-        const damage = calculateMagicDamage(origin, target)
-        target.hp.total -= damage
-        if (target.hp.total <= 0) {
-          target.hp.total = 0
-          onHealthDepleted()
-        }
-        return {
-          type: 'hit',
-          damage,
-        }
-      } else {
-        return {
-          type: 'miss',
-        }
+  },
+  magic: (
+    origin: Statistics,
+    target: Statistics,
+    onHealthDepleted: () => void
+  ) => {
+    if (wasHit(calculateMagicAccuracy(origin, target))) {
+      const damage = calculateMagicDamage(origin, target)
+      target.hp.total -= damage
+      if (target.hp.total <= 0) {
+        target.hp.total = 0
+        onHealthDepleted()
+      }
+      return {
+        type: 'hit',
+        damage,
+      }
+    } else {
+      return {
+        type: 'miss',
       }
     }
-
-    return undefined
   },
   heal: (origin: Statistics, target: Statistics) => {
     return {

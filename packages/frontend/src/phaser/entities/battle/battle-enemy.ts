@@ -2,6 +2,7 @@ import { BattleNpc } from '../../../networking/schemas/BattleNpc'
 import { app } from '../../../ui/app'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
+import { CastingCirclePlugin } from '../plugins/casting-circle'
 import { EntitySpritePlugin } from '../plugins/entity-sprite'
 import { NamePlugin } from '../plugins/name'
 import { PluginPipeline, createPluginPipeline } from '../plugins/pipeline'
@@ -30,6 +31,7 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
   }
   create() {
     this.pluginPipeline = createPluginPipeline([
+      new CastingCirclePlugin(this.scene, this),
       new RectanglePlugin(this.scene, this, undefined, () => this.onClick()),
       new ShadowPlugin(this.scene, this),
       new NamePlugin(this.scene, this, this.model.name, 'rgba(255, 120, 0)'),

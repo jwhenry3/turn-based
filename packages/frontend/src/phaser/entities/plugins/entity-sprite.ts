@@ -39,24 +39,39 @@ export class EntitySpritePlugin {
         this.lastY = this.owner.y
       }
     }
-    if (this.owner['jumping']) {
-      this.gameObject.y = -this.owner['jumpCurrent']
-      if (this.gameObject.anims.getName() !== 'jump') {
+
+    if (this.owner['isShooting']) {
+      if (this.gameObject.anims.getName() !== 'shoot') {
         this.gameObject.anims.stop()
-        this.gameObject.anims.play('jump')
+        this.gameObject.anims.play('shoot')
+        this.gameObject.x = 8 * this.gameObject.scaleX
       }
-    } else if (
-      this.owner['moving'] &&
-      this.gameObject.anims.getName() !== 'run'
-    ) {
-      this.gameObject.anims.stop()
-      this.gameObject.anims.play('run')
-    } else if (
-      !this.owner['moving'] &&
-      this.gameObject.anims.getName() !== 'stand'
-    ) {
-      this.gameObject.anims.stop()
-      this.gameObject.anims.play('stand')
+    } else {
+      this.gameObject.x = 0
+      if (this.owner['isCasting']) {
+        if (this.gameObject.anims.getName() !== 'cast') {
+          this.gameObject.anims.stop()
+          this.gameObject.anims.play('cast')
+        }
+      } else if (this.owner['jumping']) {
+        this.gameObject.y = -this.owner['jumpCurrent']
+        if (this.gameObject.anims.getName() !== 'jump') {
+          this.gameObject.anims.stop()
+          this.gameObject.anims.play('jump')
+        }
+      } else if (
+        this.owner['moving'] &&
+        this.gameObject.anims.getName() !== 'run'
+      ) {
+        this.gameObject.anims.stop()
+        this.gameObject.anims.play('run')
+      } else if (
+        !this.owner['moving'] &&
+        this.gameObject.anims.getName() !== 'stand'
+      ) {
+        this.gameObject.anims.stop()
+        this.gameObject.anims.play('stand')
+      }
     }
   }
 }
