@@ -60,6 +60,3 @@ export class RectanglePlugin {
     }
   }
 }
-function afterSelected() {
-  throw new Error('Function not implemented.')
-}

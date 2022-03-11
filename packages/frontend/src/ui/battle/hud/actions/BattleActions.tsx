@@ -43,19 +43,28 @@ export function BattleActions() {
   useEffect(() => {
     const battleScene = app.game.scene.getScene('battle') as BattleScene
     if (battleScene) {
+      let called = false
+      battleScene.onLocalPlayerAdded = () => {
+        called = true
+        const pet = battleScene.localPlayer?.pet?.model
+        const player = battleScene.localPlayer?.model
+        if (pet) {
+          setPetCanAct(pet.canAct)
+          pet.listen('canAct', (value) => {
+            setPetCanAct(value)
+          })
+        }
+        if (player) {
+          setPlayerCanAct(player.canAct)
+          player.listen('canAct', (value) => {
+            setPlayerCanAct(value)
+          })
+        }
+      }
       const pet = battleScene.localPlayer?.pet?.model
       const player = battleScene.localPlayer?.model
-      if (pet) {
-        setPetCanAct(pet.canAct)
-        pet.listen('canAct', (value) => {
-          setPetCanAct(value)
-        })
-      }
-      if (player) {
-        setPlayerCanAct(player.canAct)
-        player.listen('canAct', (value) => {
-          setPlayerCanAct(value)
-        })
+      if (player && !called) {
+        battleScene.onLocalPlayerAdded()
       }
     }
   }, [setPlayerCanAct, setPetCanAct, setHasTarget])

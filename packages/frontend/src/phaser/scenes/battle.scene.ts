@@ -44,6 +44,9 @@ export class BattleScene extends Phaser.Scene {
 
   image: Phaser.GameObjects.Image
   lastIsMobilePortrait = false
+
+  onLocalPlayerAdded = () => null
+
   isMobilePortrait() {
     return window.innerWidth < 550
   }
@@ -167,6 +170,7 @@ export class BattleScene extends Phaser.Scene {
       .add(this.players[player.characterId])
     if (player.characterId === app.character.characterId) {
       this.localPlayer = this.players[player.characterId]
+      this.onLocalPlayerAdded()
     }
   }
   addEnemy(enemy: BattleNpc) {

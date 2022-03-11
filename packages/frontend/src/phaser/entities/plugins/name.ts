@@ -33,7 +33,4 @@ export class NamePlugin {
     const zoom = zoom1 < zoom2 ? zoom1 : zoom2
     this.gameObject.setScale(1 / zoom < 1 ? 1 : 1 / zoom)
   }
-  destroy() {
-    this.gameObject.destroy()
-  }
 }

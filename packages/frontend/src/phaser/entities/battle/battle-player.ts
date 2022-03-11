@@ -26,6 +26,15 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     public connector: SceneConnector
   ) {
     super(model, scene, connector)
+    const player = this.model
+    if (player.pet) {
+      this.pet = new BattleScenePet(
+        this,
+        player.pet,
+        this.scene,
+        this.connector
+      )
+    }
   }
 
   get isLocalPlayer() {
@@ -53,14 +62,7 @@ export class BattleScenePlayer extends BattleEntity<BattlePlayer> {
     this.pluginPipeline.addToParent(this)
 
     this.setDepth(this.y)
-    const player = this.model
-    if (player.pet) {
-      this.pet = new BattleScenePet(
-        this,
-        player.pet,
-        this.scene,
-        this.connector
-      )
+    if (this.pet) {
       const container = new BattlePosition(
         this.scene,
         this.parentContainer.x,

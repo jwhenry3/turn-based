@@ -27,7 +27,7 @@ export class BattleEntity<T> extends Phaser.GameObjects.Container {
     if (this.animateJump || this.jumping) {
       this.jumping = true
       this.animateJump = false
-      const nextValue = Math.sin(Math.PI * this.timer * 10) * this.jumpMax
+      const nextValue = Math.sin(Math.PI * this.timer * 15) * this.jumpMax
       this.timer += 0.001
       if (nextValue > 0) {
         if (this.jumpCurrent < nextValue) {
