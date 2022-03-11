@@ -176,6 +176,7 @@ export class BattleScene extends Phaser.Scene {
       this,
       this.connector
     )
+    this.enemies[enemy.battleNpcId].facing = 'left'
     this.add.existing(this.enemies[enemy.battleNpcId])
     this.enemies[enemy.battleNpcId]
       .getBattleLocation()

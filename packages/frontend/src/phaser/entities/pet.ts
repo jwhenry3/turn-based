@@ -4,46 +4,48 @@ import { blurAll } from '../behaviors/blurAll'
 import { useSceneState } from '../use-scene-state'
 import { MovableEntity } from './movable'
 import { PlayerEntity } from './player'
+import { EntitySpritePlugin } from './plugins/entity-sprite'
+import { MovementPlugin } from './plugins/movement'
+import { NamePlugin } from './plugins/name'
+import { PluginPipeline, createPluginPipeline } from './plugins/pipeline'
+import { RectanglePlugin } from './plugins/rectangle'
+import { ShadowPlugin } from './plugins/shadow'
 
 export class PetEntity extends MovableEntity<PetNpc> {
   owner: PlayerEntity
+  pluginPipeline!: PluginPipeline
 
+  onClick() {
+    const scene = useSceneState.getState().scene
+    app.rooms[scene].send('character:move:destination', {
+      x: this.x,
+      y: this.y,
+    })
+  }
   create() {
-    this.rectanglePlugin.color = '#8af'
+    this.pluginPipeline = createPluginPipeline([
+      new MovementPlugin(this.scene, this),
+      new RectanglePlugin(this.scene, this, () => this.onClick()),
+      new ShadowPlugin(this.scene, this),
+      new NamePlugin(
+        this.scene,
+        this,
+        this.owner.model.name + "'s Pet",
+        'rgba(120, 150, 50, 0.8)'
+      ),
+      new EntitySpritePlugin(this.scene, this),
+    ])
     this.setPosition(this.model.position.x, this.model.position.y)
-    this.namePlugin.create(
-      this.owner.model.name + "'s Pet",
-      'rgba(120, 150, 50, 0.8)'
-    )
-    this.shadowPlugin.create()
-    this.rectanglePlugin.create()
     this.setInteractive(
       new Phaser.Geom.Rectangle(0, 0, 32, 64),
       Phaser.Geom.Rectangle.Contains
     )
-    this.handleClick(() => {
-      const scene = useSceneState.getState().scene
-      app.rooms[scene].send('character:move:destination', {
-        x: this.x,
-        y: this.y,
-      })
-    })
-    this.add(this.shadowPlugin.shadow)
-    this.add(this.rectanglePlugin.rectangle)
-    this.add(this.namePlugin.text)
+    this.pluginPipeline.create()
+    this.pluginPipeline.addToParent(this)
   }
 
   preUpdate() {
-    if (!this.rectanglePlugin.rectangle) this.create()
-    if (this.x !== this.model.position.x || this.y !== this.model.position.y) {
-      const { newX, newY } = this.lerpTo(
-        this.model.position.x,
-        this.model.position.y
-      )
-      this.setPosition(newX, newY)
-    }
-    this.rectanglePlugin.update()
-    this.namePlugin.update()
-    this.setDepth(Math.round(this.y + 32))
+    if (!this.pluginPipeline) this.create()
+    this.pluginPipeline.update()
   }
 }

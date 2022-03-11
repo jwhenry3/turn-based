@@ -1,4 +1,5 @@
 import { app } from '../../../ui/app'
+import { NetworkedScene } from '../../scenes/networked.scene'
 import { PlayerEntity } from '../player'
 
 export class InputPlugin {
@@ -21,10 +22,11 @@ export class InputPlugin {
   mouseCooldown = 20
   mouseTick = 0
 
-  constructor(
-    public input: Phaser.Input.InputPlugin,
-    public entity: PlayerEntity
-  ) {}
+  input: Phaser.Input.InputPlugin
+
+  constructor(public scene: NetworkedScene, public owner: PlayerEntity) {
+    this.input = this.scene.input
+  }
 
   onChange = (axis: [number, number]) => null
 
@@ -41,6 +43,12 @@ export class InputPlugin {
   create() {
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
+    this.onChange = ([horizontal, vertical]) => {
+      this.scene.connector.room.send('character:move', {
+        horizontal,
+        vertical,
+      })
+    }
   }
 
   update() {
@@ -81,6 +89,18 @@ export class InputPlugin {
     if (movement[0] !== this.movement[0] || movement[1] !== this.movement[1]) {
       this.movement = movement
       this.onChange(movement)
+    }
+    if (
+      this.owner.model.position.destinationX &&
+      this.owner.model.position.destinationY
+    ) {
+      this.scene.destinationPointer.setPosition(
+        this.owner.model.position.destinationX,
+        this.owner.model.position.destinationY
+      )
+      this.scene.destinationPointer.setVisible(true)
+    } else {
+      this.scene.destinationPointer.setVisible(false)
     }
   }
   destroy() {

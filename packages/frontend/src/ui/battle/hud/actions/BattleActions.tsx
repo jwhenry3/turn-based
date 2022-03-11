@@ -36,37 +36,28 @@ export const ActionMenuContainer = styled.div`
   bottom: 16px;
 `
 
-let __playerCanAct = false
-let __petCanAct = false
-let __hasTarget = false
 export function BattleActions() {
   const [hasTarget, setHasTarget] = useState(false)
   const [playerCanAct, setPlayerCanAct] = useState(false)
   const [petCanAct, setPetCanAct] = useState(false)
   useEffect(() => {
-    __playerCanAct = false
-    __petCanAct = false
-    __hasTarget = false
-    const interval = setInterval(() => {
-      const battleScene = app.game.scene.getScene('battle') as BattleScene
-      if (battleScene) {
-        const _petCanAct = !!battleScene.localPlayer?.pet?.model.canAct
-        const _playerCanAct = !!battleScene.localPlayer?.model.canAct
-        if (_petCanAct !== __petCanAct) {
-          __petCanAct = _petCanAct
-          setPetCanAct(_petCanAct)
-        }
-        if (_playerCanAct !== __playerCanAct) {
-          __playerCanAct = _playerCanAct
-          setPlayerCanAct(_playerCanAct)
-        }
-        if (!!app.target !== __hasTarget) {
-          setHasTarget(!!app.target)
-          __hasTarget = !!app.target
-        }
+    const battleScene = app.game.scene.getScene('battle') as BattleScene
+    if (battleScene) {
+      const pet = battleScene.localPlayer?.pet?.model
+      const player = battleScene.localPlayer?.model
+      if (pet) {
+        setPetCanAct(pet.canAct)
+        pet.listen('canAct', (value) => {
+          setPetCanAct(value)
+        })
       }
-    }, 500)
-    return () => clearInterval(interval)
+      if (player) {
+        setPlayerCanAct(player.canAct)
+        player.listen('canAct', (value) => {
+          setPlayerCanAct(value)
+        })
+      }
+    }
   }, [setPlayerCanAct, setPetCanAct, setHasTarget])
 
   const getTargetData = () => {
@@ -89,8 +80,12 @@ export function BattleActions() {
     return undefined
   }
   const onPlayerAction = () => {
+    console.log(app.target)
+    if (!app.target) {
+      return
+    }
     const battleScene = app.game.scene.getScene('battle') as BattleScene
-    if (battleScene && app.rooms.active && hasTarget) {
+    if (battleScene && app.rooms.active) {
       app.rooms.active.send('character:battle:action', {
         battleId: battleScene.battle.battleId,
         entity: {
@@ -102,8 +97,11 @@ export function BattleActions() {
     }
   }
   const onPetAction = () => {
+    if (!app.target) {
+      return
+    }
     const battleScene = app.game.scene.getScene('battle') as BattleScene
-    if (battleScene && app.rooms.active && hasTarget) {
+    if (battleScene && app.rooms.active) {
       // console.log('send pet action')
       app.rooms.active.send('character:battle:action', {
         battleId: battleScene.battle.battleId,
@@ -126,50 +124,18 @@ export function BattleActions() {
         <BattleActionsContainer>
           {playerCanAct && (
             <div>
-              <Fab
-                color="primary"
-                onClick={onPlayerAction}
-                disabled={!hasTarget}
-              />
-              <Fab
-                color="primary"
-                onClick={onPlayerAction}
-                disabled={!hasTarget}
-              />
-              <Fab
-                color="primary"
-                onClick={onPlayerAction}
-                disabled={!hasTarget}
-              />
-              <Fab
-                color="primary"
-                onClick={onPlayerAction}
-                disabled={!hasTarget}
-              />
+              <Fab color="primary" onClick={onPlayerAction} />
+              <Fab color="primary" onClick={onPlayerAction} />
+              <Fab color="primary" onClick={onPlayerAction} />
+              <Fab color="primary" onClick={onPlayerAction} />
             </div>
           )}
           {petCanAct && (
             <div>
-              <Fab
-                color="secondary"
-                onClick={onPetAction}
-                disabled={!hasTarget}
-              />
-              <Fab
-                color="secondary"
-                onClick={onPetAction}
-                disabled={!hasTarget}
-              />
-              <Fab
-                color="secondary"
-                onClick={onPetAction}
-                disabled={!hasTarget}
-              />
-              <Fab
-                color="secondary"
-                onClick={onPetAction}
-                disabled={!hasTarget}
-              />
+              <Fab color="secondary" onClick={onPetAction} />
+              <Fab color="secondary" onClick={onPetAction} />
+              <Fab color="secondary" onClick={onPetAction} />
+              <Fab color="secondary" onClick={onPetAction} />
             </div>
           )}
         </BattleActionsContainer>

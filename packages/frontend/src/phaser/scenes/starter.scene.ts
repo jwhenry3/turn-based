@@ -1,5 +1,6 @@
 import { app } from '../../ui/app'
 import { blurAll } from '../behaviors/blurAll'
+import { InputPlugin } from '../entities/plugins/input'
 import { NetworkedScene } from './networked.scene'
 import { SceneConnector } from './scene.connector'
 
@@ -15,7 +16,9 @@ export class StarterScene extends NetworkedScene {
     this.ground.on('pointerdown', (e: Phaser.Input.Pointer) => {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
-      const input = this.localPlayer?.inputPlugin
+      const input = this.localPlayer?.pluginPipeline?.plugins?.find(
+        (p: InputPlugin) => p.mouseCooldown
+      ) as InputPlugin
       // console.log(input)
       app.selected = undefined
       if (input?.mouseTick === 0) {

@@ -1,13 +1,16 @@
 import { BattleNpc } from '../../../networking/schemas/BattleNpc'
 import { app } from '../../../ui/app'
-import { blurAll } from '../../behaviors/blurAll'
 import { BattleScene } from '../../scenes/battle.scene'
 import { SceneConnector } from '../../scenes/scene.connector'
+import { EntitySpritePlugin } from '../plugins/entity-sprite'
 import { NamePlugin } from '../plugins/name'
+import { PluginPipeline, createPluginPipeline } from '../plugins/pipeline'
 import { RectanglePlugin } from '../plugins/rectangle'
+import { ShadowPlugin } from '../plugins/shadow'
 import { BattleEntity } from './battle-entity'
 
 export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
+  pluginPipeline!: PluginPipeline
   battleLocation = 0
 
   constructor(
@@ -21,32 +24,28 @@ export class BattleSceneEnemy extends BattleEntity<BattleNpc> {
   getBattleLocation() {
     return this.scene.rightPositions[this.model.battleLocation]
   }
+  onClick() {
+    app.target = this.model
+    app.updates.next('target:stats')
+  }
   create() {
-    this.rectanglePlugin.color = '#f50'
-    this.setPosition(0, 0)
-    this.namePlugin.create(this.model.name, 'rgba(255, 120, 0)')
-    this.shadowPlugin.create()
-    this.rectanglePlugin.create()
-
-    this.add(this.shadowPlugin.shadow)
-    this.add(this.rectanglePlugin.rectangle)
-    this.add(this.namePlugin.text)
-    this.setDepth(this.y)
-    this.rectanglePlugin.rectangle.on('pointerdown', (e) => {
-      // console.log('Selected!', this.model.name)
-      if (e.downElement.tagName.toLowerCase() !== 'canvas') return
-      blurAll()
-      e.downElement.focus()
-      app.target = this.model
-      app.updates.next('target:stats')
-    })
+    this.pluginPipeline = createPluginPipeline([
+      new RectanglePlugin(this.scene, this, undefined, () => this.onClick()),
+      new ShadowPlugin(this.scene, this),
+      new NamePlugin(this.scene, this, this.model.name, 'rgba(255, 120, 0)'),
+      new EntitySpritePlugin(this.scene, this),
+    ])
+    this.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, 33, 57),
+      Phaser.Geom.Rectangle.Contains
+    )
+    this.pluginPipeline.create()
+    this.pluginPipeline.addToParent(this)
   }
 
   preUpdate() {
-    if (!this.rectanglePlugin.rectangle) this.create()
-    this.namePlugin.update()
-    this.rectanglePlugin.update()
-    this.shadowPlugin.update()
+    if (!this.pluginPipeline) this.create()
     this.handleJump()
+    this.pluginPipeline.update()
   }
 }
