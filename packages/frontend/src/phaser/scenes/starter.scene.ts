@@ -16,19 +16,11 @@ export class StarterScene extends NetworkedScene {
     this.ground.on('pointerdown', (e: Phaser.Input.Pointer) => {
       if (e.downElement.tagName.toLowerCase() !== 'canvas') return
       blurAll()
-      const input = this.localPlayer?.pluginPipeline?.plugins?.find(
-        (p: InputPlugin) => p.mouseCooldown
-      ) as InputPlugin
       // console.log(input)
       app.selected = undefined
-      if (input?.mouseTick === 0) {
-        input.mouseTick = input.mouseCooldown
-        e.updateWorldPoint(this.input.scene.cameras.main)
-        this.connector.room.send('character:move:destination', {
-          x: e.worldX,
-          y: e.worldY,
-        })
-      }
+      e.updateWorldPoint(this.input.scene.cameras.main)
+      this.localPlayer.destX = Math.round(e.worldX / 16) * 16
+      this.localPlayer.destY = Math.round(e.worldY / 16) * 16
     })
   }
 }

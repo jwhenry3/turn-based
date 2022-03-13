@@ -37,8 +37,12 @@ export class PositionData extends Schema {
   @type('number')
   destinationY?: number
 
+  useVelocity = false
+  @type('number')
+  velocityX = 0
+  @type('number')
+  velocityY = 0
   nextX = 100
-
   nextY = 100
 
   isWithinBounds = true

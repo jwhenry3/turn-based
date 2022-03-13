@@ -27,6 +27,7 @@ export function createCharacter(model: CharacterModel, clientId: string) {
     x: model.position.x,
     y: model.position.y,
     map: model.position.map,
+    useVelocity: true,
     movement: new Movement({
       facing: model.position.facing,
     }),

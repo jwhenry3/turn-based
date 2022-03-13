@@ -35,6 +35,15 @@ export default function Mmorpg() {
           autoCenter: Phaser.Scale.Center.CENTER_BOTH,
           autoRound: true,
         },
+        physics: {
+          default: 'arcade',
+          arcade: {
+            debug: true,
+            gravity: {
+              y:0
+            }
+          }
+        },
         input: {
           keyboard: {
             target: node

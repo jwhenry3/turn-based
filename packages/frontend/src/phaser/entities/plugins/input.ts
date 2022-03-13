@@ -51,56 +51,54 @@ export class InputPlugin {
     }
   }
 
-  update() {
-    const movement: [number, number] = [0, 0]
-    if (this.keys.left) {
-      movement[0] = -1
-    }
-    if (this.keys.right) {
-      movement[0] = 1
-    }
-    if (this.keys.up) {
-      movement[1] = -1
-    }
-    if (this.keys.down) {
-      movement[1] = 1
-    }
-    // if (this.keys.jump) {
-    //   if (this.entity.jumpCurrent === 0) {
-    //     // console.log('jump!')
-    //     this.entity.animateJump = true
-    //   }
-    // }
-    if (this.mouseTick > 0) {
-      this.mouseTick--
-    }
+  lastDestX?: number = undefined
+  lastDestY?: number = undefined
+  lastVelX = 0
+  lastVelY = 0
 
-    const pads = this.input.gamepad.getAll()
-    if (pads.length > 0) {
-      for (const pad of pads) {
-        const x = Math.round(pad.getAxisValue(0) * 1.5)
-        const y = Math.round(pad.getAxisValue(1) * 1.5)
-        if (x !== 0 || y !== 0) {
-          movement[0] = x > 0 ? 1 : x < 0 ? -1 : 0
-          movement[1] = y > 0 ? 1 : y < 0 ? -1 : 0
-        }
+  moveTick = 0
+  update() {
+    const destX = this.owner.destX
+    const destY = this.owner.destY
+    const { x, y } = this.owner
+
+    const [velocityX, velocityY] = this.owner.updateVelocityForDestination(
+      destX,
+      destY
+    )
+    if (
+      Math.round(this.owner.x) !== Math.round(this.owner.model.position.x) ||
+      Math.round(this.owner.y) !== Math.round(this.owner.model.position.y)
+    ) {
+      if (this.moveTick === 0 || this.moveTick % 30 === 0) {
+        this.scene.connector.room.send('character:move', {
+          x: Math.round(x),
+          y: Math.round(y),
+        })
       }
-    }
-    if (movement[0] !== this.movement[0] || movement[1] !== this.movement[1]) {
-      this.movement = movement
-      this.onChange(movement)
+      this.moveTick++
     }
     if (
-      this.owner.model.position.destinationX &&
-      this.owner.model.position.destinationY
+      velocityX !== this.owner.model.position.velocityX ||
+      velocityY !== this.owner.model.position.velocityY
     ) {
-      this.scene.destinationPointer.setPosition(
-        this.owner.model.position.destinationX,
-        this.owner.model.position.destinationY
-      )
-      this.scene.destinationPointer.setVisible(true)
-    } else {
-      this.scene.destinationPointer.setVisible(false)
+      this.owner.body.setVelocity(velocityX, velocityY)
+      this.scene.connector.room.send('character:velocity', {
+        x: velocityX,
+        y: velocityY,
+      })
+    }
+    this.owner.moving = Boolean(velocityX || velocityY)
+
+    if (destX !== this.lastDestX || destY !== this.lastDestY) {
+      this.lastDestX = destX
+      this.lastDestY = destY
+      if (destX && destY) {
+        this.scene.destinationPointer.setPosition(destX, destY)
+        this.scene.destinationPointer.setVisible(true)
+      } else {
+        this.scene.destinationPointer.setVisible(false)
+      }
     }
   }
   destroy() {

@@ -22,6 +22,7 @@ export class NpcEntity extends MovableEntity<Npc> {
   }
 
   create() {
+    super.create()
     this.pluginPipeline = createPluginPipeline([
       new MovementPlugin(this.scene, this),
       new RectanglePlugin(this.scene, this, () => this.onClick()),

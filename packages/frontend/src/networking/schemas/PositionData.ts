@@ -16,4 +16,6 @@ export class PositionData extends Schema {
     @type(Movement) public movement: Movement = new Movement();
     @type("number") public destinationX!: number;
     @type("number") public destinationY!: number;
+    @type("number") public velocityX!: number;
+    @type("number") public velocityY!: number;
 }

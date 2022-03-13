@@ -17,6 +17,5 @@ export class BattleNpc extends BattleNpcType {
     @type("string") public element!: string;
     @type("number") public level!: number;
     @type("number") public expYield!: number;
-    @type("number") public cooldown!: number;
     @type(Statistics) public stats: Statistics = new Statistics();
 }

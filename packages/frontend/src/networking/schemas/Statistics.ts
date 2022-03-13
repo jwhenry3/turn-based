@@ -13,6 +13,10 @@ export class Statistics extends Schema {
     @type("number") public currentExp!: number;
     @type("number") public maxExpForCurrentLevel!: number;
     @type("number") public availableStatPoints!: number;
+    @type("string") public damageType!: string;
+    @type("string") public weaponCategory!: string;
+    @type("string") public damageElement!: string;
+    @type("number") public baseDamage!: number;
     @type(Attribute) public maxHp: Attribute = new Attribute();
     @type(Attribute) public hp: Attribute = new Attribute();
     @type(Attribute) public maxMp: Attribute = new Attribute();

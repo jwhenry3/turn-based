@@ -17,6 +17,9 @@ export class PlayerEntity extends MovableEntity<Character> {
   battleId?: string
   pet?: PetEntity
 
+  destX = undefined
+  destY = undefined
+
   hasCreated = false
 
   get isLocalPlayer() {
@@ -38,6 +41,7 @@ export class PlayerEntity extends MovableEntity<Character> {
     })
   }
   create() {
+    super.create()
     const plugins: Plugin[] = [
       new MovementPlugin(this.scene, this),
       new RectanglePlugin(this.scene, this, () => this.onClick()),

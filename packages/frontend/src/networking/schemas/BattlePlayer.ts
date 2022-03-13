@@ -11,9 +11,9 @@ import { Statistics } from './Statistics'
 
 export class BattlePlayer extends Schema {
     @type("string") public characterId!: string;
+    @type("string") public name!: string;
     @type("number") public health!: number;
     @type("number") public mana!: number;
-    @type("number") public cooldown!: number;
     @type(BattlePet) public pet: BattlePet = new BattlePet();
     @type("boolean") public canAct!: boolean;
     @type(Statistics) public stats: Statistics = new Statistics();

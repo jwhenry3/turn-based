@@ -9,6 +9,7 @@ import { Schema, type, ArraySchema, MapSchema, SetSchema, DataChange } from '@co
 
 
 export class ItemDrop extends Schema {
-    @type("number") public rate!: number;
+    @type("number") public chance!: number;
+    @type("number") public quantity!: number;
     @type("string") public itemId!: string;
 }

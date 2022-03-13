@@ -23,6 +23,7 @@ export class PetEntity extends MovableEntity<PetNpc> {
     })
   }
   create() {
+    super.create()
     this.pluginPipeline = createPluginPipeline([
       new MovementPlugin(this.scene, this),
       new RectanglePlugin(this.scene, this, () => this.onClick()),

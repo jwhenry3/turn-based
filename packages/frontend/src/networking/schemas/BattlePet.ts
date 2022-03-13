@@ -9,12 +9,12 @@ import { Schema, type, ArraySchema, MapSchema, SetSchema, DataChange } from '@co
 import { Statistics } from './Statistics'
 
 export class BattlePet extends Schema {
+    @type("string") public name!: string;
     @type("string") public characterId!: string;
     @type("string") public petId!: string;
     @type("string") public npcTypeId!: string;
     @type("number") public health!: number;
     @type("number") public mana!: number;
-    @type("number") public cooldown!: number;
     @type("boolean") public canAct!: boolean;
     @type(Statistics) public stats: Statistics = new Statistics();
 }

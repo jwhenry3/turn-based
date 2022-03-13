@@ -111,18 +111,10 @@ export class MmorpgMapRoom extends Room {
     return [0, 0]
   }
   moveEntity(position: PositionData) {
-    if (!isNaN(position.destinationX) && !isNaN(position.destinationY)) {
-      // alter axes based on if a destination is supplied
-      const [horizontal, vertical] = this.moveTowards(position)
-      position.movement.horizontal = horizontal as any
-      position.movement.vertical = vertical as any
-    }
     if (
       position.movement.horizontal === 0 &&
       position.movement.vertical === 0
     ) {
-      position.destinationX = undefined
-      position.destinationY = undefined
       if (this.movementUpdates.includes(position)) {
         this.movementUpdates.splice(this.movementUpdates.indexOf(position), 1)
       }
@@ -140,21 +132,35 @@ export class MmorpgMapRoom extends Room {
 
   setPlayerMovement(
     character: Character,
-    { horizontal, vertical }: { horizontal: 1 | -1 | 0; vertical: 1 | -1 | 0 }
-  ) {
-    if (!character.isInBattle && (horizontal !== 0 || vertical !== 0)) {
-      character.position.destinationX = undefined
-      character.position.destinationY = undefined
-      character.position.movement.horizontal = horizontal
-      character.position.movement.vertical = vertical
-      if (!this.movementUpdates.includes(character.position)) {
-        this.movementUpdates.push(character.position)
-      }
-      return
+    {
+      x,
+      y,
+      velocityX,
+      velocityY,
+    }: {
+      x: number
+      y: number
+      velocityX: number
+      velocityY: number
     }
-    if (this.movementUpdates.includes(character.position)) {
-      character.position.movement.horizontal = 0
-      character.position.movement.vertical = 0
+  ) {
+    if (!character.isInBattle) {
+      console.log(
+        x,
+        y,
+        velocityX,
+        velocityY,
+        character.position.x,
+        character.position.y
+      )
+      const [diffX, diffY] = [
+        x - character.position.x,
+        y - character.position.y,
+      ]
+      character.position.x = x
+      character.position.y = y
+      character.position.velocityX = velocityX
+      character.position.velocityY = velocityY
     }
   }
 
@@ -173,20 +179,21 @@ export class MmorpgMapRoom extends Room {
         handler.update()
       })
     }, 1000)
-    this.onMessage('character:move', (client, { horizontal, vertical }) => {
+    this.onMessage('character:move', (client, { x, y }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {
-        this.setPlayerMovement(character, { horizontal, vertical })
+        character.position.x = x
+        character.position.y = y
+        if (character.node) {
+          this.hash.update(character.node)
+        }
       }
     })
-    this.onMessage('character:move:destination', (client, { x, y }) => {
+    this.onMessage('character:velocity', (client, { x, y }) => {
       const character = this.state.playersByClient.get(client.sessionId)
       if (character) {
-        character.position.destinationX = x
-        character.position.destinationY = y
-        if (!this.movementUpdates.includes(character.position)) {
-          this.movementUpdates.push(character.position)
-        }
+        character.position.velocityX = x
+        character.position.velocityY = y
       }
     })
     this.onMessage('chat:map', (client, { message }) => {
