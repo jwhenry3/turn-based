@@ -19,8 +19,8 @@ export class StarterScene extends NetworkedScene {
       // console.log(input)
       app.selected = undefined
       e.updateWorldPoint(this.input.scene.cameras.main)
-      this.localPlayer.destX = Math.round(e.worldX / 16) * 16
-      this.localPlayer.destY = Math.round(e.worldY / 16) * 16
+      this.localPlayer.destX = Math.round(e.worldX / 8) * 8
+      this.localPlayer.destY = Math.round(e.worldY / 8) * 8
     })
   }
 }
